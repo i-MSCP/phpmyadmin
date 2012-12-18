@@ -1,0 +1,20 @@
+{
+	"name":"iMSCP/phpmyadmin",
+	"description":"iMSCP tools - PhpMyadmin - MySQL administration tool",
+	"authors":[
+	{
+		"name":"PhpMyAdmin Team",
+		"homepage":"http://www.phpmyadmin.net"
+	}
+],
+	"license":"GPL-2.0",
+	"keywords":[
+		"imscp",
+		"phpmyadmin",
+		"mysql",
+		"tools"
+	],
+	"require":{
+		"PHP":">=5.2"
+	}
+}
