@@ -83,7 +83,7 @@ $cfg['Servers'][$i]['controlpass'] = '{PMA_PASS}';
 /**
  * Hidden databases
  */
-$cfg['Servers'][$i]['hide_db'] = '(information_schema|phpmyadmin|mysql)';
+$cfg['Servers'][$i]['hide_db'] = '(information_schema|performance_schema|phpmyadmin|mysql)';
 
 /**
  * Disabling some warnings (disabled features, suhosin)
