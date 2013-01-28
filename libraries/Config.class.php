@@ -98,7 +98,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '3.5.5');
+        $this->set('PMA_VERSION', '3.5.6');
         /**
          * @deprecated
          */
@@ -1374,7 +1374,7 @@ class PMA_Config
      */
     function setCookie($cookie, $value, $default = null, $validity = null, $httponly = true)
     {
-        if ($validity == null) {
+        if ($validity === null) {
             $validity = 2592000;
         }
         if (strlen($value) && null !== $default && $value === $default) {
