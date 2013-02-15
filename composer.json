@@ -1,7 +1,7 @@
 {
 	"name":"imscp/phpmyadmin",
 	"description":"iMSCP tools - PhpMyadmin - MySQL administration tool",
-	"version":"3.5.6",
+	"version":"3.5.7",
 	"authors":[
 	{
 		"name":"PhpMyAdmin Team",

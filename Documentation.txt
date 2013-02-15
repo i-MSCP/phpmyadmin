@@ -1,4 +1,4 @@
-phpMyAdmin 3.5.6 Documentation
+phpMyAdmin 3.5.7 Documentation
 
   * Top
   * Requirements
@@ -1240,8 +1240,7 @@ $cfg['PropertiesNumColumns'] integer
 $cfg['DefaultTabServer'] string
     Defines the tab displayed by default on server view. Possible values:
     "main.php" (recommended for multi-user setups), "server_databases.php",
-    "server_status.php", "server_variables.php", "server_privileges.php" or
-    "server_processlist.php".
+    "server_status.php", "server_variables.php" or "server_privileges.php".
 $cfg['DefaultTabDatabase'] string
     Defines the tab displayed by default on database view. Possible values:
     "db_structure.php", "db_sql.php" or "db_search.php".
