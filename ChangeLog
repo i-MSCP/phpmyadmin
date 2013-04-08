@@ -1,6 +1,14 @@
 phpMyAdmin - ChangeLog
 ======================
 
+3.5.8.0 (2013-04-08)
+- bug #3828 MariaDB reported as MySQL
+- bug #3854 Incorrect header for Safari 6.0
+- bug #3705 Attempt to open trigger for edit gives NULL
+- Use HTML5 DOCTYPE 
+- [security] Self-XSS on GIS visualisation page, reported by Janek Vind
+- bug #3800 Incorrect keyhandler behaviour #2
+
 3.5.7.0 (2013-02-15)
 - bug #3779 [core] Problem with backslash in enum fields
 - bug #3816 Missing server_processlist.php
