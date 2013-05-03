@@ -7,7 +7,7 @@
  * phpMyAdmin, it is not intended to be perfect code and look, only
  * shows how you can integrate this functionality in your application.
  *
- * @package PhpMyAdmin
+ * @package    PhpMyAdmin
  * @subpackage Example
  */
 
@@ -37,11 +37,12 @@ if (isset($_POST['user'])) {
     header('Content-Type: text/html; charset=utf-8');
     echo '<?xml version="1.0" encoding="utf-8"?>' . "\n";
     ?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<!DOCTYPE HTML>
+<html lang="en" dir="ltr">
 <head>
     <link rel="icon" href="../favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon" />
+    <meta charset="utf-8" />
     <title>phpMyAdmin single signon example</title>
 </head>
 <body>

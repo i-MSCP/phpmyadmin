@@ -1,14 +1,15 @@
 {
 	"name":"imscp/phpmyadmin",
 	"description":"iMSCP tools - PhpMyadmin - MySQL administration tool",
-	"version":"3.5.8.1",
+	"version":"4.0.0.0",
 	"authors":[
 	{
-		"name":"PhpMyAdmin Team",
-		"homepage":"http://www.phpmyadmin.net"
+		"name":"The phpMyAdmin Team",
+        "emai":"phpmyadmin-devel@lists.sourceforge.net",
+		"homepage":"http://www.phpmyadmin.net/home_page/team.php"
 	}
 ],
-	"license":"GPL-2.0",
+	"license":"GPL-2.0+",
 	"keywords":[
 		"imscp",
 		"phpmyadmin",
@@ -16,6 +17,6 @@
 		"tools"
 	],
 	"require":{
-		"PHP":">=5.2"
+		"PHP":">=5.2.0"
 	}
 }
