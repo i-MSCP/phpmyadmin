@@ -3760,23 +3760,13 @@ class PMA_DisplayResults
                 );
 
             } else {
-                // Prepare in  Well Known Binary(WKB) format.
+                // Prepare in  Well Known Binary (WKB) format.
 
                 if ($_SESSION['tmp_user_values']['display_binary']) {
 
                     $where_comparison = ' = ' . $column;
 
-                    if ($_SESSION['tmp_user_values']['display_binary_as_hex']
-                        && PMA_Util::containsNonPrintableAscii($column)
-                    ) {
-                        $wkbval = PMA_substr(bin2hex($column), 8);
-                    } else {
-                        $wkbval = htmlspecialchars(
-                            PMA_Util::replaceBinaryContents(
-                                $column
-                            )
-                        );
-                    }
+                    $wkbval = $this->_displayBinaryAsPrintable($column, 'binary', 8);
 
                     if ((PMA_strlen($wkbval) > $GLOBALS['cfg']['LimitChars'])
                         && ($_SESSION['tmp_user_values']['display_text'] == self::DISPLAY_PARTIAL_TEXT)
@@ -3894,17 +3884,7 @@ class PMA_DisplayResults
 
                     // user asked to see the real contents of BINARY
                     // fields
-                    if ($_SESSION['tmp_user_values']['display_binary_as_hex']
-                        && PMA_Util::containsNonPrintableAscii($column)
-                    ) {
-                        $column = bin2hex($column);
-                    } else {
-                        $column = htmlspecialchars(
-                            PMA_Util::replaceBinaryContents(
-                                $column
-                            )
-                        );
-                    }
+                    $column = $this->_displayBinaryAsPrintable($column, 'binary');
 
                 } else {
                     // we show the BINARY message and field's size
@@ -4604,7 +4584,7 @@ class PMA_DisplayResults
             $exist_rel = false;
         } else {
             // This method set the values for $map array
-            $this->_setParamForLinkForiegnKeyRelatedTables($map);
+            $this->_setParamForLinkForeignKeyRelatedTables($map);
         } // end if
         // end 2b
 
@@ -4987,7 +4967,7 @@ class PMA_DisplayResults
      *
      * @see      getTable()
      */
-    private function _setParamForLinkForiegnKeyRelatedTables(&$map)
+    private function _setParamForLinkForeignKeyRelatedTables(&$map)
     {
 
         // To be able to later display a link to the related table,
@@ -5017,7 +4997,7 @@ class PMA_DisplayResults
             } // end while
         } // end if
 
-    } // end of the '_setParamForLinkForiegnKeyRelatedTables()' function
+    } // end of the '_setParamForLinkForeignKeyRelatedTables()' function
 
 
     /**
@@ -5429,17 +5409,13 @@ class PMA_DisplayResults
                     && $_SESSION['tmp_user_values']['display_blob']
                 ) {
                     // in this case, restart from the original $content
-                    $result = htmlspecialchars(
-                        PMA_Util::replaceBinaryContents(
-                            $content
-                        )
-                    );
+                    $result = $this->_displayBinaryAsPrintable($content, 'blob');
                 }
 
                 /* Create link to download */
                 if (count($url_params) > 0) {
                     $result = '<a href="tbl_get_field.php'
-                        . PMA_generate_common_url($url_params) . '">'
+                        . PMA_generate_common_url($url_params) . '" class="disableAjax">'
                         . $result . '</a>';
                 }
             }
@@ -5943,5 +5919,44 @@ class PMA_DisplayResults
         return $buffer;
     }
 
+    /**
+     * Display binary fields as hex string for PHP <5.4, 
+     * otherwise escape the contents if it may be displayed as hex
+     *
+     * @param string $content         String to parse
+     * @param string $binary_or_blob  'binary' or 'blob'
+     * @param int    $hexlength       optional, get substring
+     *
+     * @return Displayable version of the binary string
+     *
+     * @access private
+     *
+     * @see    _getDataCellForGeometryColumns
+     *         _getDataCellForNonNumericAndNonBlobColumns
+     *         _handleNonPrintableContents
+     */
+    private function _displayBinaryAsPrintable(
+        $content, $binary_or_blob, $hexlength = null
+    ) {
+        if (PMA_PHP_INT_VERSION < 50400
+            || ($binary_or_blob === 'binary'
+                && $_SESSION['tmp_user_values']['display_binary_as_hex']
+                && PMA_Util::containsNonPrintableAscii($content)
+            )
+        ) {
+            $content = bin2hex($content);
+            if ($hexlength !== null) {
+                $content = PMA_substr($content, $hexlength);
+            }
+        } else {
+            $content = htmlspecialchars(
+                PMA_Util::replaceBinaryContents(
+                    $content
+                ),
+                ENT_SUBSTITUTE
+            );
+        }
+        return $content;
+    }
 }
 ?>

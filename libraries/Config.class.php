@@ -101,7 +101,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '4.0.0');
+        $this->set('PMA_VERSION', '4.0.1');
         /**
          * @deprecated
          */
@@ -713,12 +713,12 @@ class PMA_Config
         }
         $ch = curl_init($link);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-        curl_setopt($ch, CURLOPT_NOBODY, !$get_body);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'phpMyAdmin/' . PMA_VERSION);
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         $data = @curl_exec($ch);
         if ($data === false) {
@@ -906,7 +906,10 @@ class PMA_Config
         );
 
         // backup some settings
-        $org_fontsize = $this->settings['fontsize'];
+        $org_fontsize = '';
+        if (isset($this->settings['fontsize'])) {
+            $org_fontsize = $this->settings['fontsize'];
+        }
         // load config array
         $this->settings = PMA_arrayMergeRecursive($this->settings, $config_data);
         $GLOBALS['cfg'] = PMA_arrayMergeRecursive($GLOBALS['cfg'], $config_data);

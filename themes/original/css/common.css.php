@@ -695,11 +695,6 @@ ul#topmenu2 a {
     white-space:        nowrap;
 }
 
-/* disabled tabs */
-ul#topmenu span.tab {
-    color:              #666666;
-}
-
 fieldset.caution a {
     color:              #FF0000;
 }
@@ -771,12 +766,6 @@ ul#topmenu2 a.tabactive {
 /* to be able to cancel the bottom border, use <li class="active"> */
 ul#topmenu > li.active {
      border-bottom:      1pt solid <?php echo $GLOBALS['cfg']['MainBackground']; ?>;
-}
-
-/* disabled tabs */
-ul#topmenu span.tab,
-a.error {
-    cursor:             url(<?php echo $_SESSION['PMA_Theme']->getImgPath('error.ico');?>), default;
 }
 /* end topmenu */
 
@@ -1609,6 +1598,10 @@ input#input_import_file {
 #fieldsForm ul.table-structure-actions .submenu li {
     padding: 0.3em;
     margin: 0.1em;
+}
+
+.margin#change_column_dialog {
+    margin: 0 .5em;
 }
 
 /**
