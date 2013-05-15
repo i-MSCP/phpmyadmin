@@ -1,6 +1,28 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.0.1.0 (2013-05-14)
+- bug #3879 Import broken for CSV using LOAD DATA
+- bug #3889 When login fails and error display is active, login data is displayed
+- bug #3890 [import] Web server upload directory import fails
+- bug #3891 [import] Server upload folder import file name missing in success message 
++ rfe #1421 [auth] Add retry button on connection failure with config auth
+- bug #3894 [interface] Provide feedback if no columns selected for multi-submit
+- bug #3799 [interface] Incorrect select field change on ctrl key navigation in Firefox
+- bug #3885 [browse] display_binary_as_hex option causes unexpected behavior
+- bug #3899 Git commit links to Github missing
+- bug #3900 CSP WARN in Firefox console
+- bug #3901 Setup script warning for config auth (stored login data) shows link BBcode
+- bug #3895 [browse] Fixed getting BLOB data
+- bug #3905 [export] Custom Exporting exports all databases
+- bug #3909 [import] Import of CSV FIle to selected table doesn't work
+- bug #3904 Browsing an empty table should not display its Structure
+- bug #3908 Calendar widget improperly redirects to home 
+- bug #3918 Greyed out tabs when there are no rows fixed 
+- bug #3916 [interface] Missing scrollbar (original theme)
++ [vendor] add tcpdf path to vendor_config.php
+- bug fix compat with tcpdf >= 6.0 (tested with 6.0.012)
+
 4.0.0.0 (2013-05-03)
 + Patch #3481047 for rfe #3480477 Insert as new row enhancement
 + Patch #3480999 Activate codemirror in the query window
