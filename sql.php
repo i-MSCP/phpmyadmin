@@ -646,7 +646,13 @@ if (isset($GLOBALS['show_as_php']) || ! empty($GLOBALS['validatequery'])) {
     } while (PMA_DBI_next_result());
 
     $is_procedure = false;
-    if (stripos($full_sql_query, 'call') !== false) {
+    
+    // Since multiple query execution is anyway handled,
+    // ignore the WHERE clause of the first sql statement
+    // which might contain a phrase like 'call '
+    if (preg_match("/\bcall\b/i", $full_sql_query)
+        && empty($analyzed_sql[0]['where_clause'])
+    ) {
         $is_procedure = true;
     }
 
@@ -753,6 +759,7 @@ if (isset($GLOBALS['show_as_php']) || ! empty($GLOBALS['validatequery'])) {
     // Counts the total number of rows for the same 'SELECT' query without the
     // 'LIMIT' clause that may have been programatically added
 
+    $justBrowsing = false;
     if (empty($sql_limit_to_append)) {
         $unlim_num_rows         = $num_rows;
         // if we did not append a limit, set this to get a correct
@@ -778,6 +785,7 @@ if (isset($GLOBALS['show_as_php']) || ! empty($GLOBALS['validatequery'])) {
             && ! isset($find_real_end)
         ) {
             // "j u s t   b r o w s i n g"
+            $justBrowsing = true;
             $unlim_num_rows = PMA_Table::countRecords($db, $table);
 
         } else { // n o t   " j u s t   b r o w s i n g "
@@ -1216,6 +1224,11 @@ if ((0 == $num_rows && 0 == $unlim_num_rows) || $is_affected) {
         echo '</div>';
         echo '<div id="profilingchart" style="display:none;">';
         echo '</div>';
+        echo '<script type="text/javascript">';
+        echo 'if($.jqplot !== undefined && $.jqplot.PieRenderer !== undefined) {';
+        echo 'makeProfilingChart();';
+        echo '}';
+        echo '</script>';
         echo '</fieldset>' . "\n";
     }
 
@@ -1233,7 +1246,13 @@ if ((0 == $num_rows && 0 == $unlim_num_rows) || $is_affected) {
     // hide edit and delete links:
     // - for information_schema
     // - if the result set does not contain all the columns of a unique key
-    if (PMA_is_system_schema($db) || ! $resultSetContainsUniqueKey) {
+    //   and we are not just browing all the columns of an updatable view
+    $updatableView
+        = $justBrowsing
+        && trim($analyzed_sql[0]['select_expr_clause']) == '*'
+        && PMA_Table::isUpdatableView($db, $table);
+    $editable = $resultSetContainsUniqueKey || $updatableView;
+    if (PMA_is_system_schema($db) || ! $editable) {
         $disp_mode = 'nnnn110111';
         $msg = PMA_message::notice(
             __(
@@ -1262,7 +1281,7 @@ if ((0 == $num_rows && 0 == $unlim_num_rows) || $is_affected) {
         echo getTableHtmlForMultipleQueries(
             $displayResultsObject, $db, $sql_data, $goto,
             $pmaThemeImage, $text_dir, $printview, $url_query,
-            $disp_mode, $sql_limit_to_append, $resultSetContainsUniqueKey
+            $disp_mode, $sql_limit_to_append, $editable
         );
     } else {
         $_SESSION['is_multi_query'] = false;
@@ -1270,7 +1289,7 @@ if ((0 == $num_rows && 0 == $unlim_num_rows) || $is_affected) {
             $unlim_num_rows, $fields_meta, $is_count, $is_export, $is_func,
             $is_analyse, $num_rows, $fields_cnt, $querytime, $pmaThemeImage,
             $text_dir, $is_maint, $is_explain, $is_show, $showtable,
-            $printview, $url_query, $resultSetContainsUniqueKey
+            $printview, $url_query, $editable
         );
 
         echo $displayResultsObject->getTable($result, $disp_mode, $analyzed_sql);
@@ -1462,27 +1481,24 @@ function PMA_getTableNameBySQL($sql, $tables)
  * Generate table html when SQL statement have multiple queries
  * which return displayable results
  *
- * @param PMA_DisplayResults $displayResultsObject       object
- * @param string             $db                         database name
- * @param array              $sql_data                   information about
- *                                                        SQL statement
- * @param string             $goto                       URL to go back in case
- *                                                        of errors
- * @param string             $pmaThemeImage              path for theme images
- *                                                        directory
- * @param string             $text_dir                   text direction
- * @param string             $printview                  whether printview is enabled
- * @param string             $url_query                  URL query
- * @param array              $disp_mode                  the display mode
- * @param string             $sql_limit_to_append        limit clause
- * @param bool               $resultSetContainsUniqueKey result contains a unique key
+ * @param PMA_DisplayResults $displayResultsObject object
+ * @param string             $db                   database name
+ * @param array              $sql_data             information about SQL statement
+ * @param string             $goto                 URL to go back in case of errors
+ * @param string             $pmaThemeImage        path for theme images directory
+ * @param string             $text_dir             text direction
+ * @param string             $printview            whether printview is enabled
+ * @param string             $url_query            URL query
+ * @param array              $disp_mode            the display mode
+ * @param string             $sql_limit_to_append  limit clause
+ * @param bool               $editable             whether result set is editable
  *
  * @return string   $table_html   html content
  */
 function getTableHtmlForMultipleQueries(
     $displayResultsObject, $db, $sql_data, $goto, $pmaThemeImage,
     $text_dir, $printview, $url_query, $disp_mode, $sql_limit_to_append,
-    $resultSetContainsUniqueKey
+    $editable
 ) {
     $table_html = '';
 
@@ -1592,7 +1608,7 @@ function getTableHtmlForMultipleQueries(
                 $unlim_num_rows, $fields_meta, $is_count, $is_export, $is_func,
                 $is_analyse, $num_rows, $fields_cnt, $querytime, $pmaThemeImage,
                 $text_dir, $is_maint, $is_explain, $is_show, $showtable,
-                $printview, $url_query, $resultSetContainsUniqueKey
+                $printview, $url_query, $editable
             );
         }
 

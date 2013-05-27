@@ -101,7 +101,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '4.0.1');
+        $this->set('PMA_VERSION', '4.0.2');
         /**
          * @deprecated
          */
@@ -159,7 +159,7 @@ class PMA_Config
     {
         if (PMA_getenv('HTTP_USER_AGENT')) {
             $HTTP_USER_AGENT = PMA_getenv('HTTP_USER_AGENT');
-        } elseif (! isset($HTTP_USER_AGENT)) {
+        } else {
             $HTTP_USER_AGENT = '';
         }
 

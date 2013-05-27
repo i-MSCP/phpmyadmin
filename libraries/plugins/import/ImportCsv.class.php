@@ -83,6 +83,12 @@ class ImportCsv extends AbstractImportCsv
             );
             $generalOptions->addProperty($leaf);
         }
+
+        $leaf = new BoolPropertyItem();
+        $leaf->setName("ignore");
+        $leaf->setText(__('Do not abort on INSERT error'));
+        $generalOptions->addProperty($leaf);
+
     }
 
     /**
@@ -105,8 +111,11 @@ class ImportCsv extends AbstractImportCsv
      */
     public function doImport()
     {
-        global $db, $table, $csv_terminated, $csv_enclosed, $csv_escaped, $csv_new_line;
-        global $error, $timeout_passed, $finished;
+        global $db, $table, $csv_terminated, $csv_enclosed, $csv_escaped,
+            $csv_new_line, $csv_columns, $err_url;
+        // $csv_replace and $csv_ignore should have been here,
+        // but we use directly from $_POST
+        global $error, $timeout_passed, $finished, $message;
 
         $replacements = array(
             '\\n'   => "\n",
@@ -167,11 +176,11 @@ class ImportCsv extends AbstractImportCsv
         $required_fields = 0;
 
         if (! $this->_getAnalyze()) {
-            if (isset($csv_replace)) {
+            if (isset($_POST['csv_replace'])) {
                 $sql_template = 'REPLACE';
             } else {
                 $sql_template = 'INSERT';
-                if (isset($csv_ignore)) {
+                if (isset($_POST['csv_ignore'])) {
                     $sql_template .= ' IGNORE';
                 }
             }

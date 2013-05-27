@@ -1,6 +1,26 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.0.2.0 (2013-05-24)
+- bug #3902 Cannot browse when table name contains keyword "call"
++ center loading indicator for navigation refresh, related to bug #3920
+- bug #3925 Table sorting in navigation panel is case-sensitive
+- bug #3915 Import of CSV file (Replace table data with file) with duplicate values
+- bug #3907 undefined variables, function parameter problems
+- bug #3898 Structure not refreshed after column drop 
+- bug #3926 View is not updatable
+- bug #3919 PropertiesIconic not honored
+- bug #3930 Databases to choose for specific privileges show up escaped
+- bug #3910 Export database with empty table as a php array, does not produce valid PHP
+- bug #3936 Query profiler chart not loading from SQL Query page
+- bug #3946 Missing CSV import option "Do not abort on INSERT error"
+- bug #3943 Missing Operations>Table options>AUTO_INCREMENT
+- bug Missing CREATE DATABASE statement when exporting at database level
+- bug #3924 Show warning when CSV file does not contain data for all columns
+- bug #3947 Missing Sql Query after modify structure
+- bug #3948 Server export problems
+- bug #3917 CountTables directive is deprecated
+
 4.0.1.0 (2013-05-14)
 - bug #3879 Import broken for CSV using LOAD DATA
 - bug #3889 When login fails and error display is active, login data is displayed
