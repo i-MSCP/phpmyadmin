@@ -101,7 +101,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '4.0.2');
+        $this->set('PMA_VERSION', '4.0.3');
         /**
          * @deprecated
          */
@@ -1769,7 +1769,7 @@ class PMA_Config
     }
 
     /**
-     * sets cookie if value is different from current cokkie value,
+     * sets cookie if value is different from current cookie value,
      * or removes if value is equal to default
      *
      * @param string $cookie   name of cookie to remove
