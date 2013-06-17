@@ -107,8 +107,7 @@ if ($server > 0) {
 
 echo '<div id="maincontainer">' . "\n";
 echo '<div id="main_pane_left">';
-if ($server > 0
-    || (! $cfg['NavigationDisplayServers'] && count($cfg['Servers']) > 1)
+if ($server > 0 || count($cfg['Servers']) > 1
 ) {
     echo '<div class="group">';
     echo '<h2>' . __('General Settings') . '</h2>';
@@ -117,8 +116,12 @@ if ($server > 0
     /**
      * Displays the MySQL servers choice form
      */
-    if (! $cfg['NavigationDisplayServers']
-        && (count($cfg['Servers']) > 1 || $server == 0 && count($cfg['Servers']) == 1)
+    if ($cfg['ServerDefault'] == 0 
+        || (! $cfg['NavigationDisplayServers']
+            && (count($cfg['Servers']) > 1 
+                || ($server == 0 && count($cfg['Servers']) == 1)
+            )
+        )
     ) {
         echo '<li id="li_select_server" class="no_bullets" >';
         include_once 'libraries/select_server.lib.php';
@@ -519,6 +522,8 @@ if (function_exists('PMA_DBI_get_client_info') && !PMA_DRIZZLE) {
  */
 if ($cfg['SuhosinDisableWarning'] == false
     && @ini_get('suhosin.request.max_value_length')
+    // warn about Suhosin only if its simulation mode is not enabled
+    && @ini_get('suhosin.simulation') == '0'
 ) {
     trigger_error(
         sprintf(
