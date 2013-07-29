@@ -1,22 +1,22 @@
 {
-	"name":"imscp/phpmyadmin",
-	"description":"iMSCP tools - PhpMyadmin - MySQL administration tool",
-	"version":"4.0.4.2",
-	"authors":[
-	{
-		"name":"The phpMyAdmin Team",
-        "emai":"phpmyadmin-devel@lists.sourceforge.net",
-		"homepage":"http://www.phpmyadmin.net/home_page/team.php"
-	}
-],
-	"license":"GPL-2.0+",
-	"keywords":[
-		"imscp",
-		"phpmyadmin",
-		"mysql",
-		"tools"
-	],
-	"require":{
-		"PHP":">=5.2.0"
-	}
+    "name": "imscp/phpmyadmin",
+    "description": "iMSCP tools - PhpMyadmin - MySQL administration tool",
+    "version": "4.0.4.2",
+    "authors": [
+        {
+            "name": "The phpMyAdmin Team",
+            "emai": "phpmyadmin-devel@lists.sourceforge.net",
+            "homepage": "http://www.phpmyadmin.net/home_page/team.php"
+        }
+    ],
+    "license": "GPL-2.0+",
+    "keywords": [
+        "imscp",
+        "phpmyadmin",
+        "mysql",
+        "tools"
+    ],
+    "require": {
+        "PHP": ">=5.2.0"
+    }
 }
