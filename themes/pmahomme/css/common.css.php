@@ -1792,7 +1792,7 @@ div.upload_progress_bar_outer
 
 div.upload_progress_bar_inner
 {
-    background-color: <?php echo $GLOBALS['cfg']['NaviBackground']; ?>;
+    background-color: <?php echo $GLOBALS['cfg']['NaviPointerBackground']; ?>;
     width: 0;
     height: 12px;
     margin: 1px;
@@ -2754,3 +2754,12 @@ body .ui-widget {
     color: #235A81;
 }
 
+/* over-riding jqplot-yaxis class */
+.jqplot-yaxis {
+    left:0px !important;
+    min-width:25px;
+    width:auto;
+}
+.jqplot-axis {
+    overflow:hidden;
+}

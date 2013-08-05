@@ -535,14 +535,18 @@ class PMA_DisplayResults
     ) {
 
         $caption_output = '';
-        // for true or 'both'
-        if ($GLOBALS['cfg']['NavigationBarIconic']) {
+        if (in_array(
+            $GLOBALS['cfg']['TableNavigationLinksMode'],
+            array('icons', 'both')
+            )
+        ) {
             $caption_output .= $caption;
         }
 
-        // for false or 'both'
-        if (($GLOBALS['cfg']['NavigationBarIconic'] === false)
-            || ($GLOBALS['cfg']['NavigationBarIconic'] === self::POSITION_BOTH)
+        if (in_array(
+            $GLOBALS['cfg']['TableNavigationLinksMode'],
+            array('text', 'both')
+            )
         ) {
             $caption_output .= '&nbsp;' . $title;
         }
@@ -2553,7 +2557,7 @@ class PMA_DisplayResults
                 // We need to copy the value
                 // or else the == 'both' check will always return true
 
-                if ($GLOBALS['cfg']['PropertiesIconic'] === self::POSITION_BOTH) {
+                if ($GLOBALS['cfg']['ActionLinksMode'] === self::POSITION_BOTH) {
                     $iconic_spacer = '<div class="nowrap">';
                 } else {
                     $iconic_spacer = '';
@@ -5391,7 +5395,9 @@ class PMA_DisplayResults
         $result .= ']';
 
         if (gettype($transformation_plugin) == "object"
-            && strpos($transformation_plugin->getMIMESubtype(), 'Octetstream')
+            && (strpos($transformation_plugin->getMIMESubtype(), 'Octetstream')
+            // if we want to use a text transformation on a BLOB column
+            || strpos($transformation_plugin->getMIMEtype(), 'Text') !== false)
         ) {
             $result = $content;
         }

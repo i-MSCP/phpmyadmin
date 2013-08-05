@@ -1,6 +1,25 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.0.5.0 (2013-08-04)
+- bug #3977 Not detected configuration storage
+- bug #3970 Pressing enter in the filter field reloads page
+- bug #3984 Cannot insert in this table (PHP < 5.4)
+- bug #3989 Reloading privileges does not update the interface
+- bug #3960 NavigationBarIconic config not honored
+- bug #3985 Call to undefined function mb_detect_encoding
+- bug #4007 Analyze option not shown for InnoDB tables
+- bug #4015 Forcing a storage engine for configuration storage
+- bug Incorrect Drizzle 7 detection
+- bug #4019 Create database if not exists (export): add an option to the
+  interface to enable generating CREATE DATABASE and USE (false by default)
+- bug #4012 Crash on CSV file import
+- bug #4009 Statistic Monitor shows only last 3 digits in graph
+- bug #3998 Non-permanent SQL history not working
+- bug #3578 Transformations for text/plain on a BLOB column
+- [security] Improved protection against cross framing, see PMASA-2013-10
++ Reinstated configuration directive: AllowThirdPartyFraming
+
 4.0.4.2 (2013-07-28)
 - [security] Fix stored XSS in Server status monitor, see PMASA-2013-9
 - [security] Fix stored XSS in navigation panel logo link, see PMASA-2013-9
@@ -20,7 +39,6 @@ phpMyAdmin - ChangeLog
 - bug #3961 Avoid Suhosin warning when in simulation mode
 - bug #3897 Row Statistics and Space usage bugs
 - bug #3966 Only display "table has no unique column" message when applicable
-- bug #3960 NavigationBarIconic config not honored
 - bug #3965 Default language wrong with zh-TW
 - bug #3921 Call to undefined function PMA_isSuperuser() if default server is
 not set 
@@ -198,6 +216,20 @@ underscore
 - [security] Global variables overwrite in export.php, reported by Janek Vind
   (see PMASA-2013-5)
 - bug #3892 [export] SQL Export files are empty
+
+3.5.8.2 (2013-07-28)
+- [security] Fix self-XSS in "Showing rows", see PMASA-2013-8
+- [security] Fix self-XSS in Display chart, see PMASA-2013-9
+- [security] Fix stored XSS in Server status monitor, see PMASA-2013-9
+- [security] Fix stored XSS in navigation panel logo link, see PMASA-2013-9
+- [security] Fix self-XSS in setup, trusted proxies validation, see PMASA-2013-9
++ [security] JSON content type header for version_check.php, see PMASA-2013-9
++ [security] Backport fix for jQuery issue #9521 from jQuery 1.6.3, see PMASA-2013-9
++ [security] Fix full path disclosure, see PMASA-2013-12
++ [security] Fix control user SQL injection in pmd_pdf.php, see PMASA-2013-15
++ [security] Fix control user SQL injection in schema_export.php, see PMASA-2013-15
+- [security] Fix self-XSS in schema export, see PMASA-2013-14
+- [security] Fix unencoded json object, see PMASA-2013-11
 
 3.5.8.1 (2013-04-24)
 - [security] Remote code execution (preg_replace), reported by Janek Vind

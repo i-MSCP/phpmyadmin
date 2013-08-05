@@ -84,6 +84,14 @@ $cfg['ReservedWordDisableWarning'] = false;
 $cfg['TranslationWarningThreshold'] = 80;
 
 /**
+ * Allows phpMyAdmin to be included from a other document in a frame;
+ * setting this to true is a potential security hole
+ *
+ * @global boolean $cfg['AllowThirdPartyFraming']
+ */
+$cfg['AllowThirdPartyFraming'] = false;
+
+/**
  * The 'cookie' auth_type uses blowfish algorithm to encrypt the password. If
  * at least one server configuration uses 'cookie' auth_type, enter here a
  * pass phrase that will be used by blowfish. The maximum length seems to be 46
@@ -978,12 +986,12 @@ $cfg['HideStructureActions'] = true;
  */
 
 /**
- * Use icons instead of text for the navigation bar buttons
- * and on right panel top menu (server db table) (true|false|'both')
+ * Use icons instead of text for the navigation bar buttons (table browse)
+ * ('text'|'icons'|'both')
  *
- * @global string $cfg['NavigationBarIconic']
+ * @global string $cfg['TableNavigationLinksMode']
  */
-$cfg['NavigationBarIconic'] = true;
+$cfg['TableNavigationLinksMode'] = 'icons';
 
 /**
  * Defines whether a user should be displayed a "show all (records)"
@@ -1153,11 +1161,18 @@ $cfg['CompressOnFly'] = true;
  */
 
 /**
- * Use icons instead of text for the table display of a database (true|false|'both')
+ * How to display the menu tabs ('icons'|'text'|'both')
  *
- * @global boolean $cfg['PropertiesIconic']
+ * @global boolean $cfg['TabsMode']
  */
-$cfg['PropertiesIconic'] = 'both';
+$cfg['TabsMode'] = 'both';
+
+/**
+ * How to display various action links ('icons'|'text'|'both')
+ *
+ * @global boolean $cfg['ActionLinksMode']
+ */
+$cfg['ActionLinksMode'] = 'both';
 
 /**
  * How many columns should be used for table display of a database?
@@ -1719,6 +1734,13 @@ $cfg['Export']['sql_disable_fk'] = false;
  * @global boolean $cfg['Export']['sql_use_transaction']
  */
 $cfg['Export']['sql_use_transaction'] = false;
+
+/**
+ *
+ *
+ * @global boolean $cfg['Export']['sql_create_database']
+ */
+$cfg['Export']['sql_create_database'] = false;
 
 /**
  *
