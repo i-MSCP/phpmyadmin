@@ -146,10 +146,10 @@ class PMA_Header
      */
     private function _addDefaultScripts()
     {
-        $this->_scripts->addFile('jquery/jquery-1.8.3.js');
+        $this->_scripts->addFile('jquery/jquery-1.8.3.min.js');
         $this->_scripts->addFile('ajax.js');
         $this->_scripts->addFile('keyhandler.js');
-        $this->_scripts->addFile('jquery/jquery-ui-1.9.2.custom.js');
+        $this->_scripts->addFile('jquery/jquery-ui-1.9.2.custom.min.js');
         $this->_scripts->addFile('jquery/jquery.sprintf.js');
         $this->_scripts->addFile('jquery/jquery.cookie.js');
         $this->_scripts->addFile('jquery/jquery.mousewheel.js');
@@ -158,6 +158,12 @@ class PMA_Header
         $this->_scripts->addFile('jquery/jquery.ba-hashchange-1.3.js');
         $this->_scripts->addFile('jquery/jquery.debounce-1.0.5.js');
         $this->_scripts->addFile('jquery/jquery.menuResizer-1.0.js');
+
+        // Cross-framing protection
+        if ($GLOBALS['cfg']['AllowThirdPartyFraming'] === false) {
+            $this->_scripts->addFile('cross_framing_protection.js');
+        }
+
         $this->_scripts->addFile('rte.js');
 
         // Here would not be a good place to add CodeMirror because
@@ -449,6 +455,12 @@ class PMA_Header
          */
         $GLOBALS['now'] = gmdate('D, d M Y H:i:s') . ' GMT';
         if (! defined('TESTSUITE')) {
+            /* Prevent against ClickJacking by disabling framing */
+            if (! $GLOBALS['cfg']['AllowThirdPartyFraming']) {
+                header(
+                    'X-Frame-Options: DENY'
+                );
+            }
             header(
                 "X-Content-Security-Policy: default-src 'self' "
                 . $GLOBALS['cfg']['CSPAllow'] . ';'
@@ -519,6 +531,9 @@ class PMA_Header
         $retval  = '<meta charset="utf-8" />';
         $retval .= '<meta name="robots" content="noindex,nofollow" />';
         $retval .= '<meta http-equiv="X-UA-Compatible" content="IE=Edge">';
+        if (! $GLOBALS['cfg']['AllowThirdPartyFraming']) {
+            $retval .= '<style>html{display: none;}</style>';
+        }
         return $retval;
     }
 

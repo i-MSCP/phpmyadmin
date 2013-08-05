@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; phpMyAdmin 4.0.4.2 documentation</title>
+    <title>Configuration &mdash; phpMyAdmin 4.0.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.0.4.2',
+        VERSION:     '4.0.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.0.4.2 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.0.5 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.0.4.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -220,6 +220,24 @@ warning will not longer be displayed</p>
 </tbody>
 </table>
 <p>Show warning about incomplete translations on certain threshold.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cfg_AllowThirdPartyFraming">
+<tt class="descname">$cfg['AllowThirdPartyFraming']</tt><a class="headerlink" href="#cfg_AllowThirdPartyFraming" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">boolean</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body">false</td>
+</tr>
+</tbody>
+</table>
+<p>Setting this to <tt class="docutils literal"><span class="pre">true</span></tt> allows phpMyAdmin to be included inside a frame,
+and is a potential security hole allowing cross-frame scripting attacks or
+clickjacking.</p>
 </dd></dl>
 
 </div>
@@ -2419,21 +2437,20 @@ drop-down.</p>
 <div class="section" id="browse-mode">
 <h2>Browse mode<a class="headerlink" href="#browse-mode" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
-<dt id="cfg_NavigationBarIconic">
-<tt class="descname">$cfg['NavigationBarIconic']</tt><a class="headerlink" href="#cfg_NavigationBarIconic" title="Permalink to this definition">¶</a></dt>
+<dt id="cfg_TableNavigationLinksMode">
+<tt class="descname">$cfg['TableNavigationLinksMode']</tt><a class="headerlink" href="#cfg_TableNavigationLinksMode" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">string</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body">true</td>
+<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body"><tt class="docutils literal"><span class="pre">'icons'</span></tt></td>
 </tr>
 </tbody>
 </table>
-<p>Defines whether navigation bar buttons contain text or symbols only. A
-value of true displays icons, false displays text and &#8216;both&#8217; displays
-both icons and text.</p>
+<p>Defines whether the table navigation links contain <tt class="docutils literal"><span class="pre">'icons'</span></tt>, <tt class="docutils literal"><span class="pre">'text'</span></tt>
+or <tt class="docutils literal"><span class="pre">'both'</span></tt>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -2791,8 +2808,8 @@ identify what they mean.</p>
 <div class="section" id="tabs-display-settings">
 <h2>Tabs display settings<a class="headerlink" href="#tabs-display-settings" title="Permalink to this headline">¶</a></h2>
 <dl class="option">
-<dt id="cfg_PropertiesIconic">
-<tt class="descname">$cfg['PropertiesIconic']</tt><a class="headerlink" href="#cfg_PropertiesIconic" title="Permalink to this definition">¶</a></dt>
+<dt id="cfg_TabsMode">
+<tt class="descname">$cfg['TabsMode']</tt><a class="headerlink" href="#cfg_TabsMode" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -2803,10 +2820,26 @@ identify what they mean.</p>
 </tr>
 </tbody>
 </table>
-<p>If set to <tt class="docutils literal"><span class="pre">true</span></tt>, will display icons instead of text for db and table
+<p>Defines whether the menu tabs contain <tt class="docutils literal"><span class="pre">'icons'</span></tt>, <tt class="docutils literal"><span class="pre">'text'</span></tt> or <tt class="docutils literal"><span class="pre">'both'</span></tt>.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cfg_ActionLinksMode">
+<tt class="descname">$cfg['ActionLinksMode']</tt><a class="headerlink" href="#cfg_ActionLinksMode" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body"><tt class="docutils literal"><span class="pre">'both'</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>If set to <tt class="docutils literal"><span class="pre">icons</span></tt>, will display icons instead of text for db and table
 properties links (like <em class="guilabel">Browse</em>, <em class="guilabel">Select</em>,
-<em class="guilabel">Insert</em>, ...) and for the menu tabs. Can be set to <tt class="docutils literal"><span class="pre">'both'</span></tt>
-if you want icons AND text. When set to <tt class="docutils literal"><span class="pre">false</span></tt>, will only show text.</p>
+<em class="guilabel">Insert</em>, ...). Can be set to <tt class="docutils literal"><span class="pre">'both'</span></tt>
+if you want icons AND text. When set to <tt class="docutils literal"><span class="pre">text</span></tt>, will only show text.</p>
 </dd></dl>
 
 <dl class="option">
@@ -4885,7 +4918,7 @@ displayed in the bottom of main page (right frame).</p>
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.0.4.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.0.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
