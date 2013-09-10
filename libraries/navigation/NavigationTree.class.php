@@ -639,7 +639,7 @@ class PMA_NavigationTree
         $retval  = $this->_fastFilterHtml($this->_tree);
         $retval .= $this->_getPageSelector($this->_tree);
         $this->groupTree();
-        $retval .= "<div><ul>";
+        $retval .= "<div id='pma_navigation_tree_content'><ul>";
         $children = $this->_tree->children;
         usort($children, array('PMA_NavigationTree', 'sortNode'));
         $this->_setVisibility();
@@ -881,6 +881,7 @@ class PMA_NavigationTree
                 $retval .= "</div>";
             }
 
+            $dblinkclass = ' class="dbLink"';
             $linkClass = '';
             $haveAjax = array(
                 'functions',
@@ -932,17 +933,7 @@ class PMA_NavigationTree
                     $retval .= htmlspecialchars($node->name);
                     $retval .= "</a>";
                 } else {
-                    if ($GLOBALS['cfg']['ShowTooltip']) {
-                        $title = $node->getComment();
-                        if ($title) {
-                            $title = ' title="'
-                                . htmlentities($title, ENT_QUOTES, 'UTF-8') 
-                                . '"';
-                        }
-                    } else {
-                        $title = '';
-                    }
-                    $retval .= "<a$linkClass$title href='$link'>";
+                    $retval .= "<a$dblinkclass$linkClass href='$link'>";
                     $retval .= htmlspecialchars($node->real_name);
                     $retval .= "</a>";
                 }

@@ -1025,7 +1025,7 @@ Generic settings
 .. config:option:: $cfg['MaxNavigationItems']
 
     :type: integer
-    :default: 25
+    :default: 250
 
     The number of items that can be displayed on each page of the
     navigation tree.
@@ -1311,14 +1311,6 @@ Navigation panel setup
 
     The maximum number of recently used tables shown in the navigation
     panel. Set this to 0 (zero) to disable the listing of recent tables.
-
-.. config:option:: $cfg['ShowTooltip']
-
-    :type: boolean
-    :default: true
-
-    Defines whether to display item comments as tooltips in navigation
-    panel or not.
 
 .. config:option:: $cfg['NavigationDisplayLogo']
 

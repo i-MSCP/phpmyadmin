@@ -7,6 +7,14 @@
  */
 
 /**
+ * If we are sending the export file (as opposed to just displaying it
+ * as text), we have to bypass the usual PMA_Response mechanism 
+ */
+if ($_POST['output_format'] == 'sendit') {
+    define('PMA_BYPASS_GET_INSTANCE', 1);
+}
+
+/**
  * Get the variables sent or posted to this script and a core script
  */
 require_once 'libraries/common.inc.php';
@@ -268,11 +276,6 @@ function PMA_gzencodeNeeded()
 {
     if (@function_exists('gzencode')
         && ! @ini_get('zlib.output_compression')
-        // Here, we detect Apache's mod_deflate so we bet that
-        // this module is active for this instance of phpMyAdmin
-        // and therefore, will gzip encode the content
-        && ! (function_exists('apache_get_modules')
-            && in_array('mod_deflate', apache_get_modules()))
         && ! PMA_isGzHandlerEnabled()
     ) {
         return true;

@@ -583,7 +583,7 @@ $cfg['MaxDbList'] = 100;
  *
  * @global integer $cfg['MaxDbList']
  */
-$cfg['MaxNavigationItems'] = 25;
+$cfg['MaxNavigationItems'] = 250;
 
 /**
  * maximum number of tables displayed in table list
@@ -825,13 +825,6 @@ $cfg['NavigationTreeTableSeparator'] = '__';
  * @global integer $cfg['NavigationTreeTableLevel']
  */
 $cfg['NavigationTreeTableLevel'] = 1;
-
-/**
- * display table comment as tooltip in navigation panel
- *
- * @global boolean $cfg['ShowTooltip']
- */
-$cfg['ShowTooltip'] = true;
 
 /**
  * display logo at top of navigation panel

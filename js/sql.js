@@ -306,7 +306,6 @@ AJAX.registerOnload('sql.js', function() {
                                 .prependTo('#page_content');
                         }
                     });
-                    PMA_reloadNavigation();
                 }
                 
                 $sqlqueryresults.show().trigger('makegrid');

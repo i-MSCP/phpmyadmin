@@ -1,6 +1,20 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.0.6.0 (2013-09-05)
+- bug #4036 Call to undefined function mb_detect_encoding (clarify the doc)
+- bug Missing hints when changing a column's structure
+- bug #4048 Cannot select foreign value in Search
+- bug #4025 gzip export is not actually compressed with mod_deflate
+- bug #4054 query analysis doesn't launch in status monitor
++ Add pmahomme icon credits (FamFamFam silk icon set)
+- bug #4064 Table structure statistics "Space usage" caption too small for l10n
+- bug #4051 Wrong tabindex when inserting rows
+- bug #4066 varchar field not truncated in table browse mode
++ rfe #1435 Opening database should expand it in the navigation menu
+- (performance) Removed ShowTooltip directive
+- bug #4046 Exporting huge Tables causes memory-Problems
+
 4.0.5.0 (2013-08-04)
 - bug #3977 Not detected configuration storage
 - bug #3970 Pressing enter in the filter field reloads page
@@ -21,6 +35,7 @@ phpMyAdmin - ChangeLog
 + Reinstated configuration directive: AllowThirdPartyFraming
 
 4.0.4.2 (2013-07-28)
+- [security] fix unescaped parameter, see PMASA-2013-8
 - [security] Fix stored XSS in Server status monitor, see PMASA-2013-9
 - [security] Fix stored XSS in navigation panel logo link, see PMASA-2013-9
 - [security] Fix self-XSS in setup, trusted proxies validation, see PMASA-2013-9
