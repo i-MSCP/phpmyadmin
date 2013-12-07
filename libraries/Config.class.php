@@ -102,7 +102,7 @@ class PMA_Config
      */
     function checkSystem()
     {
-        $this->set('PMA_VERSION', '4.0.9');
+        $this->set('PMA_VERSION', '4.0.10');
         /**
          * @deprecated
          */
@@ -1549,6 +1549,10 @@ class PMA_Config
             } elseif (PMA_getenv('HTTPS')
                 && strtolower(PMA_getenv('HTTPS')) == 'on'
             ) {
+                $url['scheme'] = 'https';
+            // A10 Networks load balancer:
+            } elseif (PMA_getenv('HTTP_HTTPS_FROM_LB')
+                && strtolower(PMA_getenv('HTTP_HTTPS_FROM_LB')) == 'on') {
                 $url['scheme'] = 'https';
             } elseif (PMA_getenv('HTTP_X_FORWARDED_PROTO')) {
                 $url['scheme'] = strtolower(PMA_getenv('HTTP_X_FORWARDED_PROTO'));

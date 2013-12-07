@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; phpMyAdmin 4.0.9 documentation</title>
+    <title>Installation &mdash; phpMyAdmin 4.0.10 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.0.9',
+        VERSION:     '4.0.10',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.0.9 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.0.10 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Requirements" href="require.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="require.html" title="Requirements"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.0.9 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.0.10 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -90,8 +90,8 @@ for those who prefer a graphical installation. Creating a
 <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt> is still a quick way to get started and needed for
 some advanced features.</li>
 </ol>
-<div class="section" id="manualy-creating-file">
-<h3>Manualy creating file<a class="headerlink" href="#manualy-creating-file" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="manually-creating-the-file">
+<h3>Manually creating the file<a class="headerlink" href="#manually-creating-the-file" title="Permalink to this headline">¶</a></h3>
 <p>To manually create the file, simply use your text editor to create the
 file <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt> (you can copy <tt class="file docutils literal"><span class="pre">config.sample.inc.php</span></tt> to get
 minimal configuration file) in the main (top-level) phpMyAdmin
@@ -143,14 +143,15 @@ chmod o+w config/config.inc.php     <span class="c"># give it world writable per
 <p>On other platforms, simply create the folder and ensure that your web
 server has read and write access to it. <a class="reference internal" href="faq.html#faq1-26"><em>1.26 I just installed phpMyAdmin in my document root of IIS but I get the error &#8220;No input file specified&#8221; when trying to run phpMyAdmin.</em></a> can help with
 this.</p>
-<p>Next, open <tt class="docutils literal"><span class="pre">setup/</span></tt> in your browser. Note that <strong>changes are
-not saved to disk until explicitly choose ``Save``</strong> from the
-<em>Configuration</em> area of the screen. Normally the script saves the new
+<p>Next, open <tt class="docutils literal"><span class="pre">setup/</span></tt> in your browser. If you have an existing configuration,
+use the <tt class="docutils literal"><span class="pre">Load</span></tt> button to bring its content inside the setup panel.
+Note that <strong>changes are not saved to disk until explicitly choose ``Save``</strong>
+from the <em>Configuration</em> area of the screen. Normally the script saves the new
 <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt> to the <tt class="docutils literal"><span class="pre">config/</span></tt> directory, but if the webserver does
 not have the proper permissions you may see the error &#8220;Cannot load or
 save configuration.&#8221; Ensure that the <tt class="docutils literal"><span class="pre">config/</span></tt> directory exists and
 has the proper permissions - or use the <tt class="docutils literal"><span class="pre">Download</span></tt> link to save the
-config file locally and upload (via FTP or some similar means) to the
+config file locally and upload it (via FTP or some similar means) to the
 proper location.</p>
 <p>Once the file has been saved, it must be moved out of the <tt class="docutils literal"><span class="pre">config/</span></tt>
 directory and the permissions must be reset, again as a security
@@ -411,7 +412,7 @@ MySQL credentials are not all users need to login</li>
   <ul>
 <li><a class="reference internal" href="#">Installation</a><ul>
 <li><a class="reference internal" href="#quick-install">Quick Install</a><ul>
-<li><a class="reference internal" href="#manualy-creating-file">Manualy creating file</a></li>
+<li><a class="reference internal" href="#manually-creating-the-file">Manually creating the file</a></li>
 <li><a class="reference internal" href="#using-setup-script">Using Setup script</a></li>
 </ul>
 </li>
@@ -470,7 +471,7 @@ MySQL credentials are not all users need to login</li>
         <li class="right" >
           <a href="require.html" title="Requirements"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.0.9 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.0.10 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
