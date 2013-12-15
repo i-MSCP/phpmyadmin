@@ -8,14 +8,14 @@
 /**
  * Executed on page load
  */
-$(function() {
+$(function () {
     if (! $('#pma_navigation').length) {
         // Don't bother running any code if the navigation is not even on the page
         return;
     }
 
     // Do not let the page reload on submitting the fast filter
-    $(document).on('submit', '.fast_filter', function(event) {
+    $(document).on('submit', '.fast_filter', function (event) {
         event.preventDefault();
     });
 
@@ -26,7 +26,7 @@ $(function() {
      * opens/closes (hides/shows) tree elements
      * loads data via ajax
      */
-    $('#pma_navigation_tree a.expander').live('click', function(event) {
+    $('#pma_navigation_tree a.expander').live('click', function (event) {
         event.preventDefault();
         event.stopImmediatePropagation();
         var $icon = $(this).find('img');
@@ -73,7 +73,7 @@ $(function() {
     $('#pma_navigation_tree.highlight li:not(.fast_filter)').live(
         'mouseover',
         function () {
-            if ($('li:visible', this).length == 0) {
+            if ($('li:visible', this).length === 0) {
                 $(this).addClass('activePointer');
             }
         }
@@ -88,12 +88,12 @@ $(function() {
     /**
      * Jump to recent table
      */
-    $('#recentTable').live('change', function() {
-        if (this.value != '') {
+    $('#recentTable').live('change', function () {
+        if (this.value !== '') {
             var arr = jQuery.parseJSON(this.value);
             var $form = $(this).closest('form');
-            $form.find('input[name=db]').val(arr['db']);
-            $form.find('input[name=table]').val(arr['table']);
+            $form.find('input[name=db]').val(arr.db);
+            $form.find('input[name=table]').val(arr.table);
             $form.submit();
         }
     });
@@ -102,41 +102,45 @@ $(function() {
     $('li.new_procedure a.ajax, li.new_function a.ajax').live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object('routine');
-        dialog.editorDialog(1, $(this))
+        dialog.editorDialog(1, $(this));
     });
     $('li.new_trigger a.ajax').live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object('trigger');
-        dialog.editorDialog(1, $(this))
+        dialog.editorDialog(1, $(this));
     });
     $('li.new_event a.ajax').live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object('event');
-        dialog.editorDialog(1, $(this))
+        dialog.editorDialog(1, $(this));
     });
 
     /** Edit Routines, Triggers and Events */
     $('li.procedure > a.ajax, li.function > a.ajax').live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object('routine');
-        dialog.editorDialog(0, $(this))
+        dialog.editorDialog(0, $(this));
     });
     $('li.trigger > a.ajax').live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object('trigger');
-        dialog.editorDialog(0, $(this))
+        dialog.editorDialog(0, $(this));
     });
     $('li.event > a.ajax').live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object('event');
-        dialog.editorDialog(0, $(this))
+        dialog.editorDialog(0, $(this));
     });
 
     /** Export Routines, Triggers and Events */
-    $('li.procedure a.ajax img, li.function a.ajax img, li.trigger a.ajax img, li.event a.ajax img').live('click', function (event) {
+    $('li.procedure div:eq(1) a.ajax img,' +
+        ' li.function div:eq(1) a.ajax img,' +
+        ' li.trigger div:eq(1) a.ajax img,' +
+        ' li.event div:eq(1) a.ajax img'
+        ).live('click', function (event) {
         event.preventDefault();
         var dialog = new RTE.object();
-        dialog.exportDialog($(this).parent())
+        dialog.exportDialog($(this).parent());
     });
 
     /** New index */
@@ -145,7 +149,7 @@ $(function() {
         var url = $(this).attr('href').substr(
             $(this).attr('href').indexOf('?') + 1
         ) + '&ajax_request=true';
-        var title = PMA_messages['strAddIndex'];
+        var title = PMA_messages.strAddIndex;
         indexEditorDialog(url, title);
     });
 
@@ -155,7 +159,7 @@ $(function() {
         var url = $(this).attr('href').substr(
             $(this).attr('href').indexOf('?') + 1
         ) + '&ajax_request=true';
-        var title = PMA_messages['strEditIndex'];
+        var title = PMA_messages.strEditIndex;
         indexEditorDialog(url, title);
     });
 
@@ -163,6 +167,70 @@ $(function() {
     $('li.new_view a.ajax').live('click', function (event) {
         event.preventDefault();
         PMA_createViewDialog($(this));
+    });
+
+    /** Hide navigation tree item */
+    $('a.hideNavItem.ajax').live('click', function (event) {
+        event.preventDefault();
+        $.ajax({
+            url: $(this).attr('href') + '&ajax_request=true',
+            success: function (data) {
+                if (data.success === true) {
+                    PMA_reloadNavigation();
+                } else {
+                    PMA_ajaxShowMessage(data.error);
+                }
+            }
+        });
+    });
+
+    /** Display a dialog to choose hidden navigation items to show */
+    $('a.showUnhide.ajax').live('click', function (event) {
+        event.preventDefault();
+        var $msg = PMA_ajaxShowMessage();
+        $.get($(this).attr('href') + '&ajax_request=1', function (data) {
+            if (data.success === true) {
+                PMA_ajaxRemoveMessage($msg);
+                var buttonOptions = {};
+                buttonOptions[PMA_messages.strClose] = function () {
+                    $(this).dialog("close");
+                };
+                var $dialog = $('<div/>')
+                    .attr('id', 'unhideNavItemDialog')
+                    .append(data.message)
+                    .dialog({
+                        width: 400,
+                        minWidth: 200,
+                        modal: true,
+                        buttons: buttonOptions,
+                        title: PMA_messages.strUnhideNavItem,
+                        close: function () {
+                            $(this).remove();
+                        }
+                    });
+            } else {
+                PMA_ajaxShowMessage(data.error);
+            }
+        });
+    });
+
+    /** Show a hidden navigation tree item */
+    $('a.unhideNavItem.ajax').live('click', function (event) {
+        event.preventDefault();
+        var $tr = $(this).parents('tr');
+        var $msg = PMA_ajaxShowMessage();
+        $.ajax({
+            url: $(this).attr('href') + '&ajax_request=true',
+            success: function (data) {
+                PMA_ajaxRemoveMessage($msg);
+                if (data.success === true) {
+                    $tr.remove();
+                    PMA_reloadNavigation();
+                } else {
+                    PMA_ajaxShowMessage(data.error);
+                }
+            }
+        });
     });
 
     PMA_showCurrentNavigation();
@@ -197,7 +265,7 @@ function expandTreeNode($expandElem, callback)
         $icon.hide();
         $throbber.insertBefore($icon);
 
-        loadChildNodes($expandElem, function(data) {
+        loadChildNodes($expandElem, function (data) {
             if (data.success === true) {
                 var $destination = $expandElem.closest('li');
                 $icon.removeClass('ic_b_plus').addClass('ic_b_minus');
@@ -210,7 +278,7 @@ function expandTreeNode($expandElem, callback)
                         .click();
                 }
                 if (callback && typeof callback == 'function') {
-                   callback.call();
+                    callback.call();
                 }
             } else {
                 PMA_ajaxShowMessage(data.error, false);
@@ -226,16 +294,21 @@ function expandTreeNode($expandElem, callback)
  * Auto-scrolls the newly chosen database
  *
  * @param  object   $element    The element to set to view
- * @param  object   $container  The container srollable element
+ * @param  boolean  $forceToTop Whether to force scroll to top
  *
  */
-function scrollToView($element, $container) {
-    var elementOffset = $element.offset(),
-        containerOffset = $container.offset();
-    if(elementOffset != undefined && containerOffset != undefined) {
-        var pushToOffset = elementOffset.top - containerOffset.top + $container.scrollTop();
-        $('#pma_navigation_tree_content').stop().animate({
-            scrollTop: pushToOffset
+function scrollToView($element, $forceToTop) {
+    var $container = $('#pma_navigation_tree_content');
+    var elemTop = $element.offset().top - $container.offset().top;
+    var textHeight = 20;
+    var scrollPadding = 20; // extra padding from top of bottom when scrolling to view
+    if (elemTop < 0 || $forceToTop) {
+        $container.stop().animate({
+            scrollTop: elemTop + $container.scrollTop() - scrollPadding
+        });
+    } else if (elemTop + textHeight > $container.height()) {
+        $container.stop().animate({
+            scrollTop: elemTop + textHeight - $container.height() + $container.scrollTop() + scrollPadding
         });
     }
 }
@@ -290,7 +363,7 @@ function loadChildNodes($expandElem, callback) {
             $destination.find('div.list_container').remove(); // FIXME: Hack, there shouldn't be a list container there
             $destination.append(data.message);
             if (callback && typeof callback == 'function') {
-               callback(data);
+                callback(data);
             }
         }
     });
@@ -303,166 +376,178 @@ function loadChildNodes($expandElem, callback) {
  */
 function PMA_showCurrentNavigation()
 {
-   var db = PMA_commonParams.get('db');
-   var table = PMA_commonParams.get('table');
-   $('#pma_navigation_tree')
-       .find('li.selected')
-       .removeClass('selected');
-   if (db && table) { // if we are at the table/view level
-       // open the database in the tree
-       var $dbItem = highlightLoadedItem(
-           $('#pma_navigation_tree > div'), db, 'database', false, false
-       );
-       if ($dbItem) {
-           // open the table in the tree and select it
-           var $expander = $dbItem.children('div:first').children('a.expander');
-           // if not loaded or loaded but collapsed
-           if (! $expander.hasClass('loaded')
-               || $expander.find('img').is('.ic_b_plus')
-           ) {
-               expandTreeNode($expander, function() {
-                   loadAndHighlightTableOrView($dbItem, table);
-               });
-           } else {
-               loadAndHighlightTableOrView($dbItem, table);
-           }
-       }
-   } else if (db) { // if we are at the database level
-       // open in the tree and select the database
-       highlightLoadedItem(
-           $('#pma_navigation_tree > div'), db, 'database', true, true
-       );
-   }
+    var db = PMA_commonParams.get('db');
+    var table = PMA_commonParams.get('table');
+    $('#pma_navigation_tree')
+        .find('li.selected')
+        .removeClass('selected');
+    if (db) {
+        var $dbItem = findLoadedItem(
+            $('#pma_navigation_tree > div'), db, 'database', !table
+        );
+        if ($dbItem) {
+            var $expander = $dbItem.children('div:first').children('a.expander');
+            // if not loaded or loaded but collapsed
+            if (! $expander.hasClass('loaded') ||
+                $expander.find('img').is('.ic_b_plus')
+            ) {
+                expandTreeNode($expander, function () {
+                    handleTableOrDb(table, $dbItem);
+                });
+            } else {
+                handleTableOrDb(table, $dbItem);
+            }
+        }
+    }
 
-   function highlightLoadedItem($container, name, clazz, doSelect, doOpen) {
-       var ret = false;
-       $container.children('ul').children('li').each(function() {
-           var $li = $(this);
-           // this is a navigation group, recurse
-           if ($li.is('.navGroup')) {
-               var $container = $li.children('div.list_container');
-               var $childRet = highlightLoadedItem(
-                   $container, name, clazz, doSelect, doOpen
-               );
-               if ($childRet) {
-                   ret = $childRet;
-                   return false;
-               }
-           } else { // this is a real navigation item
-               // name and class matches
-               if ($li.is('.' + clazz) && $li.children('a').text() == name) {
-                   if (doSelect) {
-                       $li.addClass('selected');
-                       if (! doOpen) { // if the node will be opened no point scrolling now
-                           scrollToView($li, $('#pma_navigation_tree_content'));
-                       }
-                   }
-                   if (doOpen) {
-                       var $expander = $li.find('div:first').children('a.expander');
-                       if ($expander.length > 0) {
-                           expandTreeNode($expander, function() {
-                               scrollToView($li, $('#pma_navigation_tree_content'));
-                           });
-                       }
-                   }
-                   // taverse up and expand and parent navigation groups
-                   $li.parents('.navGroup').each(function() {
-                       $cont = $(this).children('div.list_container');
-                       if (! $cont.is(':visible')) {
-                           $(this)
-                               .children('div:first')
-                               .children('a.expander')
-                               .click();
-                       }
-                   });
-                   ret = $li;
-                   return false;
-               }
-           }
-       });
-       return ret;
-   }
+    function handleTableOrDb(table, $dbItem) {
+        if (table) {
+            loadAndHighlightTableOrView($dbItem, table);
+        } else {
+            var $container = $dbItem.children('div.list_container');
+            var $tableContainer = $container.children('ul').children('li.tableContainer');
+            if ($tableContainer.length > 0) {
+                var $expander = $tableContainer.children('div:first').children('a.expander');
+                expandTreeNode($expander, function () {
+                    scrollToView($dbItem, true);
+                });
+            } else {
+                scrollToView($dbItem, true);
+            }
+        }
+    }
 
-   function loadAndHighlightTableOrView($dbItem, table) {
-       var $container = $dbItem.children('div.list_container');
-       var $tableContainer = $container
-           .children('ul')
-           .children('li.tableContainer');
-       var $viewContainer = $container
-           .children('ul')
-           .children('li.viewContainer');
+    function findLoadedItem($container, name, clazz, doSelect) {
+        var ret = false;
+        $container.children('ul').children('li').each(function () {
+            var $li = $(this);
+            // this is a navigation group, recurse
+            if ($li.is('.navGroup')) {
+                var $container = $li.children('div.list_container');
+                var $childRet = findLoadedItem(
+                    $container, name, clazz, doSelect
+                );
+                if ($childRet) {
+                    ret = $childRet;
+                    return false;
+                }
+            } else { // this is a real navigation item
+                // name and class matches
+                if (((clazz && $li.is('.' + clazz)) || ! clazz) &&
+                        $li.children('a').text() == name) {
+                    if (doSelect) {
+                        $li.addClass('selected');
+                    }
+                    // taverse up and expand and parent navigation groups
+                    $li.parents('.navGroup').each(function () {
+                        $cont = $(this).children('div.list_container');
+                        if (! $cont.is(':visible')) {
+                            $(this)
+                                .children('div:first')
+                                .children('a.expander')
+                                .click();
+                        }
+                    });
+                    ret = $li;
+                    return false;
+                }
+            }
+        });
+        return ret;
+    }
 
-       if ($tableContainer.length > 0) {
-           var $expander = $tableContainer
-               .children('div:first')
-               .children('a.expander');
+    function loadAndHighlightTableOrView($dbItem, table) {
+        var $container = $dbItem.children('div.list_container');
+        var $tableContainer = $container
+            .children('ul')
+            .children('li.tableContainer');
+        var $viewContainer = $container
+            .children('ul')
+            .children('li.viewContainer');
 
-           if (! $expander.hasClass('loaded') ) {
-               loadChildNodes($expander, function(data) {
-                   highlightTableOrView($tableContainer, $viewContainer, table);
-               });
-           } else {
-               highlightTableOrView($tableContainer, $viewContainer, table);
-           }
-       } else if ($viewContainer.length > 0) {
-           highlightView($viewContainer, table);
-       } else {
-           // no containers, highlight the item
-           highlightLoadedItem($container, table, 'table', true, false);
-       }
-   }
+        if ($tableContainer.length > 0) {
+            var $expander = $tableContainer
+                .children('div:first')
+                .children('a.expander');
 
-   function highlightTableOrView($tableContainer, $viewContainer, table)
-   {
-       if (isItemInContainer($tableContainer, table, 'table')) {
-           var $expander = $tableContainer
-               .children('div:first')
-               .children('a.expander');
-           if ($expander.find('img').is('.ic_b_plus')) {
-               expandTreeNode($expander);
-           }
-           highlightLoadedItem(
-               $tableContainer.children('div.list_container'),
-               table, 'table', true, false
-           );
-       } else if ($viewContainer.length > 0) {
-           highlightView($viewContainer, table);
-       }
-   }
+            if (! $expander.hasClass('loaded')) {
+                loadChildNodes($expander, function (data) {
+                    highlightTableOrView($tableContainer, $viewContainer, table);
+                });
+            } else {
+                highlightTableOrView($tableContainer, $viewContainer, table);
+            }
+        } else if ($viewContainer.length > 0) {
+            highlightView($viewContainer, table);
+        } else {
+            // no containers, highlight the item
+            var $tableOrView = findLoadedItem($container, table, null, true);
+            if ($tableOrView){
+                scrollToView($tableOrView, false);
+            }
+        }
+    }
 
-   function isItemInContainer($container, name, clazz)
-   {
-       $items = $container.find('li.' + clazz);
-       var found = false;
-       $items.each(function() {
-           if ($(this).children('a').text() == name) {
-               found = true;
-               return false;
-           }
-       });
-       return found;
-   }
+    function highlightTableOrView($tableContainer, $viewContainer, table)
+    {
+        if (isItemInContainer($tableContainer, table, 'table')) {
+            var $expander = $tableContainer
+                .children('div:first')
+                .children('a.expander');
+            if ($expander.find('img').is('.ic_b_plus')) {
+                expandTreeNode($expander);
+            }
+            var $table = findLoadedItem(
+                $tableContainer.children('div.list_container'),
+                table, 'table', true
+            );
+            if ($table) {
+                scrollToView($table, false);
+            }
+        } else if ($viewContainer.length > 0) {
+            highlightView($viewContainer, table);
+        }
+    }
 
-   function highlightView($viewContainer, view) {
-       var $expander = $viewContainer
-           .children('div:first')
-           .children('a.expander');
-       if (! $expander.hasClass('loaded')
-           || $expander.find('img').is('.ic_b_plus')
-       ) {
-           expandTreeNode($expander, function() {
-               highlightLoadedItem(
-                   $viewContainer.children('div.list_container'),
-                   view, 'view', true, false
-               );
-           });
-       } else {
-           highlightLoadedItem(
-               $viewContainer.children('div.list_container'),
-               view, 'view', true, false
-           );
-       }
-   }
+    function isItemInContainer($container, name, clazz)
+    {
+        $items = $container.find('li.' + clazz);
+        var found = false;
+        $items.each(function () {
+            if ($(this).children('a').text() == name) {
+                found = true;
+                return false;
+            }
+        });
+        return found;
+    }
+
+    function highlightView($viewContainer, view) {
+        var $expander = $viewContainer
+            .children('div:first')
+            .children('a.expander');
+        if (! $expander.hasClass('loaded') ||
+            $expander.find('img').is('.ic_b_plus')
+        ) {
+            expandTreeNode($expander, function () {
+                var $view = findLoadedItem(
+                    $viewContainer.children('div.list_container'),
+                    view, 'view', true
+                );
+                if ($view) {
+                    scrollToView($view, false);
+                }
+            });
+        } else {
+            var $view = findLoadedItem(
+                $viewContainer.children('div.list_container'),
+                view, 'view', true
+            );
+            if ($view) {
+                scrollToView($view, false);
+            }
+        }
+    }
 }
 
 /**
@@ -472,6 +557,12 @@ function PMA_showCurrentNavigation()
  * @return void
  */
 function PMA_reloadNavigation(callback) {
+    var $throbber = $('#pma_navigation .throbber')
+        .first()
+        .css({
+            'visibility' : 'visible',
+            'display' : 'block'
+        });
     var params = {
         reload: true,
         pos: $('#pma_navigation_tree').find('a.expander:first > span.pos').text()
@@ -481,8 +572,8 @@ function PMA_reloadNavigation(callback) {
     // various levels, if necessary.
     var count = 0;
     $('#pma_navigation_tree').find('a.expander:visible').each(function () {
-        if ($(this).find('img').is('.ic_b_minus')
-            && $(this).closest('li').find('div.list_container .ic_b_minus').length == 0
+        if ($(this).find('img').is('.ic_b_minus') &&
+            $(this).closest('li').find('div.list_container .ic_b_minus').length === 0
         ) {
             params['n' + count + '_aPath'] = $(this).find('span.aPath').text();
             params['n' + count + '_vPath'] = $(this).find('span.vPath').text();
@@ -545,12 +636,13 @@ function PMA_navigationTreePagination($this)
 {
     var $msgbox = PMA_ajaxShowMessage();
     var isDbSelector = $this.closest('div.pageselector').is('.dbselector');
+    var url, params;
     if ($this[0].tagName == 'A') {
-        var url = $this.attr('href');
-        var params = 'ajax_request=true';
+        url = $this.attr('href');
+        params = 'ajax_request=true';
     } else { // tagName == 'SELECT'
-        var url = 'navigation.php';
-        var params = $this.closest("form").serialize() + '&ajax_request=true';
+        url = 'navigation.php';
+        params = $this.closest("form").serialize() + '&ajax_request=true';
     }
     var searchClause = PMA_fastFilter.getSearchClause();
     if (searchClause) {
@@ -640,14 +732,14 @@ var ResizeHandler = function () {
             $collapser
                 .css(this.left, pos + resizer_width)
                 .html(this.getSymbol(pos))
-                .prop('title', PMA_messages['strShowPanel']);
+                .prop('title', PMA_messages.strShowPanel);
         } else {
             $collapser
                 .css(this.left, pos)
                 .html(this.getSymbol(pos))
-                .prop('title', PMA_messages['strHidePanel']);
+                .prop('title', PMA_messages.strHidePanel);
         }
-        setTimeout(function (){
+        setTimeout(function () {
             $(window).trigger('resize');
         }, 4);
     };
@@ -683,13 +775,13 @@ var ResizeHandler = function () {
      */
     this.getSymbol = function (width) {
         if (this.left == 'left') {
-            if (width == 0) {
+            if (width === 0) {
                 return '&rarr;';
             } else {
                 return '&larr;';
             }
         } else {
-            if (width == 0) {
+            if (width === 0) {
                 return '&larr;';
             } else {
                 return '&rarr;';
@@ -756,7 +848,7 @@ var ResizeHandler = function () {
         event.data.resize_handler.panel_width = width;
     };
     /**
-     * Even thandler for resizing the navigation tree height on window resize
+     * Event handler for resizing the navigation tree height on window resize
      *
      * @return void
      */
@@ -777,12 +869,12 @@ var ResizeHandler = function () {
     }
     // Register the events for the resizer and the collapser
     $('#pma_navigation_resizer')
-        .live('mousedown', {'resize_handler':this}, this.mousedown);
+        .live('mousedown', {'resize_handler': this}, this.mousedown);
     $(document)
-        .bind('mouseup', {'resize_handler':this}, this.mouseup)
-        .bind('mousemove', {'resize_handler':this}, $.throttle(this.mousemove, 4));
+        .bind('mouseup', {'resize_handler': this}, this.mouseup)
+        .bind('mousemove', {'resize_handler': this}, $.throttle(this.mousemove, 4));
     var $collapser = $('#pma_navigation_collapser');
-    $collapser.live('click', {'resize_handler':this}, this.collapse);
+    $collapser.live('click', {'resize_handler': this}, this.collapse);
     // Add the correct arrow symbol to the collapser
     $collapser.html(this.getSymbol($('#pma_navigation').width()));
     // Fix navigation tree height
@@ -836,9 +928,9 @@ var PMA_fastFilter = {
         this.timeout = null;
 
         var $filterInput = $this.find('li.fast_filter input.searchClause');
-        if (   $filterInput.length != 0
-            && $filterInput.val() != ''
-            && $filterInput.val() != $filterInput[0].defaultValue
+        if ($filterInput.length !== 0 &&
+            $filterInput.val() !== '' &&
+            $filterInput.val() != $filterInput[0].defaultValue
         ) {
             this.request();
         }
@@ -867,7 +959,7 @@ var PMA_fastFilter = {
         var $filterContainer = $this.closest('div.list_container');
         var $filterInput = $([]);
         while (1) {
-            if ($filterContainer.find('li.fast_filter:not(.db_fast_filter) input.searchClause').length != 0) {
+            if ($filterContainer.find('li.fast_filter:not(.db_fast_filter) input.searchClause').length !== 0) {
                 $filterInput = $filterContainer.find('li.fast_filter:not(.db_fast_filter) input.searchClause');
                 break;
             } else if (! $filterContainer.is('div.list_container')) {
@@ -878,8 +970,8 @@ var PMA_fastFilter = {
                 .closest('div.list_container');
         }
         var searchClause2 = '';
-        if ($filterInput.length != 0
-            && $filterInput.first().val() != $filterInput[0].defaultValue
+        if ($filterInput.length !== 0 &&
+            $filterInput.first().val() != $filterInput[0].defaultValue
         ) {
             searchClause2 = $filterInput.val();
         }
@@ -905,7 +997,7 @@ var PMA_fastFilter = {
             }
         },
         blur: function (event) {
-            if ($(this).val() == '') {
+            if ($(this).val() === '') {
                 $(this).val(this.defaultValue);
             }
             var $obj = $(this).closest('div.list_container');
@@ -916,18 +1008,53 @@ var PMA_fastFilter = {
         keyup: function (event) {
             var $obj = $(this).closest('div.list_container');
             var str = '';
-            if ($(this).val() != this.defaultValue && $(this).val() != '') {
+            if ($(this).val() != this.defaultValue && $(this).val() !== '') {
                 $obj.find('div.pageselector').hide();
-                str = $(this).val().toLowerCase();
+                str = $(this).val();
             }
-            $obj.find('li > a').not('.container').each(function () {
-                if ($(this).text().toLowerCase().indexOf(str) != -1) {
-                    $(this).parent().show().removeClass('hidden');
-                } else {
-                    $(this).parent().hide().addClass('hidden');
-                }
-            });
-            var container_filter = function ($curr, str) {
+
+            /**
+             * FIXME at the server level a value match is done while on
+             * the client side it is a regex match. These two should be aligned
+             */
+
+            // regex used for filtering.
+            var regex;
+            try {
+                regex = new RegExp(str, 'i');
+            } catch (err) {
+                return;
+            }
+
+            // this is the div that houses the items to be filtered by this filter.
+            var outerContainer;
+            if ($(this).closest('li.fast_filter').is('.db_fast_filter')) {
+                outerContainer = $('#pma_navigation_tree_content');
+            } else {
+                outerContainer = $obj;
+            }
+
+            // filters items that are directly under the div as well as grouped in
+            // groups. Does not filter child items (i.e. a database search does
+            // not filter tables)
+            var item_filter = function($curr) {
+                $curr.children('ul').children('li.navGroup').each(function() {
+                    $(this).children('div.list_container').each(function() {
+                        item_filter($(this)); // recursive
+                    });
+                });
+                $curr.children('ul').children('li').children('a').not('.container').each(function() {
+                    if (regex.test($(this).text())) {
+                        $(this).parent().show().removeClass('hidden');
+                    } else {
+                        $(this).parent().hide().addClass('hidden');
+                    }
+                });
+            };
+            item_filter(outerContainer);
+
+            // hides containers that does not have any visible children
+            var container_filter = function ($curr) {
                 $curr.children('ul').children('li.navGroup').each(function() {
                     var $group = $(this);
                     $group.children('div.list_container').each(function() {
@@ -940,12 +1067,9 @@ var PMA_fastFilter = {
                     }
                 });
             };
-            if ($(this).closest('li.fast_filter').is('.db_fast_filter')) {
-                container_filter($('#pma_navigation_tree_content'), str);
-            } else {
-                container_filter($obj, str);
-            }
-            if ($(this).val() != this.defaultValue && $(this).val() != '') {
+            container_filter(outerContainer);
+
+            if ($(this).val() != this.defaultValue && $(this).val() !== '') {
                 if (! $obj.data('fastFilter')) {
                     $obj.data(
                         'fastFilter',
@@ -995,7 +1119,7 @@ PMA_fastFilter.filter.prototype.request = function ()
 {
     var self = this;
     clearTimeout(self.timeout);
-    if (self.$this.find('li.fast_filter').find('img.throbber').length == 0) {
+    if (self.$this.find('li.fast_filter').find('img.throbber').length === 0) {
         self.$this.find('li.fast_filter').append(
             $('<div class="throbber"></div>').append(
                 $('#pma_navigation_content')
@@ -1012,7 +1136,7 @@ PMA_fastFilter.filter.prototype.request = function ()
         var url = $('#pma_navigation').find('a.navigation_url').attr('href');
         var results = self.$this.find('li:not(.hidden):not(.fast_filter):not(.navGroup)').not('[class^=new]').length;
         var params = self.$this.find('> ul > li > form.fast_filter').first().serialize() + "&results=" + results;
-        if (self.$this.find('> ul > li > form.fast_filter:first input[name=searchClause]').length == 0) {
+        if (self.$this.find('> ul > li > form.fast_filter:first input[name=searchClause]').length === 0) {
             var $input = $('#pma_navigation_tree').find('li.fast_filter.db_fast_filter input.searchClause');
             if ($input.length && $input.val() != $input[0].defaultValue) {
                 params += '&searchClause=' + encodeURIComponent($input.val());
@@ -1027,9 +1151,9 @@ PMA_fastFilter.filter.prototype.request = function ()
                 var data = $.parseJSON(jqXHR.responseText);
                 self.$this.find('li.fast_filter').find('div.throbber').remove();
                 if (data && data.results) {
-                    var $listItem = $('<li />', {'class':'moreResults'})
+                    var $listItem = $('<li />', {'class': 'moreResults'})
                         .appendTo(self.$this.find('li.fast_filter'));
-                    var $link = $('<a />', {href:'#'})
+                    var $link = $('<a />', {href: '#'})
                         .text(data.results)
                         .appendTo($listItem)
                         .click(function (event) {

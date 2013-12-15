@@ -1,6 +1,7 @@
 <?php
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
+ * View manipulations
  *
  * @package PhpMyAdmin
  */
@@ -85,7 +86,7 @@ $url_params['back'] = 'view_operations.php';
 <!-- Table operations -->
 <div class="operations_half_width">
 <form method="post" action="view_operations.php">
-<?php echo PMA_generate_common_hidden_inputs($GLOBALS['db'], $GLOBALS['table']); ?>
+<?php echo PMA_URL_getHiddenInputs($GLOBALS['db'], $GLOBALS['table']); ?>
 <input type="hidden" name="reload" value="1" />
 <fieldset>
     <legend><?php echo __('Operations'); ?></legend>
@@ -94,7 +95,8 @@ $url_params['back'] = 'view_operations.php';
     <!-- Change view name -->
     <tr><td><?php echo __('Rename view to'); ?></td>
         <td><input type="text" size="20" name="new_name" onfocus="this.select()"
-                value="<?php echo htmlspecialchars($GLOBALS['table']); ?>" />
+                value="<?php echo htmlspecialchars($GLOBALS['table']); ?>"
+                required />
         </td>
     </tr>
     </table>
@@ -129,7 +131,7 @@ echo PMA_getDeleteDataOrTableLink(
     $drop_view_url_params,
     'DROP VIEW',
     __('Delete the view (DROP)'),
-    ''
+    'drop_view_anchor'
 );
 echo '</ul>';
 echo '</fieldset>';

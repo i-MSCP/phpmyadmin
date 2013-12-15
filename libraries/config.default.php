@@ -146,6 +146,41 @@ $cfg['Servers'][$i]['socket'] = '';
 $cfg['Servers'][$i]['ssl'] = false;
 
 /**
+ * Path to the key file when using SSL for connecting to the MySQL server
+ *
+ * @global string $cfg['Servers'][$i]['ssl_key']
+ */
+$cfg['Servers'][$i]['ssl_key'] = null;
+
+/**
+ * Path to the cert file when using SSL for connecting to the MySQL server
+ *
+ * @global string $cfg['Servers'][$i]['ssl_cert']
+ */
+$cfg['Servers'][$i]['ssl_cert'] = null;
+
+/**
+ * Path to the CA file when using SSL for connecting to the MySQL server
+ *
+ * @global string $cfg['Servers'][$i]['ssl_ca']
+ */
+$cfg['Servers'][$i]['ssl_ca'] = null;
+
+/**
+ * Directory containing trusted SSL CA certificates in PEM format
+ *
+ * @global string $cfg['Servers'][$i]['ssl_ca_path']
+ */
+$cfg['Servers'][$i]['ssl_ca_path'] = null;
+
+/**
+ * List of allowable ciphers for SSL connections to the MySQL server
+ *
+ * @global string $cfg['Servers'][$i]['ssl_ciphers']
+ */
+$cfg['Servers'][$i]['ssl_ciphers'] = null;
+
+/**
  * How to connect to MySQL server ('tcp' or 'socket')
  *
  * @global string $cfg['Servers'][$i]['connect_type']
@@ -174,6 +209,15 @@ $cfg['Servers'][$i]['compress'] = false;
  * @global string $cfg['Servers'][$i]['controlhost']
  */
 $cfg['Servers'][$i]['controlhost'] = '';
+
+/**
+ * MySQL control port. This permits to use a port different than the
+ * main port, for the phpMyAdmin configuration storage. If left empty,
+ * $cfg['Servers'][$i]['port'] is used instead.
+ *
+ * @global string $cfg['Servers'][$i]['controlport']
+ */
+$cfg['Servers'][$i]['controlport'] = '';
 
 /**
  * MySQL control user settings (this user must have read-only
@@ -402,6 +446,33 @@ $cfg['Servers'][$i]['tracking'] = '';
 $cfg['Servers'][$i]['userconfig'] = '';
 
 /**
+ * table to store users and their assignment to user groups
+ *   - leave blank to disable configurable menus feature
+ *     SUGGESTED: 'pma__users'
+ *
+ * @global string $cfg['Servers'][$i]['users']
+ */
+$cfg['Servers'][$i]['users'] = '';
+
+/**
+ * table to store allowed menu items for each user group
+ *   - leave blank to disable configurable menus feature
+ *     SUGGESTED: 'pma__usergroups'
+ *
+ * @global string $cfg['Servers'][$i]['usergroups']
+ */
+$cfg['Servers'][$i]['usergroups'] = '';
+
+/**
+ * table to store information about item hidden from navigation triee
+ *   - leave blank to disable hide/show navigation items feature
+ *     SUGGESTED: 'pma__navigationhiding'
+ *
+ * @global string $cfg['Servers'][$i]['navigationhiding']
+ */
+$cfg['Servers'][$i]['navigationhiding'] = '';
+
+/**
  * Maximum number of records saved in $cfg['Servers'][$i]['table_uiprefs'] table.
  *
  * In case where tables in databases is modified (e.g. dropped or renamed),
@@ -441,41 +512,6 @@ $cfg['Servers'][$i]['AllowDeny']['order'] = '';
  * @global array $cfg['Servers'][$i]['AllowDeny']['rules']
  */
 $cfg['Servers'][$i]['AllowDeny']['rules'] = array();
-
-/**
- * Disable use of INFORMATION_SCHEMA. Is always 'false' for Drizzle.
- *
- * @see https://sourceforge.net/p/phpmyadmin/bugs/2606/
- * @see http://bugs.mysql.com/19588
- * @global boolean $cfg['Servers'][$i]['DisableIS']
- */
-$cfg['Servers'][$i]['DisableIS'] = true;
-
-/**
- * SQL command to fetch available databases
- *
- * by default most user will be fine with SHOW DATABASES,
- * for servers with a huge amount of databases it is possible to
- * define a command which executes faster but with less information
- *
- * especially when accessing database servers from ISPs changing this command
- * can result in a great speed improvement
- *
- * false will disable fetching databases from the server, only databases in
- * $cfg['Servers'][$i]['only_db'] will be displayed
- *
- * #user# will be replaced by current user
- *
- * examples:
- * 'SHOW DATABASES'
- * "SHOW DATABASES LIKE '#user#\_%'"
- * 'SELECT DISTINCT TABLE_SCHEMA FROM information_schema.SCHEMA_PRIVILEGES'
- * 'SELECT SCHEMA_NAME FROM information_schema.SCHEMATA'
- * false
- *
- * @global array $cfg['Servers'][$i]['ShowDatabasesCommand']
- */
-$cfg['Servers'][$i]['ShowDatabasesCommand'] = 'SHOW DATABASES';
 
 /**
  * Whether the tracking mechanism creates
@@ -530,7 +566,6 @@ $cfg['Servers'][$i]['tracking_add_drop_database'] = true;
  * (in some cases TABLE STATUS can be very slow, so you may want to cache it).
  * APC is used (if the PHP extension is available, if not, this setting is ignored
  * silently). You have to provide StatusCacheLifetime.
- * Takes effect only if DisableIS is true.
  *
  * @global array $cfg['Servers'][$i]['StatusCacheDatabases']
  */
@@ -572,18 +607,39 @@ if (defined('VERSION_CHECK_DEFAULT')) {
 }
 
 /**
+ * The url of the proxy to be used when retrieving the information about
+ * the latest version of phpMyAdmin or error reporting. You need this if
+ * the server where phpMyAdmin is installed does not have direct access to
+ * the internet.
+ * The format is: "hostname:portnumber"
+ *
+ * @global string $cfg['ProxyUrl']
+ */
+$cfg['ProxyUrl'] = "";
+
+/**
+ * The username for authenticating with the proxy. By default, no
+ * authentication is performed. If a username is supplied, Basic
+ * Authentication will be performed. No other types of authentication
+ * are currently supported.
+ *
+ * @global string $cfg['ProxyUser']
+ */
+$cfg['ProxyUser'] = "";
+
+/**
+ * The password for authenticating with the proxy.
+ *
+ * @global string $cfg['ProxyPass']
+ */
+$cfg['ProxyPass'] = "";
+
+/**
  * maximum number of db's displayed in database list
  *
  * @global integer $cfg['MaxDbList']
  */
 $cfg['MaxDbList'] = 100;
-
-/**
- * maximum number of items displayed in navigation panel
- *
- * @global integer $cfg['MaxDbList']
- */
-$cfg['MaxNavigationItems'] = 250;
 
 /**
  * maximum number of tables displayed in table list
@@ -642,13 +698,13 @@ $cfg['ExecTimeLimit'] = 300;
 $cfg['SessionSavePath'] = '';
 
 /**
- * maximum allocated bytes ('0' for no limit)
+ * maximum allocated bytes ('-1' for no limit)
  * this is a string because '16M' is a valid value; we must put here
  * a string as the default value so that /setup accepts strings
  *
  * @global string $cfg['MemoryLimit']
  */
-$cfg['MemoryLimit'] = '0';
+$cfg['MemoryLimit'] = '-1';
 
 /**
  * mark used tables, make possible to show locked tables (since MySQL 3.23.30)
@@ -688,7 +744,6 @@ $cfg['AllowUserDropDatabase'] = false;
 
 /**
  * confirm some commands that can result in loss of data
- * (see "need_confirm" in the parser)
  *
  * @global boolean $cfg['Confirm']
  */
@@ -745,6 +800,19 @@ $cfg['IgnoreMultiSubmitErrors'] = false;
  */
 $cfg['AllowArbitraryServer'] = false;
 
+/**
+ * if reCaptcha is enabled it needs public key to connect with the service
+ *
+ * @global string $cfg['CaptchaLoginPublicKey']
+ */
+$cfg['CaptchaLoginPublicKey'] = '';
+
+/**
+ * if reCaptcha is enabled it needs private key to connect with the service
+ *
+ * @global string $cfg['CaptchaLoginPrivateKey']
+ */
+$cfg['CaptchaLoginPrivateKey'] = '';
 
 /*******************************************************************************
  * Error handler configuration
@@ -795,6 +863,13 @@ $cfg['Error_Handler']['gather'] = false;
 /*******************************************************************************
  * Navigation panel setup
  */
+
+/**
+ * maximum number of items displayed in navigation panel
+ *
+ * @global integer $cfg['MaxDbList']
+ */
+$cfg['MaxNavigationItems'] = 250;
 
 /**
  * turn the select-based light menu into a tree
@@ -997,10 +1072,11 @@ $cfg['ShowAll'] = false;
 /**
  * Number of rows displayed when browsing a result set. If the result
  * set contains more rows, "Previous" and "Next".
+ * Possible values: 25,50,100,250,500
  *
  * @global integer $cfg['MaxRows']
  */
-$cfg['MaxRows'] = 30;
+$cfg['MaxRows'] = 25;
 
 /**
  * default for 'ORDER BY' clause (valid values are 'ASC', 'DESC' or 'SMART' -ie
@@ -1720,6 +1796,12 @@ $cfg['Export']['sql_include_comments'] = true;
  * @global boolean $cfg['Export']['sql_disable_fk']
  */
 $cfg['Export']['sql_disable_fk'] = false;
+/**
+ *
+ *
+ * @global boolean $cfg['Export']['sql_views_as_tables']
+ */
+$cfg['Export']['sql_views_as_tables'] = false;
 
 /**
  *
@@ -2155,32 +2237,6 @@ $cfg['Import']['xls_empty_rows'] = true;
  */
 $cfg['Import']['xlsx_col_names'] = false;
 
-/**
- * Link to the official MySQL documentation.
- * Be sure to include no trailing slash on the path.
- * See http://dev.mysql.com/doc/ for more information
- * about MySQL manuals and their types.
- *
- * @global string $cfg['MySQLManualBase']
- */
-$cfg['MySQLManualBase'] = 'http://dev.mysql.com/doc/refman';
-
-/**
- * Type of MySQL documentation:
- *   viewable     - "viewable online", current one used on MySQL website
- *   searchable   - "Searchable, with user comments"
- *   chapters     - "HTML, one page per chapter"
- *   chapters_old - "HTML, one page per chapter",
- *                  format used prior to MySQL 5.0 release
- *   big          - "HTML, all on one page"
- *   old          - old style used in phpMyAdmin 2.3.0 and sooner
- *   none         - do not show documentation links
- *
- * @global string $cfg['MySQLManualType']
- */
-$cfg['MySQLManualType'] = 'viewable';
-
-
 /*******************************************************************************
  * PDF options
  */
@@ -2236,6 +2292,7 @@ $cfg['FilterLanguages'] = '';
  *               recode)
  *      iconv  - use iconv or libiconv functions
  *      recode - use recode_string function
+ *      mb     - use mbstring extension
  *      none   - disable encoding conversion
  *
  * @global string $cfg['RecodingEngine']
@@ -2740,34 +2797,16 @@ $cfg['LinkLengthLimit'] = 1000;
  */
 $cfg['DisableMultiTableMaintenance'] = false;
 
-/*******************************************************************************
- * SQL Parser Settings
- *
- * @global array $cfg['SQP']
- */
-$cfg['SQP'] = array();
-
 /**
- * Pretty-printing style to use on queries (html, text, none)
+ * Whether or not to query the user before sending the error report to
+ * the phpMyAdmin team when a JavaScript error occurs
  *
- * @global string $cfg['SQP']['fmtType']
- */
-$cfg['SQP']['fmtType'] = 'html';
-
-/**
- * Amount to indent each level (floats are valid)
+ * Available options
+ * (ask | always | never)
  *
- * @global integer $cfg['SQP']['fmtInd']
+ * @global string $cfg['SendErrorReports']
  */
-$cfg['SQP']['fmtInd'] = '1';
-
-/**
- * Units for indenting each level (CSS Types - {em, px, pt})
- *
- * @global string $cfg['SQP']['fmtIndUnit']
- */
-$cfg['SQP']['fmtIndUnit'] = 'em';
-
+$cfg['SendErrorReports'] = 'ask';
 
 /*******************************************************************************
  * If you wish to use the SQL Validator service, you should be aware of the
@@ -2815,6 +2854,13 @@ $cfg['DBG'] = array();
  * @global boolean $cfg['DBG']['sql']
  */
 $cfg['DBG']['sql'] = false;
+
+/**
+ * Enable to let server present itself as demo server.
+ *
+ * @global boolean $cfg['DBG']['demo']
+ */
+$cfg['DBG']['demo'] = false;
 
 
 /*******************************************************************************

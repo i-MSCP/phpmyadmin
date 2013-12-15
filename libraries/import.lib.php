@@ -77,7 +77,7 @@ function PMA_detectCompression($filepath)
  * @param string $sql         query to run
  * @param string $full        query to display, this might be commented
  * @param bool   $controluser whether to use control user for queries
- * @param array  &$sql_data
+ * @param array  &$sql_data   SQL parse data storage
  *
  * @return void
  * @access public
@@ -139,6 +139,9 @@ function PMA_importRunQuery($sql = '', $full = '', $controluser = false,
                         }
                         $sql_query = $import_run_buffer['sql'];
                         $sql_data['valid_sql'][] = $import_run_buffer['sql'];
+                        if (! isset($sql_data['valid_queries'])) {
+                            $sql_data['valid_queries'] = 0;
+                        }
                         $sql_data['valid_queries']++;
 
                         // If a 'USE <db>' SQL-clause was found,
@@ -155,7 +158,7 @@ function PMA_importRunQuery($sql = '', $full = '', $controluser = false,
                                 $import_run_buffer['sql']
                             );
                         } else {
-                            $result = PMA_DBI_try_query($import_run_buffer['sql']);
+                            $result = $GLOBALS['dbi']->tryQuery($import_run_buffer['sql']);
                         }
 
                         $msg = '# ';
@@ -165,7 +168,7 @@ function PMA_importRunQuery($sql = '', $full = '', $controluser = false,
                             }
                             $my_die[] = array(
                                 'sql' => $import_run_buffer['full'],
-                                'error' => PMA_DBI_getError()
+                                'error' => $GLOBALS['dbi']->getError()
                             );
 
                             $msg .= __('Error');
@@ -175,8 +178,8 @@ function PMA_importRunQuery($sql = '', $full = '', $controluser = false,
                                 return;
                             }
                         } else {
-                            $a_num_rows = (int)@PMA_DBI_num_rows($result);
-                            $a_aff_rows = (int)@PMA_DBI_affected_rows();
+                            $a_num_rows = (int)@$GLOBALS['dbi']->numRows($result);
+                            $a_aff_rows = (int)@$GLOBALS['dbi']->affectedRows();
                             if ($a_num_rows > 0) {
                                 $msg .= __('Rows'). ': ' . $a_num_rows;
                                 $last_query_with_results = $import_run_buffer['sql'];
@@ -189,6 +192,9 @@ function PMA_importRunQuery($sql = '', $full = '', $controluser = false,
 
                             if (($a_num_rows > 0) || $is_use_query) {
                                 $sql_data['valid_sql'][] = $import_run_buffer['sql'];
+                                if (! isset($sql_data['valid_queries'])) {
+                                    $sql_data['valid_queries'] = 0;
+                                }
                                 $sql_data['valid_queries']++;
                             }
 
@@ -347,7 +353,7 @@ function PMA_importGetNextChunk($size = 32768)
     $GLOBALS['offset'] += $size;
 
     if ($charset_conversion) {
-        return PMA_convert_string($charset_of_file, 'utf-8', $result);
+        return PMA_convertString($charset_of_file, 'utf-8', $result);
     } else {
         /**
          * Skip possible byte order marks (I do not think we need more
@@ -1017,8 +1023,9 @@ function PMA_buildSQL($db_name, &$tables, &$analyses = null,
         $num_tables = count($tables);
         for ($i = 0; $i < $num_tables; ++$i) {
             $num_cols = count($tables[$i][COL_NAMES]);
-            $tempSQLStr = "CREATE TABLE IF NOT EXISTS " . PMA_Util::backquote($db_name)
-                . '.' . PMA_Util::backquote($tables[$i][TBL_NAME]) . " (";
+            $tempSQLStr = "CREATE TABLE IF NOT EXISTS "
+            . PMA_Util::backquote($db_name)
+            . '.' . PMA_Util::backquote($tables[$i][TBL_NAME]) . " (";
             for ($j = 0; $j < $num_cols; ++$j) {
                 $size = $analyses[$i][SIZES][$j];
                 if ((int)$size == 0) {
@@ -1183,8 +1190,8 @@ function PMA_buildSQL($db_name, &$tables, &$analyses = null,
     }
 
     $params = array('db' => (string)$db_name);
-    $db_url = 'db_structure.php' . PMA_generate_common_url($params);
-    $db_ops_url = 'db_operations.php' . PMA_generate_common_url($params);
+    $db_url = 'db_structure.php' . PMA_URL_getCommon($params);
+    $db_ops_url = 'db_operations.php' . PMA_URL_getCommon($params);
 
     $message = '<br /><br />';
     $message .= '<strong>' . __('The following structures have either been created or altered. Here you can:') . '</strong><br />';
@@ -1192,12 +1199,19 @@ function PMA_buildSQL($db_name, &$tables, &$analyses = null,
     $message .= '<li>' . __('Change any of its settings by clicking the corresponding "Options" link') . '</li>';
     $message .= '<li>' . __('Edit structure by following the "Structure" link') . '</li>';
     $message .= sprintf(
-        '<br /><li><a href="%s" title="%s">%s</a> (<a href="%s" title="%s">' . __('Options') . '</a>)</li>',
+        '<br /><li><a href="%s" title="%s">%s</a> (<a href="%s" title="%s">'
+        . __('Options') . '</a>)</li>',
         $db_url,
-        sprintf(__('Go to database: %s'), htmlspecialchars(PMA_Util::backquote($db_name))),
+        sprintf(
+            __('Go to database: %s'),
+            htmlspecialchars(PMA_Util::backquote($db_name))
+        ),
         htmlspecialchars($db_name),
         $db_ops_url,
-        sprintf(__('Edit settings for %s'), htmlspecialchars(PMA_Util::backquote($db_name)))
+        sprintf(
+            __('Edit settings for %s'),
+            htmlspecialchars(PMA_Util::backquote($db_name))
+        )
     );
 
     $message .= '<ul>';
@@ -1210,9 +1224,9 @@ function PMA_buildSQL($db_name, &$tables, &$analyses = null,
              'db' => (string) $db_name,
              'table' => (string) $tables[$i][TBL_NAME]
         );
-        $tbl_url = 'sql.php' . PMA_generate_common_url($params);
-        $tbl_struct_url = 'tbl_structure.php' . PMA_generate_common_url($params);
-        $tbl_ops_url = 'tbl_operations.php' . PMA_generate_common_url($params);
+        $tbl_url = 'sql.php' . PMA_URL_getCommon($params);
+        $tbl_struct_url = 'tbl_structure.php' . PMA_URL_getCommon($params);
+        $tbl_ops_url = 'tbl_operations.php' . PMA_URL_getCommon($params);
 
         unset($params);
 
@@ -1220,18 +1234,38 @@ function PMA_buildSQL($db_name, &$tables, &$analyses = null,
             $message .= sprintf(
                 '<li><a href="%s" title="%s">%s</a> (<a href="%s" title="%s">' . __('Structure') . '</a>) (<a href="%s" title="%s">' . __('Options') . '</a>)</li>',
                 $tbl_url,
-                sprintf(__('Go to table: %s'), htmlspecialchars(PMA_Util::backquote($tables[$i][TBL_NAME]))),
+                sprintf(
+                    __('Go to table: %s'),
+                    htmlspecialchars(
+                        PMA_Util::backquote($tables[$i][TBL_NAME])
+                    )
+                ),
                 htmlspecialchars($tables[$i][TBL_NAME]),
                 $tbl_struct_url,
-                sprintf(__('Structure of %s'), htmlspecialchars(PMA_Util::backquote($tables[$i][TBL_NAME]))),
+                sprintf(
+                    __('Structure of %s'),
+                    htmlspecialchars(
+                        PMA_Util::backquote($tables[$i][TBL_NAME])
+                    )
+                ),
                 $tbl_ops_url,
-                sprintf(__('Edit settings for %s'), htmlspecialchars(PMA_Util::backquote($tables[$i][TBL_NAME])))
+                sprintf(
+                    __('Edit settings for %s'),
+                    htmlspecialchars(
+                        PMA_Util::backquote($tables[$i][TBL_NAME])
+                    )
+                )
             );
         } else {
             $message .= sprintf(
                 '<li><a href="%s" title="%s">%s</a></li>',
                 $tbl_url,
-                sprintf(__('Go to view: %s'), htmlspecialchars(PMA_Util::backquote($tables[$i][TBL_NAME]))),
+                sprintf(
+                    __('Go to view: %s'),
+                    htmlspecialchars(
+                        PMA_Util::backquote($tables[$i][TBL_NAME])
+                    )
+                ),
                 htmlspecialchars($tables[$i][TBL_NAME])
             );
         }

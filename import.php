@@ -10,6 +10,8 @@
  * Get the variables sent or posted to this script and a core script
  */
 require_once 'libraries/common.inc.php';
+require_once 'libraries/sql.lib.php';
+require_once 'libraries/bookmark.lib.php';
 //require_once 'libraries/display_import_functions.lib.php';
 
 if (isset($_REQUEST['show_as_php'])) {
@@ -69,13 +71,20 @@ if (! empty($sql_query)) {
     }
 
     // refresh navigation panel only
-    if (preg_match('/^(CREATE|ALTER)\s+(VIEW|TABLE|DATABASE|SCHEMA)\s+/i', $sql_query)) {
+    if (preg_match(
+        '/^(CREATE|ALTER)\s+(VIEW|TABLE|DATABASE|SCHEMA)\s+/i',
+        $sql_query
+    )) {
         $ajax_reload['reload'] = true;
     }
 
     // do a dynamic reload if table is RENAMED
     // (by sending the instruction to the AJAX response handler)
-    if (preg_match('/^RENAME\s+TABLE\s+(.*?)\s+TO\s+(.*?)($|;|\s)/i', $sql_query, $rename_table_names)) {
+    if (preg_match(
+        '/^RENAME\s+TABLE\s+(.*?)\s+TO\s+(.*?)($|;|\s)/i',
+        $sql_query,
+        $rename_table_names
+    )) {
         $ajax_reload['table_name'] = PMA_Util::unQuote($rename_table_names[2]);
         $ajax_reload['reload'] = true;
     }
@@ -123,7 +132,7 @@ if ($_POST == array() && $_GET == array()) {
  */
 
 if (! in_array(
-    $format, 
+    $format,
     array(
         'csv',
         'ldi',
@@ -163,15 +172,15 @@ require_once 'libraries/import.lib.php';
 
 // Create error and goto url
 if ($import_type == 'table') {
-    $err_url = 'tbl_import.php?' . PMA_generate_common_url($db, $table);
+    $err_url = 'tbl_import.php?' . PMA_URL_getCommon($db, $table);
     $_SESSION['Import_message']['go_back_url'] = $err_url;
     $goto = 'tbl_import.php';
 } elseif ($import_type == 'database') {
-    $err_url = 'db_import.php?' . PMA_generate_common_url($db);
+    $err_url = 'db_import.php?' . PMA_URL_getCommon($db);
     $_SESSION['Import_message']['go_back_url'] = $err_url;
     $goto = 'db_import.php';
 } elseif ($import_type == 'server') {
-    $err_url = 'server_import.php?' . PMA_generate_common_url();
+    $err_url = 'server_import.php?' . PMA_URL_getCommon();
     $_SESSION['Import_message']['go_back_url'] = $err_url;
     $goto = 'server_import.php';
 } else {
@@ -185,11 +194,11 @@ if ($import_type == 'table') {
         }
     }
     if (strlen($table) && strlen($db)) {
-        $common = PMA_generate_common_url($db, $table);
+        $common = PMA_URL_getCommon($db, $table);
     } elseif (strlen($db)) {
-        $common = PMA_generate_common_url($db);
+        $common = PMA_URL_getCommon($db);
     } else {
-        $common = PMA_generate_common_url();
+        $common = PMA_URL_getCommon();
     }
     $err_url  = $goto . '?' . $common
         . (preg_match('@^tbl_[a-z]*\.php$@', $goto)
@@ -200,7 +209,7 @@ if ($import_type == 'table') {
 
 
 if (strlen($db)) {
-    PMA_DBI_select_db($db);
+    $GLOBALS['dbi']->selectDb($db);
 }
 
 @set_time_limit($cfg['ExecTimeLimit']);
@@ -253,12 +262,19 @@ if (! empty($id_bookmark)) {
         }
 
         // refresh navigation and main panels
-        if (preg_match('/^(DROP)\s+(VIEW|TABLE|DATABASE|SCHEMA)\s+/i', $import_text)) {
+        if (preg_match(
+            '/^(DROP)\s+(VIEW|TABLE|DATABASE|SCHEMA)\s+/i',
+            $import_text
+        )) {
             $GLOBALS['reload'] = true;
         }
 
         // refresh navigation panel only
-        if (preg_match('/^(CREATE|ALTER)\s+(VIEW|TABLE|DATABASE|SCHEMA)\s+/i', $import_text)) {
+        if (preg_match(
+            '/^(CREATE|ALTER)\s+(VIEW|TABLE|DATABASE|SCHEMA)\s+/i',
+            $import_text
+        )
+        ) {
             $ajax_reload['reload'] = true;
         }
         break;
@@ -465,7 +481,7 @@ if ($GLOBALS['PMA_recoding_engine'] != PMA_CHARSET_NONE && isset($charset_of_fil
             __('Cannot convert file\'s character set without character set conversion library')
         );
     } else {
-        PMA_DBI_query('SET NAMES \'' . $charset_of_file . '\'');
+        $GLOBALS['dbi']->query('SET NAMES \'' . $charset_of_file . '\'');
         // We can not show query in this case, it is in different charset
         $sql_query_disabled = true;
         $reset_charset = true;
@@ -519,8 +535,8 @@ if ($file_to_unlink != '') {
 
 // Reset charset back, if we did some changes
 if ($reset_charset) {
-    PMA_DBI_query('SET CHARACTER SET utf8');
-    PMA_DBI_query(
+    $GLOBALS['dbi']->query('SET CHARACTER SET utf8');
+    $GLOBALS['dbi']->query(
         'SET SESSION collation_connection =\'' . $collation_connection . '\''
     );
 }
@@ -543,7 +559,9 @@ if (! empty($id_bookmark) && $action_bookmark == 2) {
     } else {
         if ($import_notice) {
             $message = PMA_Message::success(
-                '<em>' . __('Import has been successfully finished, %d queries executed.') . '</em>'
+                '<em>'
+                . __('Import has been successfully finished, %d queries executed.')
+                . '</em>'
             );
             $message->addParam($executed_queries);
 
@@ -589,34 +607,36 @@ if (isset($message)) {
 // (but if the query is too large, in case of an imported file, the parser
 //  can choke on it so avoid parsing)
 if (strlen($sql_query) <= $GLOBALS['cfg']['MaxCharactersInDisplayedSQL']) {
-    include_once 'libraries/parse_analyze.lib.php';
+    include_once 'libraries/parse_analyze.inc.php';
 }
 
 // There was an error?
 if (isset($my_die)) {
-    foreach ($my_die AS $key => $die) {
+    foreach ($my_die as $key => $die) {
         PMA_Util::mysqlDie(
             $die['error'], $die['sql'], '', $err_url, $error
         );
     }
 }
 
-// we want to see the results of the last query that returned at least a row
-if (! empty($last_query_with_results)) {
-    // but we want to show intermediate results too
-    $disp_query = $sql_query;
-    $disp_message = __('Your SQL query has been executed successfully');
-    $sql_query = $last_query_with_results;
-    $go_sql = true;
-}
-
 if ($go_sql) {
-    include 'sql.php';
+    // parse sql query
+    include_once 'libraries/parse_analyze.inc.php';
+
+    PMA_executeQueryAndSendQueryResponse(
+        $analyzed_sql_results, false, $db, $table, null, $import_text, null,
+        $analyzed_sql_results['is_affected'], null,
+        null, null, null, $goto, $pmaThemeImage, null, null, null, $sql_query,
+        null, null
+    );
 } else if ($result) {
     $response = PMA_Response::getInstance();
     $response->isSuccess(true);
     $response->addJSON('message', PMA_Message::success($msg));
-    $response->addJSON('sql_query', PMA_Util::getMessage($msg, $sql_query, 'success'));
+    $response->addJSON(
+        'sql_query',
+        PMA_Util::getMessage($msg, $sql_query, 'success')
+    );
 } else if ($result == false) {
     $response = PMA_Response::getInstance();
     $response->isSuccess(false);

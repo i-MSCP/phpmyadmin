@@ -12,7 +12,7 @@ if (! defined('PHPMYADMIN')) {
 
 /* Get the transformations interface */
 require_once 'libraries/plugins/TransformationsPlugin.class.php';
-/* For PMA_transformation_global_html_replace */
+/* For PMA_Transformation_globalHtmlReplace */
 require_once 'libraries/transformations.lib.php';
 
 /**
@@ -43,7 +43,7 @@ abstract class TextLinkTransformationsPlugin extends TransformationsPlugin
      * @param array  $options transformation options
      * @param string $meta    meta information
      *
-     * @return void
+     * @return string
      */
     public function applyTransformation($buffer, $options = array(), $meta = '')
     {
@@ -60,12 +60,10 @@ abstract class TextLinkTransformationsPlugin extends TransformationsPlugin
                 . '</a>'
         );
 
-        $buffer = PMA_transformation_global_html_replace(
+        return PMA_Transformation_globalHtmlReplace(
             $buffer,
             $transform_options
         );
-
-        return $buffer;
     }
 
     /**
@@ -94,7 +92,7 @@ abstract class TextLinkTransformationsPlugin extends TransformationsPlugin
      */
     public static function getName()
     {
-        return "Link";
+        return "TextLink";
     }
 }
 ?>

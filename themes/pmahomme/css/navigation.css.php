@@ -117,6 +117,21 @@ if (! defined('PMA_MINIMUM_COMMON') && ! defined('TESTSUITE')) {
     color: <?php echo $GLOBALS['cfg']['NaviPointerColor']; ?>;
     background-color: <?php echo $GLOBALS['cfg']['NaviPointerBackground']; ?>;
 }
+#pma_navigation_tree li .dbItemControls {
+    padding-left: 4px;
+}
+#pma_navigation_tree li .navItemControls {
+    display: none;
+    padding-left: 4px;
+}
+#pma_navigation_tree li.activePointer .navItemControls {
+    display: inline;
+    opacity: 0.5;
+}
+#pma_navigation_tree li.activePointer .navItemControls:hover {
+    display: inline;
+    opacity: 1.0;
+}
 #pma_navigation_tree ul {
     clear: both;
     padding: 0;
@@ -210,7 +225,7 @@ li.fast_filter {
     border-<?php echo $left; ?>: 1px solid #666;
 }
 li.fast_filter input {
-    padding-<?php echo $right; ?>: .4em;
+    padding-<?php echo $right; ?>: 1.7em;
     width: 100%;
 }
 li.fast_filter span {
@@ -220,6 +235,21 @@ li.fast_filter span {
     cursor: pointer;
     font-weight: bold;
     color: #800;
+}
+/* IE10+ has its own reset X */
+html.ie li.fast_filter span {
+    display: none;
+}
+html.ie.ie9 li.fast_filter span,
+html.ie.ie8 li.fast_filter span {
+    display: auto;
+}
+html.ie li.fast_filter input {
+    padding-<?php echo $right; ?>: .2em;
+}
+html.ie.ie9 li.fast_filter input,
+html.ie.ie8 li.fast_filter input {
+    padding-<?php echo $right; ?>: 1.7em;
 }
 li.fast_filter.db_fast_filter {
     border: 0;

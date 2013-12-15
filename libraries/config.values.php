@@ -32,7 +32,7 @@ $cfg_db['Servers'] = array(
         'only_db'      => 'array'
     )
 );
-$cfg_db['RecodingEngine'] = array('auto', 'iconv', 'recode', 'none');
+$cfg_db['RecodingEngine'] = array('auto', 'iconv', 'recode', 'mb', 'none');
 $cfg_db['OBGzip'] = array('auto', true, false);
 $cfg_db['MemoryLimit'] = 'short_string';
 $cfg_db['NavigationLogoLinkWindow'] = array('main', 'new');
@@ -50,6 +50,7 @@ $cfg_db['TableNavigationLinksMode'] = array(
     'text'  => __('Text'),
     'both'  => __('Both')
 );
+$cfg_db['MaxRows'] = array(25, 50, 100, 250, 500);
 $cfg_db['Order'] = array('ASC', 'DESC', 'SMART');
 $cfg_db['RowActionLinks'] = array(
     'none'  => __('Nowhere'),
@@ -105,6 +106,11 @@ $cfg_db['InitialSlidersState'] = array(
     'open'     => __('Open'),
     'closed'   => __('Closed'),
     'disabled' => __('Disabled')
+);
+$cfg_db['SendErrorReports'] = array(
+    'ask'     => __('Ask before sending error reports'),
+    'always'   => __('Always send error reports'),
+    'never' => __('Never send error reports')
 );
 $cfg_db['Import']['format'] = array(
     'csv',    // CSV
@@ -192,53 +198,59 @@ $cfg_db['_overrides']['Servers/1/extension'] = extension_loaded('mysqli')
     ? 'mysqli' : 'mysql';
 
 /**
- * Basic validator assignments (functions from libraries/config/validate.lib.php
+ * Basic validator assignments (functions from libraries/config/Validator.class.php
  * and 'validators' object in js/config.js)
  * Use only full paths and form ids
  */
 $cfg_db['_validators'] = array(
-    'CharTextareaCols' => 'validate_positive_number',
-    'CharTextareaRows' => 'validate_positive_number',
-    'ExecTimeLimit' => 'validate_non_negative_number',
-    'Export/sql_max_query_size' => 'validate_positive_number',
-    'ForeignKeyMaxLimit' => 'validate_positive_number',
-    'Import/csv_enclosed' => array(array('validate_by_regex', '/^.?$/')),
-    'Import/csv_escaped' => array(array('validate_by_regex', '/^.$/')),
-    'Import/csv_terminated' => array(array('validate_by_regex', '/^.$/')),
-    'Import/ldi_enclosed' => array(array('validate_by_regex', '/^.?$/')),
-    'Import/ldi_escaped' => array(array('validate_by_regex', '/^.$/')),
-    'Import/ldi_terminated' => array(array('validate_by_regex', '/^.$/')),
-    'Import/skip_queries' => 'validate_non_negative_number',
-    'InsertRows' => 'validate_positive_number',
-    'NumRecentTables' => 'validate_non_negative_number',
-    'LimitChars' => 'validate_positive_number',
-    'LoginCookieValidity' => 'validate_positive_number',
-    'LoginCookieStore' => 'validate_non_negative_number',
-    'MaxDbList' => 'validate_positive_number',
-    'MaxNavigationItems' => 'validate_positive_number',
-    'MaxCharactersInDisplayedSQL' => 'validate_positive_number',
-    'MaxRows' => 'validate_positive_number',
-    'MaxTableList' => 'validate_positive_number',
-    'MemoryLimit' => array(array('validate_by_regex', '/^\d+(?:[kmg])?$/i')),
-    'NavigationTreeTableLevel' => 'validate_positive_number',
-    'QueryHistoryMax' => 'validate_positive_number',
-    'QueryWindowWidth' => 'validate_positive_number',
-    'QueryWindowHeight' => 'validate_positive_number',
-    'RepeatCells' => 'validate_non_negative_number',
-    'Server' => 'validate_server',
-    'Server_pmadb' => 'validate_pmadb',
-    'Servers/1/port' => 'validate_port_number',
-    'Servers/1/hide_db' => 'validate_regex',
-    'TextareaCols' => 'validate_positive_number',
-    'TextareaRows' => 'validate_positive_number',
-    'TrustedProxies' => 'validate_trusted_proxies');
+    'CharTextareaCols' => 'validatePositiveNumber',
+    'CharTextareaRows' => 'validatePositiveNumber',
+    'ExecTimeLimit' => 'validateNonNegativeNumber',
+    'Export/sql_max_query_size' => 'validatePositiveNumber',
+    'ForeignKeyMaxLimit' => 'validatePositiveNumber',
+    'Import/csv_enclosed' => array(array('validateByRegex', '/^.?$/')),
+    'Import/csv_escaped' => array(array('validateByRegex', '/^.$/')),
+    'Import/csv_terminated' => array(array('validateByRegex', '/^.$/')),
+    'Import/ldi_enclosed' => array(array('validateByRegex', '/^.?$/')),
+    'Import/ldi_escaped' => array(array('validateByRegex', '/^.$/')),
+    'Import/ldi_terminated' => array(array('validateByRegex', '/^.$/')),
+    'Import/skip_queries' => 'validateNonNegativeNumber',
+    'InsertRows' => 'validatePositiveNumber',
+    'NumRecentTables' => 'validateNonNegativeNumber',
+    'LimitChars' => 'validatePositiveNumber',
+    'LoginCookieValidity' => 'validatePositiveNumber',
+    'LoginCookieStore' => 'validateNonNegativeNumber',
+    'MaxDbList' => 'validatePositiveNumber',
+    'MaxNavigationItems' => 'validatePositiveNumber',
+    'MaxCharactersInDisplayedSQL' => 'validatePositiveNumber',
+    'MaxRows' => 'validatePositiveNumber',
+    'MaxTableList' => 'validatePositiveNumber',
+    'MemoryLimit' => array(array('validateByRegex', '/^(-1|(\d+(?:[kmg])?))$/i')),
+    'NavigationTreeTableLevel' => 'validatePositiveNumber',
+    'QueryHistoryMax' => 'validatePositiveNumber',
+    'QueryWindowWidth' => 'validatePositiveNumber',
+    'QueryWindowHeight' => 'validatePositiveNumber',
+    'RepeatCells' => 'validateNonNegativeNumber',
+    'Server' => 'validateServer',
+    'Server_pmadb' => 'validatePMAStorage',
+    'Servers/1/port' => 'validatePortNumber',
+    'Servers/1/hide_db' => 'validateRegex',
+    'TextareaCols' => 'validatePositiveNumber',
+    'TextareaRows' => 'validatePositiveNumber',
+    'TrustedProxies' => 'validateTrustedProxies');
 
 /**
  * Additional validators used for user preferences
  */
 $cfg_db['_userValidators'] = array(
-    'MaxDbList'       => array(array('validate_upper_bound', 'value:MaxDbList')),
-    'MaxTableList'    => array(array('validate_upper_bound', 'value:MaxTableList')),
-    'QueryHistoryMax' => array(array('validate_upper_bound', 'value:QueryHistoryMax'))
+    'MaxDbList'       => array(
+        array('validateUpperBound', 'value:MaxDbList')
+    ),
+    'MaxTableList'    => array(
+        array('validateUpperBound', 'value:MaxTableList')
+    ),
+    'QueryHistoryMax' => array(
+        array('validateUpperBound', 'value:QueryHistoryMax')
+    )
 );
 ?>

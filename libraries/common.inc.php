@@ -42,15 +42,8 @@ if (getcwd() == dirname(__FILE__)) {
  * Minimum PHP version; can't call PMA_fatalError() which uses a
  * PHP 5 function, so cannot easily localize this message.
  */
-if (version_compare(PHP_VERSION, '5.2.0', 'lt')) {
-    die('PHP 5.2+ is required');
-}
-
-/**
-  * Backward compatibility for PHP 5.2
-  */
-if (!defined('E_DEPRECATED')) {
-    define('E_DEPRECATED', 8192);
+if (version_compare(PHP_VERSION, '5.3.0', 'lt')) {
+    die('PHP 5.3+ is required');
 }
 
 /**
@@ -68,17 +61,6 @@ require './libraries/Error_Handler.class.php';
  */
 $GLOBALS['error_handler'] = new PMA_Error_Handler();
 $cfg['Error_Handler']['display'] = true;
-
-/*
- * This setting was removed in PHP 5.3. But at this point PMA_PHP_INT_VERSION
- * is not yet defined so we use another way to find out the PHP version.
- */
-if (version_compare(phpversion(), '5.3', 'lt')) {
-    /**
-     * Avoid object cloning errors
-     */
-    @ini_set('zend.ze1_compatibility_mode', false);
-}
 
 /**
  * This setting was removed in PHP 5.4. But at this point PMA_PHP_INT_VERSION
@@ -349,7 +331,7 @@ if ($GLOBALS['PMA_Config']->get('ForceSSL')
     // grab SSL URL
     $url = $GLOBALS['PMA_Config']->getSSLUri();
     // Actually redirect
-    PMA_sendHeaderLocation($url . PMA_generate_common_url($_GET, 'text'));
+    PMA_sendHeaderLocation($url . PMA_URL_getCommon($_GET, 'text'));
     // delete the current session, otherwise we get problems (see bug #2397877)
     $GLOBALS['PMA_Config']->removeCookie($GLOBALS['session_name']);
     exit;
@@ -518,7 +500,7 @@ if ($token_mismatch) {
     /**
      * Do actual cleanup
      */
-    PMA_remove_request_vars($allow_list);
+    PMA_removeRequestVars($allow_list);
 
 }
 
@@ -672,7 +654,7 @@ if (! isset($cfg['Servers']) || count($cfg['Servers']) == 0) {
             && empty($each_server['host'])
             && empty($each_server['verbose'])
         ) {
-            $each_server['verbose'] = __('Server') . $server_index;
+            $each_server['verbose'] = sprintf(__('Server %d'), $server_index);
         }
 
         $new_servers[$server_index] = $each_server;
@@ -757,7 +739,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
     /**
      * String handling
      */
-    include_once './libraries/string.lib.php';
+    include_once './libraries/string.inc.php';
 
     /**
      * Lookup server by name
@@ -768,7 +750,11 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         && ! is_numeric($_REQUEST['server'])
     ) {
         foreach ($cfg['Servers'] as $i => $server) {
-            if ($server['host'] == $_REQUEST['server']) {
+            if ($server['host'] == $_REQUEST['server']
+                || $server['verbose'] == $_REQUEST['server']
+                || $PMA_String->strtolower($server['verbose']) == $PMA_String->strtolower($_REQUEST['server'])
+                || md5($PMA_String->strtolower($server['verbose'])) == $PMA_String->strtolower($_REQUEST['server'])
+            ) {
                 $_REQUEST['server'] = $i;
                 break;
             }
@@ -834,7 +820,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         /**
          * Loads the proper database interface for this server
          */
-        include_once './libraries/database_interface.lib.php';
+        include_once './libraries/database_interface.inc.php';
 
         include_once './libraries/logging.lib.php';
 
@@ -860,7 +846,10 @@ if (! defined('PMA_MINIMUM_COMMON')) {
          * the required auth type plugin
          */
         $auth_class = "Authentication" . ucfirst($cfg['Server']['auth_type']);
-        if (! file_exists('./libraries/plugins/auth/' . $auth_class . '.class.php')) {
+        if (! file_exists(
+            './libraries/plugins/auth/'
+            . $auth_class . '.class.php'
+        )) {
             PMA_fatalError(
                 __('Invalid authentication method set in configuration:')
                 . ' ' . $cfg['Server']['auth_type']
@@ -919,22 +908,24 @@ if (! defined('PMA_MINIMUM_COMMON')) {
 
             // Ejects the user if banished
             if ($allowDeny_forbidden) {
-                PMA_log_user($cfg['Server']['user'], 'allow-denied');
+                PMA_logUser($cfg['Server']['user'], 'allow-denied');
                 $auth_plugin->authFails();
             }
         } // end if
 
         // is root allowed?
-        if (!$cfg['Server']['AllowRoot'] && $cfg['Server']['user'] == 'root') {
+        if (! $cfg['Server']['AllowRoot'] && $cfg['Server']['user'] == 'root') {
             $allowDeny_forbidden = true;
-            PMA_log_user($cfg['Server']['user'], 'root-denied');
+            PMA_logUser($cfg['Server']['user'], 'root-denied');
             $auth_plugin->authFails();
         }
 
         // is a login without password allowed?
-        if (!$cfg['Server']['AllowNoPassword'] && $cfg['Server']['password'] == '') {
+        if (! $cfg['Server']['AllowNoPassword']
+            && $cfg['Server']['password'] == ''
+        ) {
             $login_without_password_is_forbidden = true;
-            PMA_log_user($cfg['Server']['user'], 'empty-denied');
+            PMA_logUser($cfg['Server']['user'], 'empty-denied');
             $auth_plugin->authFails();
         }
 
@@ -949,15 +940,34 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         // scripts)
         $controllink = false;
         if ($cfg['Server']['controluser'] != '') {
-            if (! empty($cfg['Server']['controlhost'])) {
-                $controllink = PMA_DBI_connect(
+            if (! empty($cfg['Server']['controlhost'])
+                || ! empty($cfg['Server']['controlport'])
+            ) {
+                $server_details = array();
+                if (! empty($cfg['Server']['controlhost'])) {
+                    $server_details['host'] = $cfg['Server']['controlhost'];
+                } else {
+                    $server_details['host'] = $cfg['Server']['host'];
+                }
+                if (! empty($cfg['Server']['controlport'])) {
+                    $server_details['port'] = $cfg['Server']['controlport'];
+                } elseif ($server_details['host'] == $cfg['Server']['host']) {
+                    // Evaluates to true when controlhost == host
+                    // or controlhost is not defined (hence it defaults to host)
+                    // In such case we can use the value of port.
+                    $server_details['port'] = $cfg['Server']['port'];
+                }
+                // otherwise we leave the $server_details['port'] unset,
+                // allowing it to take default mysql port
+
+                $controllink = $GLOBALS['dbi']->connect(
                     $cfg['Server']['controluser'],
                     $cfg['Server']['controlpass'],
                     true,
-                    array('host' => $cfg['Server']['controlhost'])
+                    $server_details
                 );
             } else {
-                $controllink = PMA_DBI_connect(
+                $controllink = $GLOBALS['dbi']->connect(
                     $cfg['Server']['controluser'],
                     $cfg['Server']['controlpass'],
                     true
@@ -966,7 +976,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         }
 
         // Connects to the server (validates user's login)
-        $userlink = PMA_DBI_connect(
+        $userlink = $GLOBALS['dbi']->connect(
             $cfg['Server']['user'], $cfg['Server']['password'], false
         );
 
@@ -975,7 +985,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         }
 
         /* Log success */
-        PMA_log_user($cfg['Server']['user']);
+        PMA_logUser($cfg['Server']['user']);
 
         /**
          * with phpMyAdmin 3 we support MySQL >=5
@@ -999,9 +1009,6 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         }
 
         if (PMA_DRIZZLE) {
-            // DisableIS must be set to false for Drizzle, it maps SHOW commands
-            // to INFORMATION_SCHEMA queries anyway so it's fast on large servers
-            $cfg['Server']['DisableIS'] = false;
             // SHOW OPEN TABLES is not supported by Drizzle
             $cfg['SkipLockedTables'] = false;
         }
@@ -1027,12 +1034,12 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         /**
          * some resetting has to be done when switching servers
          */
-        if (isset($_SESSION['tmp_user_values']['previous_server'])
-            && $_SESSION['tmp_user_values']['previous_server'] != $GLOBALS['server']
+        if (isset($_SESSION['tmpval']['previous_server'])
+            && $_SESSION['tmpval']['previous_server'] != $GLOBALS['server']
         ) {
-            unset($_SESSION['tmp_user_values']['navi_limit_offset']);
+            unset($_SESSION['tmpval']['navi_limit_offset']);
         }
-        $_SESSION['tmp_user_values']['previous_server'] = $GLOBALS['server'];
+        $_SESSION['tmpval']['previous_server'] = $GLOBALS['server'];
 
     } // end server connecting
 
@@ -1064,7 +1071,9 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         }
         $scripts->addFile('jqplot/jquery.jqplot.js');
         $scripts->addFile('jqplot/plugins/jqplot.pieRenderer.js');
+        $scripts->addFile('jqplot/plugins/jqplot.highlighter.js');
         $scripts->addFile('canvg/canvg.js');
+        $scripts->addFile('jquery/jquery.tablesorter.js');
     }
 
     /*
@@ -1106,18 +1115,6 @@ if (isset($_REQUEST['ajax_request']) && $_REQUEST['ajax_request'] == true) {
     $GLOBALS['is_ajax_request'] = false;
 }
 
-/**
- * @global  boolean $GLOBALS['grid_edit']
- *
- * Set to true if this is a request made during an grid edit process.  This
- * request is made to retrieve the non-truncated/transformed values.
- */
-if (isset($_REQUEST['grid_edit']) && $_REQUEST['grid_edit'] == true) {
-    $GLOBALS['grid_edit'] = true;
-} else {
-    $GLOBALS['grid_edit'] = false;
-}
-
 if (isset($_REQUEST['GLOBALS']) || isset($_FILES['GLOBALS'])) {
     PMA_fatalError(__("GLOBALS overwrite attempt"));
 }
@@ -1142,7 +1139,8 @@ unset($dummy);
 
 // here, the function does not exist with this configuration:
 // $cfg['ServerDefault'] = 0;
-$GLOBALS['is_superuser'] = function_exists('PMA_isSuperuser') && PMA_isSuperuser();
+$GLOBALS['is_superuser']
+    = isset($GLOBALS['dbi']) && $GLOBALS['dbi']->isSuperuser();
 
 if (!empty($__redirect) && in_array($__redirect, $goto_whitelist)) {
     /**

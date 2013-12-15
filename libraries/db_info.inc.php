@@ -18,16 +18,16 @@ if (! defined('PHPMYADMIN')) {
 /**
  * limits for table list
  */
-if (! isset($_SESSION['tmp_user_values']['table_limit_offset'])
-    || $_SESSION['tmp_user_values']['table_limit_offset_db'] != $db
+if (! isset($_SESSION['tmpval']['table_limit_offset'])
+    || $_SESSION['tmpval']['table_limit_offset_db'] != $db
 ) {
-    $_SESSION['tmp_user_values']['table_limit_offset'] = 0;
-    $_SESSION['tmp_user_values']['table_limit_offset_db'] = $db;
+    $_SESSION['tmpval']['table_limit_offset'] = 0;
+    $_SESSION['tmpval']['table_limit_offset_db'] = $db;
 }
 if (isset($_REQUEST['pos'])) {
-    $_SESSION['tmp_user_values']['table_limit_offset'] = (int) $_REQUEST['pos'];
+    $_SESSION['tmpval']['table_limit_offset'] = (int) $_REQUEST['pos'];
 }
-$pos = $_SESSION['tmp_user_values']['table_limit_offset'];
+$pos = $_SESSION['tmpval']['table_limit_offset'];
 
 PMA_Util::checkParameters(array('db'));
 
@@ -41,7 +41,7 @@ $is_show_stats = $cfg['ShowStats'];
  */
 $db_is_information_schema = false;
 
-if (PMA_is_system_schema($db)) {
+if ($GLOBALS['dbi']->isSystemSchema($db)) {
     $is_show_stats = false;
     $db_is_information_schema = true;
 }
@@ -51,64 +51,75 @@ if (PMA_is_system_schema($db)) {
  */
 $tables = array();
 
-// When used in Nested table group mode,
-// only show tables matching the given groupname
-if (PMA_isValid($_REQUEST['tbl_group'])) {
-    $tbl_group_sql = ' LIKE "'
-        . PMA_Util::escapeMysqlWildcards($_REQUEST['tbl_group'])
-        . '%"';
-} else {
-    $tbl_group_sql = '';
-}
-
 $tooltip_truename = array();
 $tooltip_aliasname = array();
 
 // Special speedup for newer MySQL Versions (in 4.0 format changed)
-if (true === $cfg['SkipLockedTables']) {
-    $db_info_result = PMA_DBI_query(
+if (true === $cfg['SkipLockedTables'] && ! PMA_DRIZZLE) {
+    $db_info_result = $GLOBALS['dbi']->query(
         'SHOW OPEN TABLES FROM ' . PMA_Util::backquote($db) . ';'
     );
 
     // Blending out tables in use
-    if ($db_info_result && PMA_DBI_num_rows($db_info_result) > 0) {
-        while ($tmp = PMA_DBI_fetch_row($db_info_result)) {
-            // if in use memorize tablename
-            if (preg_match('@in_use=[1-9]+@i', $tmp[1])) {
-                $sot_cache[$tmp[0]] = true;
+    if ($db_info_result && $GLOBALS['dbi']->numRows($db_info_result) > 0) {
+        while ($tmp = $GLOBALS['dbi']->fetchAssoc($db_info_result)) {
+            // if in use, memorize table name
+            if ($tmp['In_use'] > 0) {
+                $sot_cache[$tmp['Table']] = true;
             }
         }
-        PMA_DBI_free_result($db_info_result);
+        $GLOBALS['dbi']->freeResult($db_info_result);
 
         if (isset($sot_cache)) {
-            $db_info_result = PMA_DBI_query(
-                'SHOW TABLES FROM ' . PMA_Util::backquote($db) . $tbl_group_sql . ';',
-                null, PMA_DBI_QUERY_STORE
+            $db_info_result = false;
+
+            $tblGroupSql = "";
+            $whereAdded = false;
+            if (PMA_isValid($_REQUEST['tbl_group'])) {
+                $tblGroupSql .= " WHERE "
+                    . PMA_Util::backquote('Tables_in_' . $db)
+                    . " LIKE '"
+                    . PMA_Util::escapeMysqlWildcards($_REQUEST['tbl_group'])
+                    . "%'";
+                $whereAdded = true;
+            }
+            if (PMA_isValid($_REQUEST['tbl_type'], array('table', 'view'))) {
+                $tblGroupSql .= $whereAdded ? " AND" : " WHERE";
+                if ($_REQUEST['tbl_type'] == 'view') {
+                    $tblGroupSql .= " `Table_type` != 'BASE TABLE'";
+                } else {
+                    $tblGroupSql .= " `Table_type` = 'BASE TABLE'";
+                }
+            }
+            $db_info_result = $GLOBALS['dbi']->query(
+                'SHOW FULL TABLES FROM ' . PMA_Util::backquote($db) . $tblGroupSql,
+                null, PMA_DatabaseInterface::QUERY_STORE
             );
-            if ($db_info_result && PMA_DBI_num_rows($db_info_result) > 0) {
-                while ($tmp = PMA_DBI_fetch_row($db_info_result)) {
+            unset($tblGroupSql, $whereAdded);
+
+            if ($db_info_result && $GLOBALS['dbi']->numRows($db_info_result) > 0) {
+                while ($tmp = $GLOBALS['dbi']->fetchRow($db_info_result)) {
                     if (! isset($sot_cache[$tmp[0]])) {
-                        $sts_result  = PMA_DBI_query(
-                            'SHOW TABLE STATUS FROM ' . PMA_Util::backquote($db)
-                            . ' LIKE \'' . PMA_Util::sqlAddSlashes($tmp[0], true) . '\';'
+                        $sts_result  = $GLOBALS['dbi']->query(
+                            "SHOW TABLE STATUS FROM " . PMA_Util::backquote($db)
+                            . " LIKE '" . PMA_Util::sqlAddSlashes($tmp[0], true)
+                            . "';"
                         );
-                        $sts_tmp     = PMA_DBI_fetch_assoc($sts_result);
-                        PMA_DBI_free_result($sts_result);
+                        $sts_tmp     = $GLOBALS['dbi']->fetchAssoc($sts_result);
+                        $GLOBALS['dbi']->freeResult($sts_result);
                         unset($sts_result);
 
                         if (! isset($sts_tmp['Type']) && isset($sts_tmp['Engine'])) {
                             $sts_tmp['Type'] =& $sts_tmp['Engine'];
                         }
-
-                        if (! empty($_REQUEST['tbl_group'])
-                            && ! preg_match('@' . preg_quote($_REQUEST['tbl_group'], '@') . '@i', $sts_tmp['Comment'])
-                        ) {
-                            continue;
-                        }
-
                         $tables[$sts_tmp['Name']]    = $sts_tmp;
                     } else { // table in use
-                        $tables[$tmp[0]]    = array('Name' => $tmp[0]);
+                        $tables[$tmp[0]] = array(
+                            'TABLE_NAME' => $tmp[0],
+                            'ENGINE' => '',
+                            'TABLE_TYPE' => '',
+                            'TABLE_ROWS' => 0,
+                        );
                     }
                 }
                 if ($GLOBALS['cfg']['NaturalOrder']) {
@@ -117,13 +128,13 @@ if (true === $cfg['SkipLockedTables']) {
 
                 $sot_ready = true;
             } elseif ($db_info_result) {
-                PMA_DBI_free_result($db_info_result);
+                $GLOBALS['dbi']->freeResult($db_info_result);
             }
             unset($sot_cache);
         }
         unset($tmp);
     } elseif ($db_info_result) {
-        PMA_DBI_free_result($db_info_result);
+        $GLOBALS['dbi']->freeResult($db_info_result);
     }
 }
 
@@ -155,16 +166,25 @@ if (! isset($sot_ready)) {
         }
     }
 
-    if (! empty($_REQUEST['tbl_group'])) {
-        // only tables for selected group
-        $tables = PMA_DBI_get_tables_full(
-            $db, $_REQUEST['tbl_group'], true, null, 0, false, $sort, $sort_order
-        );
+    $tbl_group = false;
+    $tbl_type = null;
+    $limit_offset = 0;
+    $limit_count = false;
+
+    if (! empty($_REQUEST['tbl_group']) || ! empty($_REQUEST['tbl_type'])) {
+        if (! empty($_REQUEST['tbl_group'])) {
+            // only tables for selected group
+            $tbl_group = $_REQUEST['tbl_group'];
+        }
+        if (! empty($_REQUEST['tbl_type'])) {
+            // only tables for selected type
+            $tbl_type = $_REQUEST['tbl_type'];
+        }
     } else {
         // all tables in db
         // - get the total number of tables
         //  (needed for proper working of the MaxTableList feature)
-        $tables = PMA_DBI_get_tables($db);
+        $tables = $GLOBALS['dbi']->getTables($db);
         $total_num_tables = count($tables);
         if (isset($sub_part) && $sub_part == '_export') {
             // (don't fetch only a subset if we are coming from db_export.php,
@@ -174,16 +194,16 @@ if (! isset($sot_ready)) {
              *
              * @todo Page selector for table names?
              */
-            $tables = PMA_DBI_get_tables_full(
-                $db, false, false, null, 0, false, $sort, $sort_order
-            );
         } else {
             // fetch the details for a possible limited subset
-            $tables = PMA_DBI_get_tables_full(
-                $db, false, false, null, $pos, true, $sort, $sort_order
-            );
+            $limit_offset = $pos;
+            $limit_count = true;
         }
     }
+    $tables = $GLOBALS['dbi']->getTablesFull(
+        $db, $tbl_group, ($tbl_group != false), null, $limit_offset,
+        $limit_count, $sort, $sort_order, $tbl_type
+    );
 }
 
 /**
@@ -198,7 +218,7 @@ if (! isset($total_num_tables)) {
 /**
  * cleanup
  */
-unset($each_table, $tbl_group_sql, $db_info_result);
+unset($each_table, $db_info_result);
 
 /**
  * If coming from a Show MySQL link on the home page,

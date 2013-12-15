@@ -7,15 +7,11 @@ if (! defined('PHPMYADMIN')) {
     exit;
 }
 
-if (! defined('PHPMYADMIN')) {
-    exit;
-}
-
 /**
  *
  * @package PhpMyAdmin-Engines
  */
-class PMA_StorageEngine_bdb extends PMA_StorageEngine
+class PMA_StorageEngine_Bdb extends PMA_StorageEngine
 {
     /**
      * Returns array with variable names related to this storage engine
