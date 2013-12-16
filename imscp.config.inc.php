@@ -90,6 +90,10 @@ $cfg['Servers'][$i]['hide_db'] = '(information_schema|performance_schema|phpmyad
  */
 $cfg['PmaNoRelation_DisableWarning'] = true;
 $cfg['SuhosinDisableWarning'] = true;
+$cfg['ServerLibraryDifference_DisableWarning'] = true;
+
+/** Disable new version check */
+$cfg['VersionCheck'] = false;
 
 /* Name of the Server displayed */
 /*$cfg['Servers'][$i]['verbose'] = 'mysql.myserver.com';*/
