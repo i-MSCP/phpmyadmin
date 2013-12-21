@@ -1,11 +1,11 @@
 {
     "name": "imscp/phpmyadmin",
     "description": "iMSCP tools - PhpMyadmin - MySQL administration tool",
-    "version": "4.1.0.0",
+    "version": "4.1.1.0",
     "authors": [
         {
             "name": "The phpMyAdmin Team",
-            "emai": "phpmyadmin-devel@lists.sourceforge.net",
+            "email": "phpmyadmin-devel@lists.sourceforge.net",
             "homepage": "http://www.phpmyadmin.net/home_page/team.php"
         }
     ],

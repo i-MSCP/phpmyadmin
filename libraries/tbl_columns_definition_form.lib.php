@@ -311,21 +311,12 @@ function PMA_getHeaderCells($is_backup, $columnMeta, $mimework, $db, $table)
     }
 
     if ($mimework && $GLOBALS['cfg']['BrowseMIME']) {
-        $hint = '<br />'
-            . sprintf(
-                __(
-                    'For a list of available transformation options and their MIME'
-                    . ' type transformations, click on'
-                    . ' %stransformation descriptions%s'
-                ),
-                '<a href="transformation_overview.php?'
-                . PMA_URL_getCommon($db, $table)
-                . '" target="_blank">',
-                '</a>'
-            );
-
         $header_cells[] = __('MIME type');
-        $header_cells[] = __('Browser transformation');
+        $header_cells[] = '<a href="transformation_overview.php?'
+            . PMA_URL_getCommon($db, $table)
+            . '" target="_blank">'
+            . __('Browser transformation')
+            . '</a>';
         $header_cells[] = __('Transformation options')
             . PMA_Util::showHint(
                 __(
@@ -335,7 +326,6 @@ function PMA_getHeaderCells($is_backup, $columnMeta, $mimework, $db, $table)
                     . ' values, precede it with a backslash (for example \'\\\\xyz\''
                     . ' or \'a\\\'b\').'
                 )
-                . $hint
             );
     }
 
@@ -388,7 +378,7 @@ function PMA_getRowDataForRegeneration($columnNumber, $submit_fulltext)
 
     $columnMeta['Key'] = '';
     if (isset($_REQUEST['field_key'][$columnNumber])) {
-        $parts = explode($_REQUEST['field_key'][$columnNumber], '_', 2);
+        $parts = explode('_', $_REQUEST['field_key'][$columnNumber], 2);
         if (count($parts) == 2 && $parts[1] == $columnNumber) {
             switch ($parts[0]) {
             case 'primary':
