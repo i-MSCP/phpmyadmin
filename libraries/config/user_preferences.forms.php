@@ -59,7 +59,6 @@ $forms['Features']['Warnings'] = array(
 // see prefs_forms.php and user_preferences.lib.php
 $forms['Features']['Developer'] = array(
     'Error_Handler/display',
-    'Error_Handler/gather',
     'DBG/sql');
 $forms['Sql_queries']['Sql_queries'] = array(
     'ShowSQL',
@@ -134,6 +133,9 @@ $forms['Main_panel']['Tabs'] = array(
     'DefaultTabServer',
     'DefaultTabDatabase',
     'DefaultTabTable');
+$forms['Main_panel']['DisplayRelationalSchema'] = array(
+    'PDFDefaultPageSize');
+
 $forms['Import']['Import_defaults'] = array(
     'Import/format',
     'Import/charset',

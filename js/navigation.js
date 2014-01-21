@@ -43,10 +43,19 @@ $(function () {
      */
     $('#pma_navigation_reload').live('click', function (event) {
         event.preventDefault();
-        $('#pma_navigation .throbber')
-            .first()
-            .css('visibility', 'visible');
+        // reload icon object
+        var $icon = $(this).find('img');
+        // source of the hidden throbber icon
+        var icon_throbber_src = $('#pma_navigation .throbber').attr('src');
+        // source of the reload icon
+        var icon_reload_src = $icon.attr('src');
+        // replace the source of the reload icon with the one for throbber
+        $icon.attr('src', icon_throbber_src);
         PMA_reloadNavigation();
+        // after one second, put back the reload icon
+        setTimeout(function () {
+            $icon.attr('src', icon_reload_src);
+        }, 1000);
     });
 
     /**
@@ -260,7 +269,7 @@ function expandTreeNode($expandElem, callback)
         var $throbber = $('#pma_navigation .throbber')
             .first()
             .clone()
-            .css('visibility', 'visible')
+            .css({visibility: 'visible', display: 'block'})
             .click(false);
         $icon.hide();
         $throbber.insertBefore($icon);
@@ -456,97 +465,79 @@ function PMA_showCurrentNavigation()
         return ret;
     }
 
-    function loadAndHighlightTableOrView($dbItem, table) {
+    function loadAndHighlightTableOrView($dbItem, itemName) {
         var $container = $dbItem.children('div.list_container');
-        var $tableContainer = $container
-            .children('ul')
-            .children('li.tableContainer');
-        var $viewContainer = $container
-            .children('ul')
-            .children('li.viewContainer');
-
-        if ($tableContainer.length > 0) {
-            var $expander = $tableContainer
-                .children('div:first')
-                .children('a.expander');
-
-            if (! $expander.hasClass('loaded')) {
-                loadChildNodes($expander, function (data) {
-                    highlightTableOrView($tableContainer, $viewContainer, table);
-                });
-            } else {
-                highlightTableOrView($tableContainer, $viewContainer, table);
-            }
-        } else if ($viewContainer.length > 0) {
-            highlightView($viewContainer, table);
+        var $expander;
+        var $whichItem = isItemInContainer($container, itemName, 'li.table, li.view');
+        //If item already there in some container
+        if ($whichItem) {
+            //get the relevant container while may also be a subcontainer
+            var $relatedContainer = $whichItem.closest('li.subContainer').length
+                ? $whichItem.closest('li.subContainer')
+                : $dbItem;
+            $whichItem = findLoadedItem(
+                $relatedContainer.children('div.list_container'),
+                itemName, null, true
+            );
+            //Show directly
+            showTableOrView($whichItem, $relatedContainer.children('div:first').children('a.expander'));
+        //else if item not there, try loading once
         } else {
-            // no containers, highlight the item
-            var $tableOrView = findLoadedItem($container, table, null, true);
-            if ($tableOrView){
-                scrollToView($tableOrView, false);
+            var $sub_containers = $dbItem.find('.subContainer');
+            //If there are subContainers i.e. tableContainer or viewContainer
+            if($sub_containers.length > 0) {
+                var $containers = new Array();
+                $sub_containers.each(function (index) {
+                    $containers[index] = $(this);
+                    $expander = $containers[index]
+                        .children('div:first')
+                        .children('a.expander');
+                    collapseTreeNode($expander);
+                    loadAndShowTableOrView($expander, $containers[index], itemName);
+                });
+            // else if no subContainers
+            } else {
+                $expander = $dbItem
+                    .children('div:first')
+                    .children('a.expander');
+                collapseTreeNode($expander);
+                loadAndShowTableOrView($expander, $dbItem, itemName);
             }
         }
     }
 
-    function highlightTableOrView($tableContainer, $viewContainer, table)
-    {
-        if (isItemInContainer($tableContainer, table, 'table')) {
-            var $expander = $tableContainer
-                .children('div:first')
-                .children('a.expander');
-            if ($expander.find('img').is('.ic_b_plus')) {
-                expandTreeNode($expander);
-            }
-            var $table = findLoadedItem(
-                $tableContainer.children('div.list_container'),
-                table, 'table', true
+    function loadAndShowTableOrView($expander, $relatedContainer, itemName) {
+        loadChildNodes($expander, function (data) {
+            var $whichItem = findLoadedItem(
+                $relatedContainer.children('div.list_container'),
+                itemName, null, true
             );
-            if ($table) {
-                scrollToView($table, false);
+            if ($whichItem) {
+                showTableOrView($whichItem, $expander);
             }
-        } else if ($viewContainer.length > 0) {
-            highlightView($viewContainer, table);
-        }
+        });
+    }
+
+    function showTableOrView($whichItem, $expander) {
+        expandTreeNode($expander, function (data) {
+            if ($whichItem) {
+                scrollToView($whichItem, false);
+            }
+        });
     }
 
     function isItemInContainer($container, name, clazz)
     {
-        $items = $container.find('li.' + clazz);
+        var $whichItem = null;
+        $items = $container.find(clazz);
         var found = false;
         $items.each(function () {
             if ($(this).children('a').text() == name) {
-                found = true;
+                $whichItem = $(this);
                 return false;
             }
         });
-        return found;
-    }
-
-    function highlightView($viewContainer, view) {
-        var $expander = $viewContainer
-            .children('div:first')
-            .children('a.expander');
-        if (! $expander.hasClass('loaded') ||
-            $expander.find('img').is('.ic_b_plus')
-        ) {
-            expandTreeNode($expander, function () {
-                var $view = findLoadedItem(
-                    $viewContainer.children('div.list_container'),
-                    view, 'view', true
-                );
-                if ($view) {
-                    scrollToView($view, false);
-                }
-            });
-        } else {
-            var $view = findLoadedItem(
-                $viewContainer.children('div.list_container'),
-                view, 'view', true
-            );
-            if ($view) {
-                scrollToView($view, false);
-            }
-        }
+        return $whichItem;
     }
 }
 
@@ -557,12 +548,6 @@ function PMA_showCurrentNavigation()
  * @return void
  */
 function PMA_reloadNavigation(callback) {
-    var $throbber = $('#pma_navigation .throbber')
-        .first()
-        .css({
-            'visibility' : 'visible',
-            'display' : 'block'
-        });
     var params = {
         reload: true,
         pos: $('#pma_navigation_tree').find('a.expander:first > span.pos').text()
@@ -605,10 +590,6 @@ function PMA_reloadNavigation(callback) {
     });
     var url = $('#pma_navigation').find('a.navigation_url').attr('href');
     $.post(url, params, function (data) {
-        // Hide throbber if it's visible
-        $('#pma_navigation .throbber')
-            .first()
-            .css('visibility', 'hidden');
         if (data.success) {
             $('#pma_navigation_tree').html(data.message).children('div').show();
             PMA_showCurrentNavigation();
@@ -754,6 +735,8 @@ var ResizeHandler = function () {
     this.getPos = function (event) {
         var pos = event.pageX;
         var windowWidth = $(window).width();
+        var windowScroll = $(window).scrollLeft();
+        pos = pos - windowScroll;
         if (this.left != 'left') {
             pos = windowWidth - event.pageX;
         }
@@ -1125,7 +1108,7 @@ PMA_fastFilter.filter.prototype.request = function ()
                 $('#pma_navigation_content')
                     .find('img.throbber')
                     .clone()
-                    .css('visibility', 'visible')
+                    .css({visibility: 'visible', display: 'block'})
             )
         );
     }

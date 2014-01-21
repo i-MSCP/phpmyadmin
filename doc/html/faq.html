@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.1.1 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.1.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.1.1',
+        VERSION:     '4.1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.1.1 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.1.5 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Other sources of information" href="other.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="other.html" title="Other sources of information"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.1.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -96,12 +96,12 @@ this time there is no better fix): remove or comment the <tt class="docutils lit
 declarations (2 lines) from the scripts <tt class="file docutils literal"><span class="pre">libraries/Header.class.php</span></tt>
 and <tt class="file docutils literal"><span class="pre">index.php</span></tt>.</p>
 </div>
-<div class="section" id="how-can-i-gzip-or-bzip-a-dump-or-a-csv-export-it-does-not-seem-to-work">
-<span id="faq1-7"></span><h3>1.7 How can I GZip or Bzip a dump or a CSV export? It does not seem to work.<a class="headerlink" href="#how-can-i-gzip-or-bzip-a-dump-or-a-csv-export-it-does-not-seem-to-work" title="Permalink to this headline">¶</a></h3>
-<p>These features are based on the <tt class="docutils literal"><span class="pre">gzencode()</span></tt> and <tt class="docutils literal"><span class="pre">bzcompress()</span></tt>
-PHP functions to be more independent of the platform (Unix/Windows,
-Safe Mode or not, and so on). So, you must have Zlib/Bzip2 support
-(<tt class="docutils literal"><span class="pre">--with-zlib</span></tt> and <tt class="docutils literal"><span class="pre">--with-bz2</span></tt>).</p>
+<div class="section" id="how-can-i-gzip-a-dump-or-a-csv-export-it-does-not-seem-to-work">
+<span id="faq1-7"></span><h3>1.7 How can I GZip a dump or a CSV export? It does not seem to work.<a class="headerlink" href="#how-can-i-gzip-a-dump-or-a-csv-export-it-does-not-seem-to-work" title="Permalink to this headline">¶</a></h3>
+<p>This feature is based on the <tt class="docutils literal"><span class="pre">gzencode()</span></tt>
+PHP function to be more independent of the platform (Unix/Windows,
+Safe Mode or not, and so on). So, you must have Zlib support
+(<tt class="docutils literal"><span class="pre">--with-zlib</span></tt>).</p>
 </div>
 <div class="section" id="i-cannot-insert-a-text-file-in-a-table-and-i-get-an-error-about-safe-mode-being-in-effect">
 <span id="faq1-8"></span><h3>1.8 I cannot insert a text file in a table, and I get an error about safe mode being in effect.<a class="headerlink" href="#i-cannot-insert-a-text-file-in-a-table-and-i-get-an-error-about-safe-mode-being-in-effect" title="Permalink to this headline">¶</a></h3>
@@ -794,6 +794,11 @@ the size of the largest item in any given column as the column size
 for the appropriate type. If you know you will be adding larger items
 to that column then you should manually adjust the column sizes
 accordingly. This is done for the sake of efficiency.</p>
+</div>
+<div class="section" id="after-upgrading-some-bookmarks-are-gone-or-their-content-cannot-be-shown">
+<span id="faq3-20"></span><h3>3.20 After upgrading, some bookmarks are gone or their content cannot be shown.<a class="headerlink" href="#after-upgrading-some-bookmarks-are-gone-or-their-content-cannot-be-shown" title="Permalink to this headline">¶</a></h3>
+<p>At some point, the character set used to store bookmark content has changed.
+It&#8217;s better to recreate your bookmark from the newer phpMyAdmin version.</p>
 </div>
 </div>
 <div class="section" id="isps-multi-user-installations">
@@ -1571,7 +1576,7 @@ attempts.</p>
 <li><a class="reference internal" href="#using-phpmyadmin-on-iis-i-m-displayed-the-error-message-the-specified-cgi-application-misbehaved-by-not-returning-a-complete-set-of-http-headers">1.4 Using phpMyAdmin on IIS, I&#8217;m displayed the error message: &#8220;The specified CGI application misbehaved by not returning a complete set of HTTP headers ...&#8221;.</a></li>
 <li><a class="reference internal" href="#using-phpmyadmin-on-iis-i-m-facing-crashes-and-or-many-error-messages-with-the-http">1.5 Using phpMyAdmin on IIS, I&#8217;m facing crashes and/or many error messages with the HTTP.</a></li>
 <li><a class="reference internal" href="#i-can-t-use-phpmyadmin-on-pws-nothing-is-displayed">1.6 I can&#8217;t use phpMyAdmin on PWS: nothing is displayed!</a></li>
-<li><a class="reference internal" href="#how-can-i-gzip-or-bzip-a-dump-or-a-csv-export-it-does-not-seem-to-work">1.7 How can I GZip or Bzip a dump or a CSV export? It does not seem to work.</a></li>
+<li><a class="reference internal" href="#how-can-i-gzip-a-dump-or-a-csv-export-it-does-not-seem-to-work">1.7 How can I GZip a dump or a CSV export? It does not seem to work.</a></li>
 <li><a class="reference internal" href="#i-cannot-insert-a-text-file-in-a-table-and-i-get-an-error-about-safe-mode-being-in-effect">1.8 I cannot insert a text file in a table, and I get an error about safe mode being in effect.</a></li>
 <li><a class="reference internal" href="#faq1-9">1.9 (withdrawn).</a></li>
 <li><a class="reference internal" href="#i-m-having-troubles-when-uploading-files-with-phpmyadmin-running-on-a-secure-server-my-browser-is-internet-explorer-and-i-m-using-the-apache-server">1.10 I&#8217;m having troubles when uploading files with phpMyAdmin running on a secure server. My browser is Internet Explorer and I&#8217;m using the Apache server.</a></li>
@@ -1643,6 +1648,7 @@ attempts.</p>
 <li><a class="reference internal" href="#faq3-17">3.17 (withdrawn).</a></li>
 <li><a class="reference internal" href="#when-i-import-a-csv-file-that-contains-multiple-tables-they-are-lumped-together-into-a-single-table">3.18 When I import a CSV file that contains multiple tables, they are lumped together into a single table.</a></li>
 <li><a class="reference internal" href="#when-i-import-a-file-and-have-phpmyadmin-determine-the-appropriate-data-structure-it-only-uses-int-decimal-and-varchar-types">3.19 When I import a file and have phpMyAdmin determine the appropriate data structure it only uses int, decimal, and varchar types.</a></li>
+<li><a class="reference internal" href="#after-upgrading-some-bookmarks-are-gone-or-their-content-cannot-be-shown">3.20 After upgrading, some bookmarks are gone or their content cannot be shown.</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#isps-multi-user-installations">ISPs, multi-user installations</a><ul>
@@ -1774,7 +1780,7 @@ attempts.</p>
         <li class="right" >
           <a href="other.html" title="Other sources of information"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.1.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.1.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

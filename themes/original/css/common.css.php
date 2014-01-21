@@ -789,7 +789,6 @@ div#tablestatistics table {
 
 #serverinfo .item {
     white-space:        nowrap;
-    float: <?php echo $left; ?>
 }
 
 #goto_pagetop {
@@ -2098,11 +2097,6 @@ fieldset .disabled-field td {
 
 .data_full_width {
     width: 100%;
-}
-
-form#resultsForm > .data {
-    overflow-x: auto;
-    overflow-y: hidden;
 }
 
 .cDrop {

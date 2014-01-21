@@ -68,13 +68,13 @@ and :file:`index.php`.
 
 .. _faq1_7:
 
-1.7 How can I GZip or Bzip a dump or a CSV export? It does not seem to work.
-----------------------------------------------------------------------------
+1.7 How can I GZip a dump or a CSV export? It does not seem to work.
+--------------------------------------------------------------------
 
-These features are based on the ``gzencode()`` and ``bzcompress()``
-PHP functions to be more independent of the platform (Unix/Windows,
-Safe Mode or not, and so on). So, you must have Zlib/Bzip2 support
-(``--with-zlib`` and ``--with-bz2``).
+This feature is based on the ``gzencode()``
+PHP function to be more independent of the platform (Unix/Windows,
+Safe Mode or not, and so on). So, you must have Zlib support
+(``--with-zlib``).
 
 .. _faq1_8:
 
@@ -1001,6 +1001,14 @@ the size of the largest item in any given column as the column size
 for the appropriate type. If you know you will be adding larger items
 to that column then you should manually adjust the column sizes
 accordingly. This is done for the sake of efficiency.
+
+.. _faq3_20:
+
+3.20 After upgrading, some bookmarks are gone or their content cannot be shown.
+-------------------------------------------------------------------------------
+
+At some point, the character set used to store bookmark content has changed.
+It's better to recreate your bookmark from the newer phpMyAdmin version.
 
 .. _faqmultiuser:
 

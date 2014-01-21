@@ -66,6 +66,13 @@ $cfg_db['TabsMode'] = array(
     'text'  => __('Text'),
     'both'  => __('Both')
 );
+$cfg_db['PDFDefaultPageSize'] = array(
+    'A3'     => 'A3',
+    'A4'     => 'A4',
+    'A5'     => 'A5',
+    'letter' => 'letter',
+    'legal'  => 'legal'
+);
 $cfg_db['ActionLinksMode'] = array(
     'icons' => __('Icons'),
     'text'  => __('Text'),
@@ -152,7 +159,7 @@ $cfg_db['Export']['format'] = array(
     'codegen', 'csv', 'excel', 'htmlexcel','htmlword', 'latex', 'ods',
     'odt', 'pdf', 'sql', 'texytext', 'xls', 'xml', 'yaml'
 );
-$cfg_db['Export']['compression'] = array('none', 'zip', 'gzip', 'bzip2');
+$cfg_db['Export']['compression'] = array('none', 'zip', 'gzip');
 $cfg_db['Export']['charset'] = array_merge(
     array(''),
     $GLOBALS['cfg']['AvailableCharsets']

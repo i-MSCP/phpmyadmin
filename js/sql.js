@@ -232,6 +232,9 @@ AJAX.registerOnload('sql.js', function () {
         event.preventDefault();
 
         var $form = $(this);
+        if (codemirror_editor) {
+            $form[0].elements['sql_query'].value = codemirror_editor.getValue();
+        }
         if (! checkSqlQuery($form[0])) {
             return false;
         }
@@ -286,6 +289,7 @@ AJAX.registerOnload('sql.js', function () {
                      .show()
                      .html(data.message);
                 }
+                PMA_highlightSQL($('#result_query'));
 
                 if (typeof data.ajax_reload != 'undefined') {
                     if (data.ajax_reload.reload) {
