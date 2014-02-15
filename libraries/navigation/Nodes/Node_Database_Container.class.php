@@ -9,6 +9,8 @@ if (! defined('PHPMYADMIN')) {
     exit;
 }
 
+require_once './libraries/check_user_privileges.lib.php';
+
 /**
  * Represents a container for database nodes in the navigation tree
  *
@@ -30,7 +32,7 @@ class Node_Database_Container extends Node
         $new        = PMA_NodeFactory::getInstance(
             'Node', _pgettext('Create new database', 'New')
         );
-        $new->isNew = true;
+        $new->isNew = $GLOBALS['is_create_db_priv'];
         $new->icon  = PMA_Util::getImage('b_newdb.png', '');
         $new->links = array(
             'text' => 'server_databases.php?server=' . $GLOBALS['server']

@@ -1309,7 +1309,6 @@ function PMA_getHtmlForDisplayLoginInformationFields($mode = 'new')
             __(
                 'An account already exists with the same username '
                 . 'but possibly a different hostname. '
-                . 'Are you sure you wish to proceed?'
             )
         )->getDisplay()
         . '</div>';
@@ -1417,7 +1416,8 @@ function PMA_getHtmlForDisplayLoginInformationFields($mode = 'new')
 
     $html_output .= '<input type="text" name="hostname" maxlength="'
         . $hostname_length . '" value="'
-        . htmlspecialchars(isset($GLOBALS['hostname']) ? $GLOBALS['hostname'] : '')
+        // use default value of '%' to match with the default 'Any host'
+        . htmlspecialchars(isset($GLOBALS['hostname']) ? $GLOBALS['hostname'] : '%')
         . '" title="' . __('Host')
         . '" onchange="pred_hostname.value = \'userdefined\';" />' . "\n"
         . PMA_Util::showHint(

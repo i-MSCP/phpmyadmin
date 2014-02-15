@@ -129,7 +129,10 @@ function PMA_current_version(data)
     if (data && data.version && data.date) {
         var current = parseVersionString(pmaversion);
         var latest = parseVersionString(data.version);
-        var version_information_message = PMA_messages.strLatestAvailable + ' ' + escapeHtml(data.version);
+        var version_information_message = '<span>'
+            + PMA_messages.strLatestAvailable
+            + ' ' + escapeHtml(data.version)
+            + '</span>';
         if (latest > current) {
             var message = $.sprintf(
                 PMA_messages.strNewerVersion,
@@ -146,6 +149,7 @@ function PMA_current_version(data)
         if (latest === current) {
             version_information_message = ' (' + PMA_messages.strUpToDate + ')';
         }
+        $('#li_pma_version span').remove();
         $('#li_pma_version').append(version_information_message);
     }
 }
@@ -156,6 +160,7 @@ function PMA_current_version(data)
 function PMA_display_git_revision()
 {
     $('#is_git_revision').remove();
+    $('#li_pma_version_git').remove();
     $.get(
         "index.php",
         {
@@ -853,8 +858,25 @@ function insertValueQuery()
 function addDateTimePicker() {
     if ($.timepicker !== undefined) {
         $('input.datefield, input.datetimefield').each(function () {
-            PMA_addDatepicker($(this));
-        });
+
+            no_decimals = $(this).parent().data('decimals');
+            var showMillisec = false;
+            var showMicrosec = false;
+            var timeFormat = 'HH:mm:ss';
+            // check for decimal places of seconds
+            if (($(this).parent().data('decimals') > 0) && ($(this).parent().data('type').indexOf('time') != -1)){
+                showMillisec = true;                       
+                timeFormat = 'HH:mm:ss.lc';
+                if ($(this).parent().data('decimals') > 3) {
+                    showMicrosec = true;
+                }
+            }
+            PMA_addDatepicker($(this), {
+                showMillisec: showMillisec,
+                showMicrosec: showMicrosec,
+                timeFormat: timeFormat,                        
+            });               
+         })
     }
 }
 
@@ -1666,7 +1688,7 @@ function PMA_ajaxShowMessage(message, timeout)
         $retval
         .delay(timeout)
         .fadeOut('medium', function () {
-            if ($(this).is('.dismissable')) {
+            if ($(this).is(':data(tooltip)')) {
                 $(this).tooltip('destroy');
             }
             // Remove the notification
@@ -1705,10 +1727,8 @@ function PMA_ajaxRemoveMessage($this_msgbox)
         $this_msgbox
         .stop(true, true)
         .fadeOut('medium');
-        if ($this_msgbox.is('.dismissable')) {
-            if ($.isFunction($this_msgbox.tooltip)) {
-                $this_msgbox.tooltip('destroy');
-            }
+        if ($this_msgbox.is(':data(tooltip)')) {
+            $this_msgbox.tooltip('destroy');
         } else {
             $this_msgbox.remove();
         }
