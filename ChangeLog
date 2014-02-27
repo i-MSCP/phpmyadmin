@@ -1,6 +1,22 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.1.8.0 (2014-02-22)
+- bug #4276 Login loop on session expiry
+- bug #4249 Incorrect number of result rows for SQL with subqueries
+- bug #4275 Broken Link to php extension manual
+- bug #4053 List of procedures is not displayed after executing with Enter
+- bug #4081 Setup page content shifted to the right edge of its tabs
+- bug #4284 Reordering a column erases comments for other columns
+- bug #4286 Open "Browse" in a new tab
+- bug #4287 Printview - Always one column too much
+- bug #4288 Expand database (+ icon) after timeout doesn't do anything
+- bug #4285 Fixed CSS for setup
+- Fixed altering table to DOUBLE/FLOAT field
+- bug #4292 Success message and failure message being shown together
+- bug #4293 opening new tab (using selflink) for import.php based actions
+            results in error and logout 
+
 4.1.7.0 (2014-02-09)
 - bug #4245 initial Browse query does not match sorting order
 - bug #4250 Notice on export page
