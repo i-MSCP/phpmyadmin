@@ -1,6 +1,14 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.1.10.0 (2014-03-22)
+- bug #4301 Grid edit: "SELECT" query is replaced by "UPDATE" query after edit
+- bug #4278 reCaptcha re-login requires double effort
+- bug #4324 Datepicker not showing up on insert page
+- bug #3991 Problem selecting item in select boxes with the ENTER keystroke in some browsers
+- bug #4323 QueryWindow ignores CodeMirror
+- bug       None of the live charts shown on "Status -> Monitor" (Chrome) 
+
 4.1.9.0 (2014-03-06)
 - bug #4279 CTRL + up or down moves two fields (part one)
 - bug #4294 output as text radio clickable for "OpenDocument Text" export 
@@ -44,7 +52,6 @@ phpMyAdmin - ChangeLog
 - bug #4263 Japanese character encoding not working properly when exporting
 - bug #4269 Notice on table relation page
 - bug #4270 Bad text-color for table comments
-- bug #4278 reCaptcha re-login requires double effort
 - bug #4272 Incorrect tabindex
 - bug #4271 Query by example and the second criteria line
 - bug #4242 Wildcard-containing only_db failure in sidebar
