@@ -32,7 +32,6 @@ $i++;
  *Authentication type
  */
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
-$cfg['Servers'][$i]['AllowRoot'] = false;
 
 /**
  * Parameters set by i-MSCP
@@ -49,6 +48,7 @@ $cfg['Servers'][$i]['connect_type'] = 'tcp';
 $cfg['Servers'][$i]['compress'] = true;
 $cfg['Servers'][$i]['extension'] = 'mysqli';
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
+$cfg['Servers'][$i]['AllowRoot'] = false;
 
 /**
  * rajk - for blobstreaming
