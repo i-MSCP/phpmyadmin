@@ -1,6 +1,20 @@
 phpMyAdmin - ChangeLog
 ======================
 
+4.2.4.0 (2014-06-20)
+- bug #4449 Mediawiki export does not produce table header row; also fix related PHP warnings
+- bug #4442 New lines are added to query every time
+- bug #4445 Fatal error on SQL Export of join query
+- bug #4448 Dump binary columns in hexadecimal notation not working
+- Regenerate cookie encryption IV for every session
+- bug #4405 Cannot import (open_basedir): fix another case
+- bug #4457 SQL tab - Insert queries not showing affected row count
+- bug       Missing warning about existing account, on multi-server config
+- bug #4435 WHERE clause can be undefined
+- bug       SQL export views as tables option getting ignored
+- bug #4464 [security] XSS injection due to unescaped db/table name in navigation hiding
+- bug #4465 [security] XSS injection due to unescaped db/table name in recent/favorite tables
+
 4.2.3.0 (2014-06-08)
 - bug #4423 Moving fields not working
 - bug #4424 Table indexes disappear after altering field
