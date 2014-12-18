@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.2.13 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.3.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.2.13',
+        VERSION:     '4.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.2.13 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.3.2 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Other sources of information" href="other.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="other.html" title="Other sources of information"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.2.13 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.3.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -705,11 +705,8 @@ TableSeparator or disabling that feature.</p>
 <p class="last"><span class="target" id="index-18"></span><a class="reference internal" href="config.html#cfg_NavigationTreeTableSeparator"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['NavigationTreeTableSeparator']</span></tt></a></p>
 </div>
 </div>
-<div class="section" id="what-is-currently-not-supported-in-phpmyadmin-about-innodb">
-<span id="faq3-6"></span><h3>3.6 What is currently not supported in phpMyAdmin about InnoDB?<a class="headerlink" href="#what-is-currently-not-supported-in-phpmyadmin-about-innodb" title="Permalink to this headline">¶</a></h3>
-<p>In Relation view, having more than one index column in the foreign key. In Query-by-
-example (Query), automatic generation of the query LEFT JOIN from the
-foreign table.</p>
+<div class="section" id="faq3-6">
+<span id="id7"></span><h3>3.6 (withdrawn).<a class="headerlink" href="#faq3-6" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="i-have-table-with-many-100-columns-and-when-i-try-to-browse-table-i-get-series-of-errors-like-warning-unable-to-parse-url-how-can-this-be-fixed">
 <span id="faq3-7"></span><h3>3.7 I have table with many (100+) columns and when I try to browse table I get series of errors like &#8220;Warning: unable to parse url&#8221;. How can this be fixed?<a class="headerlink" href="#i-have-table-with-many-100-columns-and-when-i-try-to-browse-table-i-get-series-of-errors-like-warning-unable-to-parse-url-how-can-this-be-fixed" title="Permalink to this headline">¶</a></h3>
@@ -752,10 +749,13 @@ can use it for the Edit and Delete links.</p>
 <p>phpMyAdmin uses a quick method to get the row count, and this method only
 returns an approximate count in the case of InnoDB tables. See
 <span class="target" id="index-19"></span><a class="reference internal" href="config.html#cfg_MaxExactCount"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['MaxExactCount']</span></tt></a> for a way to modify those results, but
-this could have a serious impact on performance.</p>
+this could have a serious impact on performance.
+However, one can easily replace the approximate row count with exact count by
+simply clicking on the approximate count. This can also be done for all tables
+at once by clicking on the rows sum displayed at the bottom.</p>
 </div>
 <div class="section" id="faq3-12">
-<span id="id8"></span><h3>3.12 (withdrawn).<a class="headerlink" href="#faq3-12" title="Permalink to this headline">¶</a></h3>
+<span id="id9"></span><h3>3.12 (withdrawn).<a class="headerlink" href="#faq3-12" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="i-get-an-error-when-entering-use-followed-by-a-db-name-containing-an-hyphen">
 <span id="faq3-13"></span><h3>3.13 I get an error when entering <tt class="docutils literal"><span class="pre">USE</span></tt> followed by a db name containing an hyphen.<a class="headerlink" href="#i-get-an-error-when-entering-use-followed-by-a-db-name-containing-an-hyphen" title="Permalink to this headline">¶</a></h3>
@@ -768,13 +768,13 @@ accept this syntax for the USE command.</p>
 it&#8217;s not likely to be solved in the future.</p>
 </div>
 <div class="section" id="faq3-15">
-<span id="id9"></span><h3>3.15 (withdrawn).<a class="headerlink" href="#faq3-15" title="Permalink to this headline">¶</a></h3>
+<span id="id10"></span><h3>3.15 (withdrawn).<a class="headerlink" href="#faq3-15" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="faq3-16">
-<span id="id10"></span><h3>3.16 (withdrawn).<a class="headerlink" href="#faq3-16" title="Permalink to this headline">¶</a></h3>
+<span id="id11"></span><h3>3.16 (withdrawn).<a class="headerlink" href="#faq3-16" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="faq3-17">
-<span id="id11"></span><h3>3.17 (withdrawn).<a class="headerlink" href="#faq3-17" title="Permalink to this headline">¶</a></h3>
+<span id="id12"></span><h3>3.17 (withdrawn).<a class="headerlink" href="#faq3-17" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="when-i-import-a-csv-file-that-contains-multiple-tables-they-are-lumped-together-into-a-single-table">
 <span id="faq3-18"></span><h3>3.18 When I import a CSV file that contains multiple tables, they are lumped together into a single table.<a class="headerlink" href="#when-i-import-a-csv-file-that-contains-multiple-tables-they-are-lumped-together-into-a-single-table" title="Permalink to this headline">¶</a></h3>
@@ -1221,7 +1221,7 @@ will usually let you create a database with a dot, but then you cannot
 work with it, nor delete it.</p>
 </div>
 <div class="section" id="faqsqlvalidator">
-<span id="id12"></span><h3>6.14 (withdrawn).<a class="headerlink" href="#faqsqlvalidator" title="Permalink to this headline">¶</a></h3>
+<span id="id13"></span><h3>6.14 (withdrawn).<a class="headerlink" href="#faqsqlvalidator" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="i-want-to-add-a-blob-column-and-put-an-index-on-it-but-mysql-says-blob-column-used-in-key-specification-without-a-key-length">
 <span id="faq6-15"></span><h3>6.15 I want to add a BLOB column and put an index on it, but MySQL says &#8220;BLOB column &#8216;...&#8217; used in key specification without a key length&#8221;.<a class="headerlink" href="#i-want-to-add-a-blob-column-and-put-an-index-on-it-but-mysql-says-blob-column-used-in-key-specification-without-a-key-length" title="Permalink to this headline">¶</a></h3>
@@ -1352,7 +1352,7 @@ which works out of the box.</p>
 native ones is done whenever you enter Structure page for this table.</p>
 </div>
 <div class="section" id="faq6-25">
-<span id="id13"></span><h3>6.25 (withdrawn).<a class="headerlink" href="#faq6-25" title="Permalink to this headline">¶</a></h3>
+<span id="id14"></span><h3>6.25 (withdrawn).<a class="headerlink" href="#faq6-25" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="how-can-i-select-a-range-of-rows">
 <span id="faq6-26"></span><h3>6.26 How can I select a range of rows?<a class="headerlink" href="#how-can-i-select-a-range-of-rows" title="Permalink to this headline">¶</a></h3>
@@ -1502,6 +1502,73 @@ wait until it turns <cite>Gray</cite> again.</p>
 file, you can define the  maximum number of favorite tables shown in the
 navigation panel. Its default value is <cite>10</cite>.</p>
 </div>
+<div class="section" id="how-can-i-use-the-range-search-feature">
+<span id="faq6-35"></span><h3>6.35 How can I use the Range search feature?<a class="headerlink" href="#how-can-i-use-the-range-search-feature" title="Permalink to this headline">¶</a></h3>
+<p>With the help of range search feature, one can specify a range of values for
+particular column(s) while performing search operation on a table from the <cite>Search</cite>
+tab.</p>
+<p>To use this feature simply click on the <cite>BETWEEN</cite> or <cite>NOT BETWEEN</cite> operators
+from the operator select list in front of the column name. On choosing one of the
+above options, a dialog box will show up asking for the <cite>Minimum</cite> and <cite>Maximum</cite>
+value for that column. Only the specified range of values will be included
+in case of <cite>BETWEEN</cite> and excluded in case of <cite>NOT BETWEEN</cite> from the final results.</p>
+<p>Note: The Range search feature will work only <cite>Numeric</cite> and <cite>Date</cite> data type columns.</p>
+</div>
+<div class="section" id="what-is-central-columns-and-how-can-i-use-this-feature">
+<span id="faq6-36"></span><h3>6.36 What is Central columns and How can I use this feature?<a class="headerlink" href="#what-is-central-columns-and-how-can-i-use-this-feature" title="Permalink to this headline">¶</a></h3>
+<p>As the name suggests, the Central columns feature enables to maintain a central list of
+columns per database to avoid similar name for the same data element and bring consistency
+of data type for the same data element. You can use the central list of columns to
+add an element to any table structure in that database which will save from writing
+similar column name and column definition.</p>
+<p>To add a column to central list, go to table structure page, check the columns you want
+to include and then simply click on &#8220;Add to central columns&#8221;. If you want to add all
+unique columns from more than one table from a database then go to database structure page,
+check the tables you want to include and then select &#8220;Add columns to central list&#8221;.</p>
+<p>To remove a column from central list, go to Table structure page, check the columns you want
+to remove and then simply click on &#8220;Remove from central columns&#8221;. If you want to remove all
+columns from more than one tables from a database then go to database structure page,
+check the tables you want to include and then select &#8220;Remove columns from central list&#8221;.</p>
+<p>To view and manage the central list, select the database you want to manage central columns
+for then from the top menu click on &#8220;Central columns&#8221;. You will be taken to a page where
+you will have options to edit, delete or add new columns to central list.</p>
+</div>
+<div class="section" id="how-can-i-use-improve-table-structure-feature">
+<span id="faq6-37"></span><h3>6.37 How can I use Improve Table structure feature?<a class="headerlink" href="#how-can-i-use-improve-table-structure-feature" title="Permalink to this headline">¶</a></h3>
+<p>Improve table structure feature helps to bring the table structure upto
+Third Normal Form. A wizard is presented to user which asks questions about the
+elements during the various steps for normalization and a new structure is proposed
+accordingly to bring the table into the First/Second/Third Normal form.
+On startup of the wizard, user gets to select upto what normal form they want to
+normalize the table structure.</p>
+<p>Here is an example table which you can use to test all of the three First, Second and
+Third Normal From.</p>
+<div class="highlight-mysql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="ss">`VetOffice`</span> <span class="p">(</span>
+ <span class="ss">`petName`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`petBreed`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`petType`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`petDOB`</span> <span class="kt">date</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`ownerLastName`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`ownerFirstName`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`ownerPhone1`</span> <span class="kt">int</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`ownerPhone2`</span> <span class="kt">int</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+ <span class="ss">`ownerEmail`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The above table is not in First normal Form as no primary key exists. Primary key
+is supposed to be (<cite>petName</cite>,`ownerLastName`,`ownerFirstName`) . If the primary key
+is chosen as suggested the resultant table won&#8217;t be in Second as well as Third Normal
+form as the following dependencies exists.</p>
+<div class="highlight-mysql"><div class="highlight"><pre><span class="p">(</span><span class="n">OwnerLastName</span><span class="p">,</span> <span class="n">OwnerFirstName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nf">OwnerEmail</span>
+<span class="p">(</span><span class="n">OwnerLastName</span><span class="p">,</span> <span class="n">OwnerFirstName</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OwnerPhone</span>
+<span class="n">PetBreed</span> <span class="o">-&gt;</span> <span class="n">PetType</span>
+</pre></div>
+</div>
+<p>Which says, OwnerEmail depends on OwnerLastName and OwnerFirstName.
+OwnerPhone depends on OwnerLastName and OwnerFirstName.
+PetType depends on PetBreed.</p>
+</div>
 </div>
 <div class="section" id="phpmyadmin-project">
 <span id="faqproject"></span><h2>phpMyAdmin project<a class="headerlink" href="#phpmyadmin-project" title="Permalink to this headline">¶</a></h2>
@@ -1561,10 +1628,10 @@ attempts.</p>
 <div class="section" id="synchronization">
 <span id="faqsynchronization"></span><h2>Synchronization<a class="headerlink" href="#synchronization" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="faq9-1">
-<span id="id14"></span><h3>9.1 (withdrawn).<a class="headerlink" href="#faq9-1" title="Permalink to this headline">¶</a></h3>
+<span id="id15"></span><h3>9.1 (withdrawn).<a class="headerlink" href="#faq9-1" title="Permalink to this headline">¶</a></h3>
 </div>
 <div class="section" id="faq9-2">
-<span id="id15"></span><h3>9.2 (withdrawn).<a class="headerlink" href="#faq9-2" title="Permalink to this headline">¶</a></h3>
+<span id="id16"></span><h3>9.2 (withdrawn).<a class="headerlink" href="#faq9-2" title="Permalink to this headline">¶</a></h3>
 </div>
 </div>
 </div>
@@ -1643,7 +1710,7 @@ attempts.</p>
 <li><a class="reference internal" href="#with-innodb-tables-i-lose-foreign-key-relationships-when-i-rename-a-table-or-a-column">3.3 With InnoDB tables, I lose foreign key relationships when I rename a table or a column.</a></li>
 <li><a class="reference internal" href="#i-am-unable-to-import-dumps-i-created-with-the-mysqldump-tool-bundled-with-the-mysql-server-distribution">3.4 I am unable to import dumps I created with the mysqldump tool bundled with the MySQL server distribution.</a></li>
 <li><a class="reference internal" href="#when-using-nested-folders-multiple-hierarchies-are-displayed-in-a-wrong-manner">3.5 When using nested folders, multiple hierarchies are displayed in a wrong manner.</a></li>
-<li><a class="reference internal" href="#what-is-currently-not-supported-in-phpmyadmin-about-innodb">3.6 What is currently not supported in phpMyAdmin about InnoDB?</a></li>
+<li><a class="reference internal" href="#faq3-6">3.6 (withdrawn).</a></li>
 <li><a class="reference internal" href="#i-have-table-with-many-100-columns-and-when-i-try-to-browse-table-i-get-series-of-errors-like-warning-unable-to-parse-url-how-can-this-be-fixed">3.7 I have table with many (100+) columns and when I try to browse table I get series of errors like &#8220;Warning: unable to parse url&#8221;. How can this be fixed?</a></li>
 <li><a class="reference internal" href="#i-cannot-use-clickable-html-forms-in-columns-where-i-put-a-mime-transformation-onto">3.8 I cannot use (clickable) HTML-forms in columns where I put a MIME-Transformation onto!</a></li>
 <li><a class="reference internal" href="#i-get-error-messages-when-using-sql-mode-ansi-for-the-mysql-server">3.9 I get error messages when using &#8220;&#8211;sql_mode=ANSI&#8221; for the MySQL server.</a></li>
@@ -1728,6 +1795,9 @@ attempts.</p>
 <li><a class="reference internal" href="#how-can-i-use-the-zoom-search-feature">6.32 How can I use the zoom search feature?</a></li>
 <li><a class="reference internal" href="#when-browsing-a-table-how-can-i-copy-a-column-name">6.33 When browsing a table, how can I copy a column name?</a></li>
 <li><a class="reference internal" href="#how-can-i-use-the-favorite-tables-feature">6.34 How can I use the Favorite Tables feature?</a></li>
+<li><a class="reference internal" href="#how-can-i-use-the-range-search-feature">6.35 How can I use the Range search feature?</a></li>
+<li><a class="reference internal" href="#what-is-central-columns-and-how-can-i-use-this-feature">6.36 What is Central columns and How can I use this feature?</a></li>
+<li><a class="reference internal" href="#how-can-i-use-improve-table-structure-feature">6.37 How can I use Improve Table structure feature?</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#phpmyadmin-project">phpMyAdmin project</a><ul>
@@ -1790,7 +1860,7 @@ attempts.</p>
         <li class="right" >
           <a href="other.html" title="Other sources of information"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.2.13 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.3.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
