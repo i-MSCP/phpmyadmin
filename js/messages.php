@@ -471,6 +471,7 @@ $js_messages['strHidePanel'] = __('Hide Panel');
 $js_messages['strUnhideNavItem'] = __('Show hidden navigation tree items.');
 $js_messages['linkWithMain'] = __('Link with main panel');
 $js_messages['unlinkWithMain'] = __('Unlink from main panel');
+$js_messages['strHoverFastFilter'] = __('To search all databases on server, press Enter after a search term');
 
 /* microhistory */
 $js_messages['strInvalidPage'] = __('The requested page was not found in the history, it may have expired.');
@@ -526,6 +527,7 @@ $js_messages['phpErrorsBeingSubmitted'] = '<div class="error">'
 
 $js_messages['strConsoleRequeryConfirm'] = __('Execute this query again?');
 $js_messages['strConsoleDeleteBookmarkConfirm'] = __('Do you really want to delete this bookmark?');
+$js_messages['strNoLocalStorage'] = __('Your web browser does not support local storage of settings or the quota limit has been reached, some features may not work properly for you. In Safari, such problem is commonly caused by "Private Mode Browsing".');
 
 echo "var PMA_messages = new Array();\n";
 foreach ($js_messages as $name => $js_message) {
