@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; phpMyAdmin 4.4.4 documentation</title>
+    <title>Configuration &mdash; phpMyAdmin 4.4.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.4.4',
+        VERSION:     '4.4.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.4 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.4.5 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -2291,7 +2291,7 @@ with a delimiter character.</p>
 </tr>
 </tbody>
 </table>
-<p>The public key for the reCaptcha service that can be obtain from
+<p>The public key for the reCaptcha service that can be obtained from
 <a class="reference external" href="http://www.google.com/recaptcha">http://www.google.com/recaptcha</a>.</p>
 <p>reCaptcha will be then used in <a class="reference internal" href="setup.html#cookie"><em>Cookie authentication mode</em></a>.</p>
 </dd></dl>
@@ -2891,6 +2891,23 @@ or <tt class="docutils literal"><span class="pre">'both'</span></tt>.</p>
 properties links (like <em class="guilabel">Browse</em>, <em class="guilabel">Select</em>,
 <em class="guilabel">Insert</em>, ...). Can be set to <tt class="docutils literal"><span class="pre">'both'</span></tt>
 if you want icons AND text. When set to <tt class="docutils literal"><span class="pre">text</span></tt>, will only show text.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cfg_RowActionType">
+<tt class="descname">$cfg['RowActionType']</tt><a class="headerlink" href="#cfg_RowActionType" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">string</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body"><tt class="docutils literal"><span class="pre">'both'</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>Whether to display icons or text or both icons and text in table row action
+segment. Value can be either of <tt class="docutils literal"><span class="pre">'icons'</span></tt>, <tt class="docutils literal"><span class="pre">'text'</span></tt> or <tt class="docutils literal"><span class="pre">'both'</span></tt>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -3863,6 +3880,8 @@ of multiple maintenance operation.</p>
 </tr>
 </tbody>
 </table>
+<p>The background color used when hovering over a row in the Browse panel.
+See <tt class="file docutils literal"><span class="pre">themes/themename/layout.inc.php</span></tt>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -3878,6 +3897,9 @@ of multiple maintenance operation.</p>
 </tr>
 </tbody>
 </table>
+<p>The text color used when hovering over a row in the Browse panel.
+Used when <span class="target" id="index-73"></span><a class="reference internal" href="#cfg_BrowsePointerEnable"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['BrowsePointerEnable']</span></tt></a> is true.
+See <tt class="file docutils literal"><span class="pre">themes/themename/layout.inc.php</span></tt>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -3893,6 +3915,10 @@ of multiple maintenance operation.</p>
 </tr>
 </tbody>
 </table>
+<p>The background color used to highlight a row selected by checkbox in the Browse panel or
+when a column is selected.
+Used when <span class="target" id="index-74"></span><a class="reference internal" href="#cfg_BrowsePointerEnable"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['BrowsePointerEnable']</span></tt></a> is true.
+See <tt class="file docutils literal"><span class="pre">themes/themename/layout.inc.php</span></tt>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -3908,11 +3934,9 @@ of multiple maintenance operation.</p>
 </tr>
 </tbody>
 </table>
-<p>The colors (HTML) uses for the pointer and the marker in browse mode.
-The former feature highlights the row over which your mouse is passing
-and the latter lets you visually mark/unmark rows by clicking on the
-corresponding checkbox. Highlighting / marking a column is done by
-hovering over / clicking the column&#8217;s header (outside of the text).
+<p>The color used when you visually mark a row or column in the Browse panel.
+Rows can be marked by clicking the checkbox to the left of the row and columns can be
+marked by clicking the column&#8217;s header (outside of the header text).
 See <tt class="file docutils literal"><span class="pre">themes/themename/layout.inc.php</span></tt>.</p>
 </dd></dl>
 
@@ -3966,7 +3990,8 @@ This one is used in textarea. See <tt class="file docutils literal"><span class=
 </tr>
 </tbody>
 </table>
-<p>A value of <tt class="docutils literal"><span class="pre">true</span></tt> activates the navi pointer.</p>
+<p>When set to true, hovering over an item in the navigation panel causes that item to be marked
+(the background is highlighted).</p>
 </dd></dl>
 
 <dl class="option">
@@ -3982,7 +4007,8 @@ This one is used in textarea. See <tt class="file docutils literal"><span class=
 </tr>
 </tbody>
 </table>
-<p>Whether to activate the browse pointer or not.</p>
+<p>When set to true, hovering over a row in the Browse page causes that row to be marked (the background
+is highlighted).</p>
 </dd></dl>
 
 <dl class="option">
@@ -3998,7 +4024,8 @@ This one is used in textarea. See <tt class="file docutils literal"><span class=
 </tr>
 </tbody>
 </table>
-<p>Whether to activate the browse marker or not.</p>
+<p>When set to true, a data row is marked (the background is highlighted) when the row is selected
+with the checkbox.</p>
 </dd></dl>
 
 <dl class="option">
@@ -4230,7 +4257,7 @@ emphasized (*2) for <a class="reference internal" href="glossary.html#term-sql">
 textareas and (*1.25) for <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a>
 textareas inside the query window.</p>
 <p>The Char* values are used for CHAR
-and VARCHAR editing (if configured via <span class="target" id="index-73"></span><a class="reference internal" href="#cfg_CharEditing"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CharEditing']</span></tt></a>).</p>
+and VARCHAR editing (if configured via <span class="target" id="index-75"></span><a class="reference internal" href="#cfg_CharEditing"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CharEditing']</span></tt></a>).</p>
 </dd></dl>
 
 <dl class="option">
@@ -4489,9 +4516,9 @@ reading and writing data in this directory.</p>
 </tr>
 </tbody>
 </table>
-<p>If <span class="target" id="index-74"></span><a class="reference internal" href="#cfg_QueryHistoryDB"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['QueryHistoryDB']</span></tt></a> is set to <tt class="docutils literal"><span class="pre">true</span></tt>, all your
+<p>If <span class="target" id="index-76"></span><a class="reference internal" href="#cfg_QueryHistoryDB"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['QueryHistoryDB']</span></tt></a> is set to <tt class="docutils literal"><span class="pre">true</span></tt>, all your
 Queries are logged to a table, which has to be created by you (see
-<span class="target" id="index-75"></span><a class="reference internal" href="#cfg_Servers_history"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['history']</span></tt></a>). If set to false, all your
+<span class="target" id="index-77"></span><a class="reference internal" href="#cfg_Servers_history"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['history']</span></tt></a>). If set to false, all your
 queries will be appended to the form, but only as long as your window is
 opened they remain saved.</p>
 <p>When using the JavaScript based query window, it will always get updated
@@ -4505,9 +4532,9 @@ you first have to look in. The checkbox will get automatically checked
 whenever you change the contents of the textarea. Please uncheck the button
 whenever you definitely want the query window to get updated even though
 you have made alterations.</p>
-<p>If <span class="target" id="index-76"></span><a class="reference internal" href="#cfg_QueryHistoryDB"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['QueryHistoryDB']</span></tt></a> is set to <tt class="docutils literal"><span class="pre">true</span></tt> you can
+<p>If <span class="target" id="index-78"></span><a class="reference internal" href="#cfg_QueryHistoryDB"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['QueryHistoryDB']</span></tt></a> is set to <tt class="docutils literal"><span class="pre">true</span></tt> you can
 specify the amount of saved history items using
-<span class="target" id="index-77"></span><a class="reference internal" href="#cfg_QueryHistoryMax"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['QueryHistoryMax']</span></tt></a>.</p>
+<span class="target" id="index-79"></span><a class="reference internal" href="#cfg_QueryHistoryMax"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['QueryHistoryMax']</span></tt></a>.</p>
 </dd></dl>
 
 <dl class="option">
@@ -4749,7 +4776,7 @@ containing all the themes.</p>
 </tr>
 </tbody>
 </table>
-<p>The default theme (a subdirectory under <span class="target" id="index-78"></span><a class="reference internal" href="#cfg_ThemePath"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['ThemePath']</span></tt></a>).</p>
+<p>The default theme (a subdirectory under <span class="target" id="index-80"></span><a class="reference internal" href="#cfg_ThemePath"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['ThemePath']</span></tt></a>).</p>
 </dd></dl>
 
 <dl class="option">
@@ -4881,23 +4908,6 @@ displayed in the bottom of main page (right frame).</p>
 This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.net/">http://demo.phpmyadmin.net/</a>&gt;.</p>
 </dd></dl>
 
-<dl class="option">
-<dt id="cfg_RowActionType">
-<tt class="descname">$cfg['RowActionType']</tt><a class="headerlink" href="#cfg_RowActionType" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">string</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body"><tt class="docutils literal"><span class="pre">'both'</span></tt></td>
-</tr>
-</tbody>
-</table>
-<p>Whether to display icons or text or both icons and text in table row action
-segment. Value can be either of <tt class="docutils literal"><span class="pre">'icons'</span></tt>, <tt class="docutils literal"><span class="pre">'text'</span></tt> or <tt class="docutils literal"><span class="pre">'both'</span></tt>.</p>
-</dd></dl>
-
 </div>
 </div>
 
@@ -4979,7 +4989,7 @@ segment. Value can be either of <tt class="docutils literal"><span class="pre">'
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
