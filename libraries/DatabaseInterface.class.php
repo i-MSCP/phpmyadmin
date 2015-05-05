@@ -91,8 +91,8 @@ class PMA_DatabaseInterface
      * Caches table data so PMA_Table does not require to issue
      * SHOW TABLE STATUS again
      *
-     * @param array       $tables information for tables of some databases
-     * @param string|bool $table  table name or false
+     * @param array  $tables information for tables of some databases
+     * @param string $table  table name
      *
      * @return void
      */
@@ -304,16 +304,16 @@ class PMA_DatabaseInterface
     /**
      * returns a segment of the SQL WHERE clause regarding table name and type
      *
-     * @param string|bool $table        table or false
-     * @param boolean     $tbl_is_group $table is a table group
-     * @param string      $table_type   whether table or view
+     * @param string  $table        table
+     * @param boolean $tbl_is_group $table is a table group
+     * @param string  $table_type   whether table or view
      *
      * @return string a segment of the WHERE clause
      */
     private function _getTableCondition($table, $tbl_is_group, $table_type)
     {
         // get table information from information_schema
-        if ($table && is_string($table)) {
+        if ($table) {
             if (true === $tbl_is_group) {
                 $sql_where_table = 'AND t.`TABLE_NAME` LIKE \''
                     . PMA_Util::escapeMysqlWildcards(
@@ -445,7 +445,7 @@ class PMA_DatabaseInterface
      * </code>
      *
      * @param string          $database     database
-     * @param string|bool     $table        table name or false
+     * @param string          $table        table name
      * @param boolean         $tbl_is_group $table is a table group
      * @param mixed           $link         mysql link
      * @param integer         $limit_offset zero-based offset for the count
@@ -458,7 +458,7 @@ class PMA_DatabaseInterface
      *
      * @return array           list of tables in given db(s)
      */
-    public function getTablesFull($database, $table = false,
+    public function getTablesFull($database, $table = '',
         $tbl_is_group = false,  $link = null, $limit_offset = 0,
         $limit_count = false, $sort_by = 'Name', $sort_order = 'ASC',
         $table_type = null
@@ -958,12 +958,15 @@ class PMA_DatabaseInterface
                         $stats_join";
                 }
                 $sql .= $sql_where_schema . '
-                    GROUP BY s.SCHEMA_NAME
+                    GROUP BY s.SCHEMA_NAME, s.DEFAULT_COLLATION_NAME
                     ORDER BY ' . PMA_Util::backquote($sort_by) . ' ' . $sort_order
                     . $limit;
             } else {
-                $sql = 'SELECT
-                    s.SCHEMA_NAME,
+                $sql  = 'SELECT *,
+                        CAST(BIN_NAME AS CHAR CHARACTER SET utf8) AS SCHEMA_NAME
+                    FROM (';
+                $sql .= 'SELECT
+                    BINARY s.SCHEMA_NAME AS BIN_NAME,
                     s.DEFAULT_COLLATION_NAME';
                 if ($force_stats) {
                     $sql .= ',
@@ -984,10 +987,17 @@ class PMA_DatabaseInterface
                             ON BINARY t.TABLE_SCHEMA = BINARY s.SCHEMA_NAME';
                 }
                 $sql .= $sql_where_schema . '
-                        GROUP BY BINARY s.SCHEMA_NAME
-                        ORDER BY BINARY ' . PMA_Util::backquote($sort_by)
+                        GROUP BY BINARY s.SCHEMA_NAME, s.DEFAULT_COLLATION_NAME
+                        ORDER BY ';
+                if ($sort_by == 'SCHEMA_NAME'
+                    || $sort_by == 'DEFAULT_COLLATION_NAME'
+                ) {
+                    $sql .= 'BINARY ';
+                }
+                $sql .= PMA_Util::backquote($sort_by)
                     . ' ' . $sort_order
                     . $limit;
+                $sql .= ') a';
             }
 
             $databases = $this->fetchResult($sql, 'SCHEMA_NAME', null, $link);
@@ -1331,7 +1341,7 @@ class PMA_DatabaseInterface
      */
     public function getColumnsSql($database, $table, $column = null, $full = false)
     {
-        if (PMA_DRIZZLE) {
+        if (defined('PMA_DRIZZLE') && PMA_DRIZZLE) {
             // `Key` column:
             // * used in primary key => PRI
             // * unique one-column => UNI
@@ -2098,14 +2108,11 @@ class PMA_DatabaseInterface
 
         $result = array();
         if (! $GLOBALS['cfg']['Server']['DisableIS']) {
-            // Note: in http://dev.mysql.com/doc/refman/5.0/en/faqs-triggers.html
-            // their example uses WHERE TRIGGER_SCHEMA='dbname' so let's use this
-            // instead of WHERE EVENT_OBJECT_SCHEMA='dbname'
             $query = 'SELECT TRIGGER_SCHEMA, TRIGGER_NAME, EVENT_MANIPULATION'
                 . ', EVENT_OBJECT_TABLE, ACTION_TIMING, ACTION_STATEMENT'
                 . ', EVENT_OBJECT_SCHEMA, EVENT_OBJECT_TABLE, DEFINER'
                 . ' FROM information_schema.TRIGGERS'
-                . ' WHERE TRIGGER_SCHEMA ' . PMA_Util::getCollateForIS() . '='
+                . ' WHERE EVENT_OBJECT_SCHEMA ' . PMA_Util::getCollateForIS() . '='
                 . ' \'' . PMA_Util::sqlAddSlashes($db) . '\'';
 
             if (! empty($table)) {
@@ -2656,7 +2663,7 @@ class PMA_DatabaseInterface
      *
      * @param object $link the connection object
      *
-     * @return string|int
+     * @return int|boolean
      */
     public function insertId($link = null)
     {
@@ -2681,7 +2688,7 @@ class PMA_DatabaseInterface
      * @param object $link           the connection object
      * @param bool   $get_from_cache whether to retrieve from cache
      *
-     * @return int
+     * @return int|boolean
      */
     public function affectedRows($link = null, $get_from_cache = true)
     {
@@ -2803,9 +2810,9 @@ class PMA_DatabaseInterface
     /**
      * Gets correct link object.
      *
-     * @param mixed $link optional database link to use
+     * @param object $link optional database link to use
      *
-     * @return object
+     * @return object|boolean
      */
     public function getLink($link = null)
     {

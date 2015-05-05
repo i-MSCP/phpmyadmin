@@ -22,7 +22,7 @@ $cfgRelation = PMA_getRelationsParam();
 $savedSearchList = array();
 $savedSearch = null;
 $currentSearchId = null;
-if ($cfgRelation['savedsearcheswork']) {
+if (isset($cfgRelation['savedsearcheswork']) && $cfgRelation['savedsearcheswork']) {
     include 'libraries/SavedSearches.class.php';
     $header = $response->getHeader();
     $scripts = $header->getScripts();
@@ -87,7 +87,7 @@ if (isset($_REQUEST['submit_sql']) && ! empty($sql_query)) {
 
         PMA_executeQueryAndSendQueryResponse(
             $analyzed_sql_results, false, $_REQUEST['db'], null, false, null, null,
-            false, null, null, null, null, $goto, $pmaThemeImage, null, null, null,
+            false, null, null, null, $goto, $pmaThemeImage, null, null, null,
             $sql_query, null, null
         );
     }
@@ -129,5 +129,5 @@ if ($cfgRelation['pdfwork']) {
     );
 }
 
-$response->addHTML($db_qbe->getSelectionForm($cfgRelation));
+$response->addHTML($db_qbe->getSelectionForm());
 ?>

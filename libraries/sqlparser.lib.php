@@ -359,49 +359,49 @@ function PMA_SQP_parse($sql)
                 ) - 1;
                 // ($pos === false)
                 if ($pos < 0) {
-                    if ($c == '`') {
-                        /*
-                         * Behave same as MySQL and accept end of query as end
-                         * of backtick.
-                         * I know this is sick, but MySQL behaves like this:
-                         *
-                         * SELECT * FROM `table
-                         *
-                         * is treated like
-                         *
-                         * SELECT * FROM `table`
-                         */
-                        $pos_quote_separator = /*overload*/mb_strpos(
-                            ' ' . $sql, $GLOBALS['sql_delimiter'], $oldpos + 1
-                        ) - 1;
-                        if ($pos_quote_separator < 0) {
-                            $len += 1;
-                            $sql .= '`';
-                            $sql_array['raw'] .= '`';
-                            $pos = $len;
-                        } else {
-                            $len += 1;
-                            $sql = /*overload*/mb_substr(
-                                $sql, 0, $pos_quote_separator
-                            ) . '`' . /*overload*/mb_substr(
-                                $sql, $pos_quote_separator
-                            );
-                            $sql_array['raw'] = $sql;
-                            $pos = $pos_quote_separator;
-                        }
-                        if (class_exists('PMA_Message')
-                            && $GLOBALS['is_ajax_request'] != true
-                        ) {
-                            PMA_Message::notice(
-                                __('Automatically appended backtick to the end of query!')
-                            )->display();
-                        }
-                    } else {
+                    if ($c != '`') {
                         $debugstr = __('Unclosed quote')
                             . ' @ ' . $startquotepos . "\n"
                             . 'STR: ' . htmlspecialchars($quotetype);
                         PMA_SQP_throwError($debugstr, $sql);
                         return $sql_array;
+                    }
+
+                    /*
+                     * Behave same as MySQL and accept end of query as end
+                     * of backtick.
+                     * I know this is sick, but MySQL behaves like this:
+                     *
+                     * SELECT * FROM `table
+                     *
+                     * is treated like
+                     *
+                     * SELECT * FROM `table`
+                     */
+                    $pos_quote_separator = /*overload*/mb_strpos(
+                        ' ' . $sql, $GLOBALS['sql_delimiter'], $oldpos + 1
+                    ) - 1;
+                    if ($pos_quote_separator < 0) {
+                        $len += 1;
+                        $sql .= '`';
+                        $sql_array['raw'] .= '`';
+                        $pos = $len;
+                    } else {
+                        $len += 1;
+                        $sql = /*overload*/mb_substr(
+                            $sql, 0, $pos_quote_separator
+                        ) . '`' . /*overload*/mb_substr(
+                            $sql, $pos_quote_separator
+                        );
+                        $sql_array['raw'] = $sql;
+                        $pos = $pos_quote_separator;
+                    }
+                    if (class_exists('PMA_Message')
+                        && $GLOBALS['is_ajax_request'] != true
+                    ) {
+                        PMA_Message::notice(
+                            __('Automatically appended backtick to the end of query!')
+                        )->display();
                     }
                 }
 
@@ -849,7 +849,7 @@ function PMA_SQP_parse($sql)
                 $t_suffix = '_reservedWord';
             } elseif (isset($PMA_SQPdata_column_attrib[$d_cur_upper])) {
                 $t_suffix = '_columnAttrib';
-                // INNODB is a MySQL table type, but in "SHOW INNODB STATUS",
+                // INNODB is a MySQL table type, but in "SHOW ENGINE INNODB STATUS",
                 // it should be regarded as a reserved word.
                 if ($d_cur_upper == 'INNODB'
                     && $d_prev_upper == 'SHOW'

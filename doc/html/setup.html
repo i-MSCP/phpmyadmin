@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; phpMyAdmin 4.3.9 documentation</title>
+    <title>Installation &mdash; phpMyAdmin 4.4.4 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '4.3.9',
+        VERSION:     '4.4.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.3.9 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.4.4 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Requirements" href="require.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="require.html" title="Requirements"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.3.9 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.4 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -291,22 +291,22 @@ not prompted to create more tables in the new database.</li>
 </div>
 <div class="section" id="manual-configuration">
 <h3>Manual configuration<a class="headerlink" href="#manual-configuration" title="Permalink to this headline">¶</a></h3>
-<p>Please look at your <tt class="docutils literal"><span class="pre">./examples/</span></tt> directory, where you should find a
+<p>Please look at your <tt class="docutils literal"><span class="pre">./sql/</span></tt> directory, where you should find a
 file called <em>create_tables.sql</em>. (If you are using a Windows server,
 pay special attention to <a class="reference internal" href="faq.html#faq1-23"><em>1.23 I&#8217;m running MySQL on a Win32 machine. Each time I create a new table the table and column names are changed to lowercase!</em></a>).</p>
 <p>If you already had this infrastructure and:</p>
 <ul class="simple">
 <li>upgraded to MySQL 4.1.2 or newer, please use
-<tt class="file docutils literal"><span class="pre">examples/upgrade_tables_mysql_4_1_2+.sql</span></tt>.</li>
+<tt class="file docutils literal"><span class="pre">sql/upgrade_tables_mysql_4_1_2+.sql</span></tt>.</li>
 <li>upgraded to phpMyAdmin 4.3.0 or newer from 2.5.0 or newer (&lt;= 4.2.x),
-please use <tt class="file docutils literal"><span class="pre">examples/upgrade_column_info_4_3_0+.sql</span></tt>.</li>
+please use <tt class="file docutils literal"><span class="pre">sql/upgrade_column_info_4_3_0+.sql</span></tt>.</li>
 </ul>
-<p>and then create new tables by importing <tt class="file docutils literal"><span class="pre">examples/create_tables.sql</span></tt>.</p>
+<p>and then create new tables by importing <tt class="file docutils literal"><span class="pre">sql/create_tables.sql</span></tt>.</p>
 <p>You can use your phpMyAdmin to create the tables for you. Please be
 aware that you may need special (administrator) privileges to create
 the database and tables, and that the script may need some tuning,
 depending on the database name.</p>
-<p>After having imported the <tt class="file docutils literal"><span class="pre">examples/create_tables.sql</span></tt> file, you
+<p>After having imported the <tt class="file docutils literal"><span class="pre">sql/create_tables.sql</span></tt> file, you
 should specify the table names in your <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt> file. The
 directives used for that can be found in the <a class="reference internal" href="config.html#config"><em>Configuration</em></a>.</p>
 <p>You will also need to have a controluser
@@ -335,11 +335,11 @@ specific.</p>
 <p>If you have upgraded your MySQL server from a version previous to 4.1.2 to
 version 5.x or newer and if you use the phpMyAdmin configuration storage, you
 should run the <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a> script found in
-<tt class="file docutils literal"><span class="pre">examples/upgrade_tables_mysql_4_1_2+.sql</span></tt>.</p>
+<tt class="file docutils literal"><span class="pre">sql/upgrade_tables_mysql_4_1_2+.sql</span></tt>.</p>
 <p>If you have upgraded your phpMyAdmin to 4.3.0 or newer from 2.5.0 or
 newer (&lt;= 4.2.x) and if you use the phpMyAdmin configuration storage, you
 should run the <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a> script found in
-<tt class="file docutils literal"><span class="pre">examples/upgrade_column_info_4_3_0+.sql</span></tt>.</p>
+<tt class="file docutils literal"><span class="pre">sql/upgrade_column_info_4_3_0+.sql</span></tt>.</p>
 </div>
 <div class="section" id="using-authentication-modes">
 <span id="authentication-modes"></span><span id="index-5"></span><h2>Using authentication modes<a class="headerlink" href="#using-authentication-modes" title="Permalink to this headline">¶</a></h2>
@@ -798,15 +798,16 @@ file <tt class="file docutils literal"><span class="pre">examples/swekey.sample.
 <p>The phpMyAdmin team tries hard to make the application secure, however there
 are always ways to make your installation more secure:</p>
 <ul class="simple">
-<li>remove <tt class="docutils literal"><span class="pre">setup</span></tt> directory from phpMyAdmin, you will probably not
-use it after initial setup</li>
-<li>properly choose authentication method - <a class="reference internal" href="#cookie"><em>Cookie authentication mode</em></a>
-is probably the best choice for shared hosting</li>
-<li>in case you don&#8217;t want all MySQL users to be able to access
-phpMyAdmin, you can use <span class="target" id="index-27"></span><a class="reference internal" href="config.html#cfg_Servers_AllowDeny_rules"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['AllowDeny']['rules']</span></tt></a> to limit them</li>
-<li>consider hiding phpMyAdmin behind authentication proxy, so that
-MySQL credentials are not all users need to login</li>
-<li>if you are afraid of automated attacks, enabling Captcha by
+<li>Remove the <tt class="docutils literal"><span class="pre">setup</span></tt> directory from phpMyAdmin, you will probably not
+use it after the initial setup.</li>
+<li>Properly choose an authentication method - <a class="reference internal" href="#cookie"><em>Cookie authentication mode</em></a>
+is probably the best choice for shared hosting.</li>
+<li>In case you don&#8217;t want all MySQL users to be able to access
+phpMyAdmin, you can use <span class="target" id="index-27"></span><a class="reference internal" href="config.html#cfg_Servers_AllowDeny_rules"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['AllowDeny']['rules']</span></tt></a> to limit them.</li>
+<li>Consider hiding phpMyAdmin behind an authentication proxy, so that
+users need to authenticate prior to providing MySQL credentials
+to phpMyAdmin.</li>
+<li>If you are afraid of automated attacks, enabling Captcha by
 <span class="target" id="index-28"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPublicKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPublicKey']</span></tt></a> and
 <span class="target" id="index-29"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPrivateKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPrivateKey']</span></tt></a> might be an option.</li>
 </ul>
@@ -897,7 +898,7 @@ MySQL credentials are not all users need to login</li>
         <li class="right" >
           <a href="require.html" title="Requirements"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.3.9 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

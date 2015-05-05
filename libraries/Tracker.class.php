@@ -277,16 +277,17 @@ class PMA_Tracker
 
 
     /**
-     * Removes all tracking data for a table
+     * Removes all tracking data for a table or a version of a table
      *
      * @param string $dbname    name of database
      * @param string $tablename name of table
+     * @param string $version   version
      *
      * @static
      *
      * @return int result of version insertion
      */
-    static public function deleteTracking($dbname, $tablename)
+    static public function deleteTracking($dbname, $tablename, $version = '')
     {
         $sql_query = "/*NOTRACK*/\n"
             . "DELETE FROM " . self::_getTrackingTable()
@@ -294,6 +295,10 @@ class PMA_Tracker
             . PMA_Util::sqlAddSlashes($dbname) . "'"
             . " AND `table_name` = '"
             . PMA_Util::sqlAddSlashes($tablename) . "'";
+        if ($version) {
+            $sql_query .= " AND `version` = '"
+                . PMA_Util::sqlAddSlashes($version) . "'";
+        }
         $result = PMA_queryAsControlUser($sql_query);
 
         return $result;
@@ -692,11 +697,7 @@ class PMA_Tracker
             $result['identifier'] = 'DROP VIEW';
 
             $prefix  = explode('DROP VIEW ', $query);
-            $str = /*overload*/mb_strstr($prefix[1], 'IF EXISTS');
-
-            if ($str == false ) {
-                $str = $prefix[1];
-            }
+            $str = str_replace('IF EXISTS', '', $prefix[1]);
             $result['tablename'] = self::getTableName($str);
         }
 
@@ -762,11 +763,7 @@ class PMA_Tracker
             $result['identifier'] = 'DROP TABLE';
 
             $prefix  = explode('DROP TABLE ', $query);
-            $str = /*overload*/mb_strstr($prefix[1], 'IF EXISTS');
-
-            if ($str == false ) {
-                $str = $prefix[1];
-            }
+            $str = str_replace('IF EXISTS', '', $prefix[1]);
             $result['tablename'] = self::getTableName($str);
         }
 
@@ -959,7 +956,7 @@ class PMA_Tracker
                 . PMA_Util::sqlAddSlashes($result['tablename']) . "' " .
                 " AND `version` = '" . PMA_Util::sqlAddSlashes($version) . "' ";
 
-                $result = PMA_queryAsControlUser($sql_query);
+                PMA_queryAsControlUser($sql_query);
             }
         }
     }

@@ -341,6 +341,13 @@ if ($GLOBALS['cfg']['ShowServerInfo'] || $GLOBALS['cfg']['ShowPhpInfo']) {
                 $php_ext_string,
                 'li_used_php_extension'
             );
+
+            $php_version_string = __('PHP version:') . ' ' . phpversion();
+
+            PMA_printListItem(
+                $php_version_string,
+                'li_used_php_version'
+            );
         }
     }
 
@@ -417,7 +424,7 @@ PMA_printListItem(
 PMA_printListItem(
     __('List of changes'),
     'li_pma_changes',
-    PMA_linkURL('changelog.php'),
+    'changelog.php' . PMA_URL_getCommon(),
     null,
     '_blank'
 );
@@ -437,8 +444,8 @@ if ($server != 0
 ) {
     trigger_error(
         __(
-            'Your configuration file contains settings (root with no password)'
-            . ' that correspond to the default MySQL privileged account.'
+            'You are connected as \'root\' with no password, which'
+            . ' corresponds to the default MySQL privileged account.'
             . ' Your MySQL server is running with this default, is open to'
             . ' intrusion, and you really should fix this security hole by'
             . ' setting a password for user \'root\'.'
@@ -463,7 +470,7 @@ if (@extension_loaded('mbstring') && @ini_get('mbstring.func_overload') > 1) {
 }
 
 /**
- * mbstring is used for handling multibyte inside parser, so it is good
+ * mbstring is used for handling multibytes inside parser, so it is good
  * to tell user something might be broken without it, see bug #1063149.
  */
 if (! @extension_loaded('mbstring')) {
@@ -478,15 +485,17 @@ if (! @extension_loaded('mbstring')) {
     );
 }
 
-/**
- * Check whether session.gc_maxlifetime limits session validity.
- */
-$gc_time = (int)@ini_get('session.gc_maxlifetime');
-if ($gc_time < $GLOBALS['cfg']['LoginCookieValidity'] ) {
-    trigger_error(
-        __('Your PHP parameter [a@http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime@_blank]session.gc_maxlifetime[/a] is lower than cookie validity configured in phpMyAdmin, because of this, your login will expire sooner than configured in phpMyAdmin.'),
-        E_USER_WARNING
-    );
+if ($cfg['LoginCookieValidityDisableWarning'] == false) {
+    /**
+     * Check whether session.gc_maxlifetime limits session validity.
+     */
+    $gc_time = (int)@ini_get('session.gc_maxlifetime');
+    if ($gc_time < $GLOBALS['cfg']['LoginCookieValidity'] ) {
+        trigger_error(
+            __('Your PHP parameter [a@http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime@_blank]session.gc_maxlifetime[/a] is lower than cookie validity configured in phpMyAdmin, because of this, your login might expire sooner than configured in phpMyAdmin.'),
+            E_USER_WARNING
+        );
+    }
 }
 
 /**
@@ -564,6 +573,8 @@ if ($server > 0) {
  * If no default server is set, $GLOBALS['dbi'] is not defined yet.
  * Drizzle can speak MySQL protocol, so don't warn about version mismatch for
  * Drizzle servers.
+ * We also do not warn if MariaDB is detected, as it has its own version
+ * numbering.
  */
 if (isset($GLOBALS['dbi'])
     && !PMA_DRIZZLE
@@ -575,6 +586,7 @@ if (isset($GLOBALS['dbi'])
     $_client_info = $GLOBALS['dbi']->getClientInfo();
     if ($server > 0
         && /*overload*/mb_strpos($_client_info, 'mysqlnd') === false
+        && /*overload*/mb_strpos(PMA_MYSQL_STR_VERSION, 'MariaDB') === false
         && substr(PMA_MYSQL_CLIENT_API, 0, 3) != substr(
             PMA_MYSQL_INT_VERSION, 0, 3
         )

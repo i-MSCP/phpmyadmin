@@ -165,7 +165,7 @@ var AJAX = {
         // Show lock icon if locked targets is not empty.
         // otherwise remove lock icon
         if (!jQuery.isEmptyObject(AJAX.lockedTargets)) {
-            $('#lock_page_icon').html(PMA_getImage('s_lock.png').toString());
+            $('#lock_page_icon').html(PMA_getImage('s_lock.png',PMA_messages.strLockToolTip).toString());
         } else {
             $('#lock_page_icon').html('');
         }
@@ -306,6 +306,7 @@ var AJAX = {
         }
         if (typeof data.success != 'undefined' && data.success) {
             $table_clone = false;
+            $('html, body').animate({scrollTop: 0}, 'fast');
             PMA_ajaxRemoveMessage(AJAX.$msgbox);
 
             if (data._redirect) {
@@ -580,8 +581,8 @@ var AJAX = {
              * Re-attach a generic event handler to clicks
              * on pages and submissions of forms
              */
-            $('a').die('click').live('click', AJAX.requestHandler);
-            $('form').die('submit').live('submit', AJAX.requestHandler);
+            $(document).off('click', 'a').on('click', 'a', AJAX.requestHandler);
+            $(document).off('submit', 'form').on('submit', 'form', AJAX.requestHandler);
             AJAX.cache.update();
             callback();
         }
@@ -604,6 +605,23 @@ AJAX.registerOnload('functions.js', function () {
             $(this).data('onsubmit', this.onsubmit).attr('onsubmit', '');
         }
     });
+
+    /**
+     * Workaround for passing submit button name,value on ajax form submit
+     * by appending hidden element with submit button name and value.
+     */
+    $("#page_content").on('click', 'form input[type=submit]', function() {
+        var buttonName = $(this).attr('name');
+        if (typeof buttonName === 'undefined') {
+            return;
+        }
+        $(this).closest('form').append($('<input/>', {
+            'type' : 'hidden',
+            'name' : buttonName,
+            'value': $(this).val()
+        }));
+    });
+
     /**
      * Attach event listener to events when user modify visible
      * Input or Textarea fields to make changes in forms
@@ -884,7 +902,7 @@ AJAX.setUrlHash = (function (jQuery, window) {
 
     // Fix favicon disappearing in Firefox when setting location.hash
     function resetFavicon() {
-        if (jQuery.browser.mozilla) {
+        if (navigator.userAgent.indexOf('Firefox') > -1) {
             // Move the link tags for the favicon to the bottom
             // of the head element to force a reload of the favicon
             $('head > link[href=favicon\\.ico]').appendTo('head');
@@ -999,8 +1017,8 @@ $(function () {
  * Attach a generic event handler to clicks
  * on pages and submissions of forms
  */
-$('a').live('click', AJAX.requestHandler);
-$('form').live('submit', AJAX.requestHandler);
+$(document).on('click', 'a', AJAX.requestHandler);
+$(document).on('submit', 'form', AJAX.requestHandler);
 
 /**
  * Gracefully handle fatal server errors
