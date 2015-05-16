@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -8,15 +6,15 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; phpMyAdmin 4.4.6 documentation</title>
+    <title>Configuration &mdash; phpMyAdmin 4.4.7 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '',
-        VERSION:     '4.4.6',
+        URL_ROOT:    './',
+        VERSION:     '4.4.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.6 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.4.7 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -43,7 +41,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -108,7 +106,7 @@ an error message if phpMyAdmin is having trouble auto–detecting the correct
 value. If you get an error that this must be set or if the autodetect code
 fails to detect your path, please post a bug report on our bug tracker so
 we can improve the code.</p>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="faq.html#faq1-40"><em>1.40 When accessing phpMyAdmin via an Apache reverse proxy, cookie login does not work.</em></a></p>
 </div>
@@ -584,9 +582,10 @@ holds the configuration storage.</p>
 </table>
 <p>This special account is used for 2 distinct purposes: to make possible all
 relational features (see <span class="target" id="index-9"></span><a class="reference internal" href="#cfg_Servers_pmadb"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['pmadb']</span></tt></a>).</p>
-<p class="versionchanged">
-<span class="versionmodified">Changed in version 2.2.5: </span>those were called <tt class="docutils literal"><span class="pre">stduser</span></tt> and <tt class="docutils literal"><span class="pre">stdpass</span></tt></p>
-<div class="admonition-see-also admonition seealso">
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 2.2.5: </span>those were called <tt class="docutils literal"><span class="pre">stduser</span></tt> and <tt class="docutils literal"><span class="pre">stdpass</span></tt></p>
+</div>
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="setup.html#setup"><em>Installation</em></a>, <a class="reference internal" href="setup.html#authentication-modes"><em>Using authentication modes</em></a>, <a class="reference internal" href="setup.html#linked-tables"><em>phpMyAdmin configuration storage</em></a></p>
 </div>
@@ -617,7 +616,7 @@ valid MySQL user via HTTP-Auth.</li>
 <li>&#8216;signon&#8217; authentication mode (<tt class="docutils literal"><span class="pre">$auth_type&nbsp;=&nbsp;'signon'</span></tt>) allows you to
 log in from prepared PHP session data or using supplied PHP script.</li>
 </ul>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="setup.html#authentication-modes"><em>Using authentication modes</em></a></p>
 </div>
@@ -743,9 +742,10 @@ will be displayed but <strong>not that all other databases can&#8217;t be used.<
 <div class="highlight-php"><div class="highlight"><pre><span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;only_db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;db1&#39;</span><span class="p">,</span> <span class="s1">&#39;db2&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-<p class="versionchanged">
-<span class="versionmodified">Changed in version 4.0.0: </span>Previous versions permitted to specify the display order of
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 4.0.0: </span>Previous versions permitted to specify the display order of
 the database names via this directive.</p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -918,7 +918,7 @@ functionality:</p>
 &#8220;Structure/Relation view/Choose column to display&#8221; to choose the
 column.</li>
 </ul>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="faq.html#faqdisplay"><em>6.7 How can I use the &#8220;display column&#8221; feature?</em></a></p>
 </div>
@@ -965,7 +965,7 @@ a <a class="reference internal" href="glossary.html#term-pdf"><em class="xref st
 <span class="target" id="index-21"></span><a class="reference internal" href="#cfg_Servers_table_coords"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['table_coords']</span></tt></a> and
 <span class="target" id="index-22"></span><a class="reference internal" href="#cfg_Servers_pdf_pages"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['pdf_pages']</span></tt></a></li>
 </ul>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="faq.html#faqpdf"><em>6.8 How can I produce a PDF schema of my database?</em></a>.</p>
 </div>
@@ -1640,7 +1640,7 @@ empty). See <tt class="file docutils literal"><span class="pre">examples/signon-
 <span class="cp">?&gt;</span><span class="x"></span>
 </pre></div>
 </div>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="setup.html#auth-signon"><em>Signon authentication mode</em></a></p>
 </div>
@@ -1663,7 +1663,7 @@ empty). See <tt class="file docutils literal"><span class="pre">examples/signon-
 You should use something different than <tt class="docutils literal"><span class="pre">phpMyAdmin</span></tt>, because this
 is session which phpMyAdmin uses internally. Takes effect only if
 <span class="target" id="index-56"></span><a class="reference internal" href="#cfg_Servers_SignonScript"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['SignonScript']</span></tt></a> is not configured.</p>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="setup.html#auth-signon"><em>Signon authentication mode</em></a></p>
 </div>
@@ -1685,7 +1685,7 @@ is session which phpMyAdmin uses internally. Takes effect only if
 <p><a class="reference internal" href="glossary.html#term-url"><em class="xref std std-term">URL</em></a> where user will be redirected
 to log in for signon authentication method. Should be absolute
 including protocol.</p>
-<div class="admonition-see-also admonition seealso">
+<div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="setup.html#auth-signon"><em>Signon authentication mode</em></a></p>
 </div>
@@ -2153,11 +2153,12 @@ prompted for this passphrase. There is no maximum length for this secret.</p>
 <p class="last">The configuration is called blowfish_secret for historical reasons as
 Blowfish algorithm was originally used to do the encryption.</p>
 </div>
-<p class="versionchanged">
-<span class="versionmodified">Changed in version 3.1.0: </span>Since version 3.1.0 phpMyAdmin can generate this on the fly, but it
+<div class="versionchanged">
+<p><span class="versionmodified">Changed in version 3.1.0: </span>Since version 3.1.0 phpMyAdmin can generate this on the fly, but it
 makes a bit weaker security as this generated secret is stored in
 session and furthermore it makes impossible to recall user name from
 cookie.</p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -3678,8 +3679,9 @@ would be normally not allowed by Content Security Policy.</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;CSPAllow&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;example.com example.net&#39;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p class="versionadded">
-<span class="versionmodified">New in version 4.0.4.</span></p>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.0.4.</span></p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -4454,12 +4456,12 @@ user required to access this directory is the one who runs the webserver.
 If you have root privileges, simply make this user owner of this directory
 and make it accessible only by it:</p>
 <div class="highlight-sh"><div class="highlight"><pre>chown www-data:www-data tmp
-chmod 700 tmp
+chmod <span class="m">700</span> tmp
 </pre></div>
 </div>
 <p>If you cannot change owner of the directory, you can achieve a similar
 setup using <a class="reference internal" href="glossary.html#term-acl"><em class="xref std std-term">ACL</em></a>:</p>
-<div class="highlight-sh"><div class="highlight"><pre>chmod 700 tmp
+<div class="highlight-sh"><div class="highlight"><pre>chmod <span class="m">700</span> tmp
 setfacl -m <span class="s2">&quot;g:www-data:rwx&quot;</span> tmp
 setfacl -d -m <span class="s2">&quot;g:www-data:rwx&quot;</span> tmp
 </pre></div>
@@ -4989,12 +4991,12 @@ This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.6 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.7 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; <a href="copyright.html">Copyright</a> 2012 - 2014, The phpMyAdmin devel team.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
