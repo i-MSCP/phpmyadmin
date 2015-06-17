@@ -617,6 +617,7 @@ function browseForeignDialog($this_a)
         $dialog = $('<div>').append(data.message).dialog({
             title: PMA_messages.strBrowseForeignValues,
             width: Math.min($(window).width() - 100, 700),
+            maxHeight: $(window).height() - 100,
             dialogClass: 'browse_foreign_modal',
             close: function (ev, ui) {
                 // remove event handlers attached to elements related to dialog
@@ -626,14 +627,12 @@ function browseForeignDialog($this_a)
                 // remove dialog itself
                 $(this).remove();
             },
-            create: function () {
-                $(this).css('maxHeight', $(window).height() - 100);
-            },
             modal: true
         });
     }).done(function () {
         var showAll = false;
-        $(tableId).on('click', 'td a.foreign_value', function () {
+        $(tableId).on('click', 'td a.foreign_value', function (e) {
+            e.preventDefault();
             var $input = $this_a.prev('input[type=text]');
             // Check if input exists or get CEdit edit_box
             if ($input.length === 0 ) {

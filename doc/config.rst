@@ -1190,7 +1190,8 @@ Generic settings
     :type: boolean
     :default: false
 
-    Whether to force using https while accessing phpMyAdmin.
+    Whether to force using https while accessing phpMyAdmin. In a reverse
+    proxy setup, setting this to ``true`` is not supported.
 
     .. note::
 
@@ -1523,9 +1524,9 @@ Navigation panel setup
     :type: string
     :default: ``'index.php'``
 
-    Enter :term:`URL` where logo in the
-    navigation panel will point to. For use especially with self made
-    theme which changes this.
+    Enter :term:`URL` where logo in the navigation panel will point to. 
+    For use especially with self made theme which changes this.
+    For external :term:`URL`s, you should include URL scheme as well.
 
 .. config:option:: $cfg['NavigationLogoLinkWindow']
 
