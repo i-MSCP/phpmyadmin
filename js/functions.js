@@ -144,6 +144,7 @@ function PMA_tooltip($elements, item, myContent, additionalOptions)
 function escapeHtml(unsafe) {
     if (typeof(unsafe) != 'undefined') {
         return unsafe
+            .toString()
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
@@ -778,7 +779,8 @@ AJAX.registerOnload('functions.js', function () {
      */
 
     $(document).on('click', 'input:checkbox.checkall', function (e) {
-        var $tr = $(this).closest('tr');
+        $this = $(this);
+        var $tr = $this.closest('tr');
 
         // make the table unselectable (to prevent default highlighting when shift+click)
         //$tr.parents('table').noSelect();
@@ -787,25 +789,15 @@ AJAX.registerOnload('functions.js', function () {
             // usual click
 
             // XXX: FF fires two click events for <label> (label and checkbox), so we need to handle this differently
-            var $checkbox = $tr.find(':checkbox');
-            if ($checkbox.length) {
-                // checkbox in a row, add or remove class depending on checkbox state
-                var checked = $checkbox.prop('checked');
-                if (!$(e.target).is(':checkbox, label')) {
-                    checked = !checked;
-                    $checkbox.prop('checked', checked).trigger('change');
-                }
-                if (checked) {
-                    $tr.addClass('marked');
-                } else {
-                    $tr.removeClass('marked');
-                }
-                last_click_checked = checked;
+            var $checkbox = $tr.find(':checkbox.checkall');
+            var checked = $this.prop('checked');
+            $checkbox.prop('checked', checked).trigger('change');
+            if (checked) {
+                $tr.addClass('marked');
             } else {
-                // normal data table, just toggle class
-                $tr.toggleClass('marked');
-                last_click_checked = false;
+                $tr.removeClass('marked');
             }
+            last_click_checked = checked;
 
             // remember the last clicked row
             last_clicked_row = last_click_checked ? $('tr.odd:not(.noclick), tr.even:not(.noclick)').index($tr) : -1;
@@ -3820,7 +3812,7 @@ AJAX.registerOnload('functions.js', function () {
      * Load version information asynchronously.
      */
     if ($('li.jsversioncheck').length > 0) {
-        $.getJSON('version_check.php', {}, PMA_current_version);
+        $.getJSON('version_check.php', {'server' : PMA_commonParams.get('server')}, PMA_current_version);
     }
 
     if ($('#is_git_revision').length > 0) {

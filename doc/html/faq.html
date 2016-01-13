@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.4.10 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.4.15.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.4.10',
+        VERSION:     '4.4.15.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.10 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.4.15.2 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Import and export" href="import_export.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.10 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.15.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -52,7 +52,7 @@
             
   <div class="section" id="faq-frequently-asked-questions">
 <span id="faq"></span><h1>FAQ - Frequently Asked Questions<a class="headerlink" href="#faq-frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
-<p>Please have a look at our <a class="reference external" href="http://www.phpmyadmin.net/home_page/docs.php">Link section</a> on the official
+<p>Please have a look at our <a class="reference external" href="https://www.phpmyadmin.net/docs/">Link section</a> on the official
 phpMyAdmin homepage for in-depth coverage of phpMyAdmin&#8217;s features and
 or interface.</p>
 <div class="section" id="server">
@@ -184,30 +184,20 @@ MySQL:</p>
 </li>
 </ul>
 </div>
-<div class="section" id="which-mysql-versions-does-phpmyadmin-support">
-<span id="faq1-17"></span><h3>1.17 Which MySQL versions does phpMyAdmin support?<a class="headerlink" href="#which-mysql-versions-does-phpmyadmin-support" title="Permalink to this headline">¶</a></h3>
-<p>Since phpMyAdmin 3.0.x, only MySQL 5.0.1 and newer are supported. For
-older MySQL versions, you need to use the latest 2.x branch.
-phpMyAdmin can connect to your MySQL server using PHP&#8217;s classic <a class="reference external" href="http://php.net/mysql">MySQL
-extension</a> as well as the <a class="reference external" href="http://php.net/mysqli">improved MySQL
-extension (MySQLi)</a> that is available in PHP
-5.0. The latter one should be used unless you have a good reason not
-to do so. When compiling PHP, we strongly recommend that you manually
-link the MySQL extension of your choice to a MySQL client library of
-at least the same minor version since the one that is bundled with
-some PHP distributions is rather old and might cause problems see
-<a class="reference internal" href="#faq1-17a"><em>1.17a I cannot connect to the MySQL server. It always returns the error message, &#8220;Client does not support authentication protocol requested by server; consider upgrading MySQL client&#8221;</em></a>. <a class="reference external" href="http://mariadb.org/">MariaDB</a> is also supported
-(versions 5.1 and 5.2 were tested).</p>
-<div class="versionchanged">
-<p><span class="versionmodified">Changed in version 3.5: </span>Since phpMyAdmin 3.5 <a class="reference external" href="http://www.drizzle.org/">Drizzle</a> is supported.</p>
-</div>
+<div class="section" id="which-database-versions-does-phpmyadmin-support">
+<span id="faq1-17"></span><h3>1.17 Which Database versions does phpMyAdmin support?<a class="headerlink" href="#which-database-versions-does-phpmyadmin-support" title="Permalink to this headline">¶</a></h3>
+<p>For <a class="reference external" href="http://www.mysql.com/">MySQL</a>, versions 5.5 and newer are supported.
+For older MySQL versions, our <a class="reference external" href="https://www.phpmyadmin.net/downloads/">Downloads</a> page offers older phpMyAdmin versions
+(which may have become unsupported).</p>
+<p>For <a class="reference external" href="http://mariadb.org/">MariaDB</a>, versions 5.5 and newer are supported.</p>
+<p>For <a class="reference external" href="http://www.drizzle.org">Drizzle</a>, versions 7.1 and newer are supported.</p>
 </div>
 <div class="section" id="a-i-cannot-connect-to-the-mysql-server-it-always-returns-the-error-message-client-does-not-support-authentication-protocol-requested-by-server-consider-upgrading-mysql-client">
 <span id="faq1-17a"></span><h3>1.17a I cannot connect to the MySQL server. It always returns the error message, &#8220;Client does not support authentication protocol requested by server; consider upgrading MySQL client&#8221;<a class="headerlink" href="#a-i-cannot-connect-to-the-mysql-server-it-always-returns-the-error-message-client-does-not-support-authentication-protocol-requested-by-server-consider-upgrading-mysql-client" title="Permalink to this headline">¶</a></h3>
 <p>You tried to access MySQL with an old MySQL client library. The
 version of your MySQL client library can be checked in your phpinfo()
 output. In general, it should have at least the same minor version as
-your server - as mentioned in <a class="reference internal" href="#faq1-17"><em>1.17 Which MySQL versions does phpMyAdmin support?</em></a>. This problem is
+your server - as mentioned in <a class="reference internal" href="#faq1-17"><em>1.17 Which Database versions does phpMyAdmin support?</em></a>. This problem is
 generally caused by using MySQL version 4.1 or newer. MySQL changed
 the authentication hash and your PHP is trying to use the old method.
 The proper solution is to use the <a class="reference external" href="http://www.php.net/mysqli">mysqli extension</a> with the proper client library to match
@@ -723,7 +713,7 @@ the parent form-container with the target to tbl_row_delete.php and
 just put your own input-elements inside. If you use a custom submit
 input field, the form will submit itself to the displaying page again,
 where you can validate the $HTTP_POST_VARS in a transformation. For
-a tutorial on how to effectively use transformations, see our <a class="reference external" href="http://www.phpmyadmin.net/home_page/docs.php">Link
+a tutorial on how to effectively use transformations, see our <a class="reference external" href="https://www.phpmyadmin.net/docs/">Link
 section</a> on the
 official phpMyAdmin-homepage.</p>
 </div>
@@ -1464,7 +1454,7 @@ to display the plot.</p>
 <p>After the plot is generated, you can use the
 mousewheel to zoom in and out of the plot. In addition, panning
 feature is enabled to navigate through the plot. You can zoom-in to a
-certail level of detail and use panning to locate your area of
+certain level of detail and use panning to locate your area of
 interest. Clicking on a point opens a dialogue box, displaying field
 values of the data row represented by the point. You can edit the
 values if required and click on submit to issue an update query. Basic
@@ -1542,7 +1532,7 @@ accordingly to bring the table into the First/Second/Third Normal form.
 On startup of the wizard, user gets to select upto what normal form they want to
 normalize the table structure.</p>
 <p>Here is an example table which you can use to test all of the three First, Second and
-Third Normal From.</p>
+Third Normal Form.</p>
 <div class="highlight-mysql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="ss">`VetOffice`</span> <span class="p">(</span>
  <span class="ss">`petName`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
  <span class="ss">`petBreed`</span> <span class="kt">varchar</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span> <span class="k">NOT</span> <span class="no">NULL</span><span class="p">,</span>
@@ -1576,20 +1566,20 @@ PetType depends on PetBreed.</p>
 <span id="faq7-1"></span><h3>7.1 I have found a bug. How do I inform developers?<a class="headerlink" href="#i-have-found-a-bug-how-do-i-inform-developers" title="Permalink to this headline">¶</a></h3>
 <p>Our Bug Tracker is located at &lt;<a class="reference external" href="http://sf.net/projects/phpmyadmin/">http://sf.net/projects/phpmyadmin/</a>&gt; under the
 Bugs section. But please first discuss your bug with other users:
-&lt;<a class="reference external" href="https://sourceforge.net/projects/phpmyadmin/forums">https://sourceforge.net/projects/phpmyadmin/forums</a>&gt;.</p>
+&lt;<a class="reference external" href="https://www.phpmyadmin.net/support/">https://www.phpmyadmin.net/support/</a>&gt;</p>
 </div>
 <div class="section" id="i-want-to-translate-the-messages-to-a-new-language-or-upgrade-an-existing-language-where-do-i-start">
 <span id="faq7-2"></span><h3>7.2 I want to translate the messages to a new language or upgrade an existing language, where do I start?<a class="headerlink" href="#i-want-to-translate-the-messages-to-a-new-language-or-upgrade-an-existing-language-where-do-i-start" title="Permalink to this headline">¶</a></h3>
 <p>Translations are very welcome and all you need to have are the
 language skills. The easiest way is to use our <a class="reference external" href="https://hosted.weblate.org/projects/phpmyadmin/">online translation
 service</a>. You can check
-out all the possibilities to translate in the <a class="reference external" href="http://www.phpmyadmin.net/home_page/translate.php">translate section on
+out all the possibilities to translate in the <a class="reference external" href="https://www.phpmyadmin.net/translate/">translate section on
 our website</a>.</p>
 </div>
 <div class="section" id="i-would-like-to-help-out-with-the-development-of-phpmyadmin-how-should-i-proceed">
 <span id="faq7-3"></span><h3>7.3 I would like to help out with the development of phpMyAdmin. How should I proceed?<a class="headerlink" href="#i-would-like-to-help-out-with-the-development-of-phpmyadmin-how-should-i-proceed" title="Permalink to this headline">¶</a></h3>
 <p>We welcome every contribution to the development of phpMyAdmin. You
-can check out all the possibilities to contribute in the <a class="reference external" href="http://www.phpmyadmin.net/home_page/improve.php">contribute
+can check out all the possibilities to contribute in the <a class="reference external" href="https://www.phpmyadmin.net/contribute/">contribute
 section on our website</a>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
@@ -1601,7 +1591,7 @@ section on our website</a>.</p>
 <span id="faqsecurity"></span><h2>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="where-can-i-get-information-about-the-security-alerts-issued-for-phpmyadmin">
 <span id="faq8-1"></span><h3>8.1 Where can I get information about the security alerts issued for phpMyAdmin?<a class="headerlink" href="#where-can-i-get-information-about-the-security-alerts-issued-for-phpmyadmin" title="Permalink to this headline">¶</a></h3>
-<p>Please refer to &lt;<a class="reference external" href="http://www.phpmyadmin.net/home_page/security.php">http://www.phpmyadmin.net/home_page/security.php</a>&gt;.</p>
+<p>Please refer to &lt;<a class="reference external" href="https://www.phpmyadmin.net/security/">https://www.phpmyadmin.net/security/</a>&gt;.</p>
 </div>
 <div class="section" id="how-can-i-protect-phpmyadmin-against-brute-force-attacks">
 <span id="faq8-2"></span><h3>8.2 How can I protect phpMyAdmin against brute force attacks?<a class="headerlink" href="#how-can-i-protect-phpmyadmin-against-brute-force-attacks" title="Permalink to this headline">¶</a></h3>
@@ -1662,7 +1652,7 @@ attempts.</p>
 <li><a class="reference internal" href="#faq1-14">1.14 (withdrawn).</a></li>
 <li><a class="reference internal" href="#i-have-problems-with-mysql-user-column-names">1.15 I have problems with <em>mysql.user</em> column names.</a></li>
 <li><a class="reference internal" href="#i-cannot-upload-big-dump-files-memory-http-or-timeout-problems">1.16 I cannot upload big dump files (memory, HTTP or timeout problems).</a></li>
-<li><a class="reference internal" href="#which-mysql-versions-does-phpmyadmin-support">1.17 Which MySQL versions does phpMyAdmin support?</a></li>
+<li><a class="reference internal" href="#which-database-versions-does-phpmyadmin-support">1.17 Which Database versions does phpMyAdmin support?</a></li>
 <li><a class="reference internal" href="#a-i-cannot-connect-to-the-mysql-server-it-always-returns-the-error-message-client-does-not-support-authentication-protocol-requested-by-server-consider-upgrading-mysql-client">1.17a I cannot connect to the MySQL server. It always returns the error message, &#8220;Client does not support authentication protocol requested by server; consider upgrading MySQL client&#8221;</a></li>
 <li><a class="reference internal" href="#faq1-18">1.18 (withdrawn).</a></li>
 <li><a class="reference internal" href="#i-can-t-run-the-display-relations-feature-because-the-script-seems-not-to-know-the-font-face-i-m-using">1.19 I can&#8217;t run the &#8220;display relations&#8221; feature because the script seems not to know the font face I&#8217;m using!</a></li>
@@ -1860,7 +1850,7 @@ attempts.</p>
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.10 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.15.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

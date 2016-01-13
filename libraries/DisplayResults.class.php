@@ -1417,11 +1417,6 @@ class PMA_DisplayResults
                 = (($displayParts['edit_lnk'] != self::NO_EDIT_OR_DELETE)
                 && ($displayParts['del_lnk'] != self::NO_EDIT_OR_DELETE)) ? 4 : 0;
 
-            $button_html .= '<th colspan="' . $this->__get('fields_cnt') . '">'
-                . '</th>'
-                . '</tr>'
-                . '<tr>';
-
         } elseif ((($GLOBALS['cfg']['RowActionLinks'] == self::POSITION_LEFT)
             || ($GLOBALS['cfg']['RowActionLinks'] == self::POSITION_BOTH))
             && ($displayParts['text_btn'] == '1')
@@ -3030,7 +3025,9 @@ class PMA_DisplayResults
 
             $vertical_display = $this->__get('vertical_display');
 
-            if ($meta->numeric == 1) {
+            // in some situations (issue 11406), numeric returns 1
+            // even for a string type
+            if ($meta->numeric == 1 && $meta->type != 'string') {
                 // n u m e r i c
 
                 $vertical_display['data'][$row_no][$i]
@@ -5126,7 +5123,7 @@ class PMA_DisplayResults
 
         if (isset($content)) {
 
-            $size = /*overload*/mb_strlen($content);
+            $size = /*overload*/mb_strlen($content, '8bit');
             $display_size = PMA_Util::formatByteDown($size, 3, 1);
             $result .= ' - ' . $display_size[0] . ' ' . $display_size[1];
 
