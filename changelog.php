@@ -20,7 +20,7 @@ $filename = CHANGELOG_FILE;
  * Read changelog.
  */
 // Check if the file is available, some distributions remove these.
-if (is_readable($filename)) {
+if (@is_readable($filename)) {
 
     // Test if the if is in a compressed format
     if (substr($filename, -3) == '.gz') {
@@ -33,7 +33,10 @@ if (is_readable($filename)) {
     }
 } else {
     printf(
-        __('The %s file is not available on this system, please visit www.phpmyadmin.net for more information.'),
+        __(
+            'The %s file is not available on this system, please visit '
+            . 'www.phpmyadmin.net for more information.'
+        ),
         $filename
     );
     exit;

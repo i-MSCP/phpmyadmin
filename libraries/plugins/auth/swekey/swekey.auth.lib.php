@@ -24,7 +24,7 @@ function Swekey_Auth_check()
         $_SESSION['SWEKEY'] = array();
     }
 
-    $_SESSION['SWEKEY']['ENABLED'] = (! empty($confFile) && file_exists($confFile));
+    $_SESSION['SWEKEY']['ENABLED'] = (! empty($confFile) && @file_exists($confFile));
 
     // Load the swekey.conf file the first time
     if ($_SESSION['SWEKEY']['ENABLED']
@@ -100,9 +100,9 @@ function Swekey_Auth_error()
     function Swekey_GetValidKey()
     {
         var valids = "<?php
-    foreach ($_SESSION['SWEKEY']['VALID_SWEKEYS'] as $key => $value) {
+        foreach ($_SESSION['SWEKEY']['VALID_SWEKEYS'] as $key => $value) {
                 echo $key . ',';
-    }
+        }
         ?>";
         var connected_keys = Swekey_ListKeyIds().split(",");
         for (i in connected_keys) {
@@ -136,18 +136,18 @@ function Swekey_Auth_error()
 
     setTimeout("timedCheck()",1000);
     </script>
-     <?php
+        <?php
 
-    if (! empty($_SESSION['SWEKEY']['AUTHENTICATED_SWEKEY'])) {
-        return null;
-    }
+        if (! empty($_SESSION['SWEKEY']['AUTHENTICATED_SWEKEY'])) {
+            return null;
+        }
 
-    if (count($_SESSION['SWEKEY']['VALID_SWEKEYS']) == 0) {
-        return sprintf(
-            __('File %s does not contain any key id'),
-            $GLOBALS['cfg']['Server']['auth_swekey_config']
-        );
-    }
+        if (count($_SESSION['SWEKEY']['VALID_SWEKEYS']) == 0) {
+            return sprintf(
+                __('File %s does not contain any key id'),
+                $GLOBALS['cfg']['Server']['auth_swekey_config']
+            );
+        }
 
     include_once "libraries/plugins/auth/swekey/swekey.php";
 
@@ -169,7 +169,7 @@ function Swekey_Auth_error()
         //            echo "<!-- exists -->\n";
     }
 
-    if (file_exists($caFile)) {
+    if (@file_exists($caFile)) {
         Swekey_SetCAFile($caFile);
     } elseif (! empty($caFile)
         && (substr($_SESSION['SWEKEY']['CONF_SERVER_CHECK'], 0, 8) == "https://")
@@ -315,4 +315,3 @@ if (isset($_GET['swekey_reset'])) {
     unset($_SESSION['SWEKEY']);
 }
 
-?>

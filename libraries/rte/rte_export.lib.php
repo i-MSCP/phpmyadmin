@@ -23,8 +23,7 @@ function PMA_RTE_handleExport($export_data)
 
     $item_name = htmlspecialchars(PMA_Util::backquote($_GET['item_name']));
     if ($export_data !== false) {
-        $export_data = '<textarea cols="40" rows="15" style="width: 100%;">'
-                     . htmlspecialchars(trim($export_data)) . '</textarea>';
+        $export_data = htmlspecialchars(trim($export_data));
         $title = sprintf(PMA_RTE_getWord('export'), $item_name);
         if ($GLOBALS['is_ajax_request'] == true) {
             $response = PMA_Response::getInstance();
@@ -32,6 +31,8 @@ function PMA_RTE_handleExport($export_data)
             $response->addJSON('title', $title);
             exit;
         } else {
+            $export_data = '<textarea cols="40" rows="15" style="width: 100%;">'
+               . $export_data . '</textarea>';
             echo "<fieldset>\n"
                . "<legend>$title</legend>\n"
                . $export_data
@@ -80,16 +81,18 @@ function PMA_RTN_handleExport()
 {
     global $_GET, $db;
 
-    if (   ! empty($_GET['export_item'])
+    if (! empty($_GET['export_item'])
         && ! empty($_GET['item_name'])
         && ! empty($_GET['item_type'])
     ) {
         if ($_GET['item_type'] == 'FUNCTION' || $_GET['item_type'] == 'PROCEDURE') {
-            $export_data = $GLOBALS['dbi']->getDefinition(
-                $db,
-                $_GET['item_type'],
-                $_GET['item_name']
-            );
+            $export_data = "DELIMITER $$\n"
+                . $GLOBALS['dbi']->getDefinition(
+                    $db,
+                    $_GET['item_type'],
+                    $_GET['item_name']
+                )
+                . "$$\nDELIMITER ;\n";
             PMA_RTE_handleExport($export_data);
         }
     }
@@ -118,4 +121,3 @@ function PMA_TRI_handleExport()
         PMA_RTE_handleExport($export_data);
     }
 } // end PMA_TRI_handleExport()
-?>

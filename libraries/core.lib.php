@@ -220,7 +220,7 @@ function PMA_fatalError(
         $error_message = vsprintf($error_message, $message_args);
     }
 
-    if ($GLOBALS['is_ajax_request']) {
+    if (! empty($GLOBALS['is_ajax_request']) && $GLOBALS['is_ajax_request']) {
         $response = PMA_Response::getInstance();
         $response->isSuccess(false);
         $response->addJSON('message', PMA_Message::error($error_message));
@@ -590,26 +590,10 @@ function PMA_sendHeaderLocation($uri, $use_refresh = false)
         include_once './libraries/js_escape.lib.php';
         PMA_Response::getInstance()->disable();
 
-        echo '<html><head><title>- - -</title>' . "\n";
-        echo '<meta http-equiv="expires" content="0">' . "\n";
-        echo '<meta http-equiv="Pragma" content="no-cache">' . "\n";
-        echo '<meta http-equiv="Cache-Control" content="no-cache">' . "\n";
-        echo '<meta http-equiv="Refresh" content="0;url='
-            .  htmlspecialchars($uri) . '">' . "\n";
-        echo '<script type="text/javascript">' . "\n";
-        echo '//<![CDATA[' . "\n";
-        echo 'setTimeout("window.location = unescape(\'"'
-            . PMA_escapeJsString($uri) . '"\')", 2000);' . "\n";
-        echo '//]]>' . "\n";
-        echo '</script>' . "\n";
-        echo '</head>' . "\n";
-        echo '<body>' . "\n";
-        echo '<script type="text/javascript">' . "\n";
-        echo '//<![CDATA[' . "\n";
-        echo 'document.write(\'<p><a href="' . PMA_escapeJsString(htmlspecialchars($uri)) . '">'
-            . __('Go') . '</a></p>\');' . "\n";
-        echo '//]]>' . "\n";
-        echo '</script></body></html>' . "\n";
+        include_once './libraries/Template.class.php';
+
+        echo PMA\Template::get('header_location')
+            ->render(array('uri' => $uri));
 
         return;
     }
@@ -644,6 +628,26 @@ function PMA_sendHeaderLocation($uri, $use_refresh = false)
     } else {
         header('Location: ' . $uri);
     }
+}
+
+/**
+ * Outputs application/json headers. This includes no caching.
+ *
+ * @return void
+ */
+function PMA_headerJSON()
+{
+    if (defined('TESTSUITE') && ! defined('PMA_TEST_HEADERS')) {
+        return;
+    }
+    // No caching
+    PMA_noCacheHeader();
+    // MIME type
+    header('Content-Type: application/json; charset=UTF-8');
+    // Disable content sniffing in browser
+    // This is needed in case we include HTML in JSON, browser might assume it's
+    // html to display
+    header('X-Content-Type-Options: nosniff');
 }
 
 /**
@@ -791,7 +795,7 @@ function PMA_arrayRemove($path, &$array)
             break;
         }
         $depth++;
-        $path[$depth] =& $path[$depth-1][$key];
+        $path[$depth] =& $path[$depth - 1][$key];
     }
     // if element found, remove it
     if ($found) {
@@ -859,8 +863,10 @@ function PMA_isAllowedDomain($url)
         'docs.phpmyadmin.net',
         /* mysql.com domains */
         'dev.mysql.com','bugs.mysql.com',
-        /* drizzle.com domains */
+        /* drizzle.org domains */
         'www.drizzle.org',
+        /* mariadb domains */
+        'mariadb.org',
         /* php.net domains */
         'php.net',
         /* Github domains*/
@@ -1021,4 +1027,3 @@ if(! function_exists('hash_equals')) {
         return ! $ret;
     }
 }
-?>

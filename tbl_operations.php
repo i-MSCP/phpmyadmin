@@ -14,6 +14,7 @@ require_once 'libraries/common.inc.php';
 /**
  * functions implementation for this script
  */
+require_once 'libraries/check_user_privileges.lib.php';
 require_once 'libraries/operations.lib.php';
 
 $pma_table = new PMA_Table($GLOBALS['table'], $GLOBALS['db']);
@@ -55,13 +56,10 @@ require_once 'libraries/Partition.class.php';
 $GLOBALS['dbi']->selectDb($GLOBALS['db']);
 
 /**
- * Gets tables informations
+ * Gets tables information
  */
 require 'libraries/tbl_info.inc.php';
 
-// define some variables here, for improved syntax in the conditionals
-$is_myisam_or_aria = $is_isam = $is_innodb = $is_berkeleydb = false;
-$is_aria = $is_pbxt = false;
 // set initial value of these variables, based on the current table engine
 list($is_myisam_or_aria, $is_innodb, $is_isam,
     $is_berkeleydb, $is_aria, $is_pbxt
@@ -109,7 +107,23 @@ if (isset($_REQUEST['submitoptions'])) {
     $warning_messages = array();
 
     if (isset($_REQUEST['new_name'])) {
+        // Get original names before rename operation
+        $oldTable = $pma_table->getName();
+        $oldDb = $pma_table->getDbName();
+
         if ($pma_table->rename($_REQUEST['new_name'])) {
+            if (isset($_REQUEST['adjust_privileges'])
+                && ! empty($_REQUEST['adjust_privileges'])
+            ) {
+                PMA_AdjustPrivileges_renameOrMoveTable(
+                    $oldDb, $oldTable, $_REQUEST['db'], $_REQUEST['new_name']
+                );
+            }
+
+            // Reselect the original DB
+            $GLOBALS['db'] = $oldDb;
+            $GLOBALS['dbi']->selectDb($oldDb);
+
             $_message .= $pma_table->getLastMessage();
             $result = true;
             $GLOBALS['table'] = $pma_table->getName();
@@ -122,9 +136,9 @@ if (isset($_REQUEST['submitoptions'])) {
     }
 
     if (! empty($_REQUEST['new_tbl_storage_engine'])
-        && /*overload*/mb_strtolower($_REQUEST['new_tbl_storage_engine']) !== /*overload*/mb_strtolower($tbl_storage_engine)
+        && /*overload*/mb_strtoupper($_REQUEST['new_tbl_storage_engine']) !== $tbl_storage_engine
     ) {
-        $new_tbl_storage_engine = $_REQUEST['new_tbl_storage_engine'];
+        $new_tbl_storage_engine = mb_strtoupper($_REQUEST['new_tbl_storage_engine']);
         // reset the globals for the new engine
         list($is_myisam_or_aria, $is_innodb, $is_isam,
             $is_berkeleydb, $is_aria, $is_pbxt
@@ -162,6 +176,16 @@ if (isset($_REQUEST['submitoptions'])) {
         unset($table_alters);
         $warning_messages = PMA_getWarningMessagesArray();
     }
+
+    if (isset($_REQUEST['tbl_collation'])
+        && ! empty($_REQUEST['tbl_collation'])
+        && isset($_REQUEST['change_all_collations'])
+        && ! empty($_REQUEST['change_all_collations'])
+    ) {
+        PMA_changeAllColumnsCollation(
+            $GLOBALS['db'], $GLOBALS['table'], $_REQUEST['tbl_collation']
+        );
+    }
 }
 /**
  * Reordering the table has been requested by the user
@@ -184,7 +208,7 @@ if (isset($_REQUEST['submit_partition'])
 if ($reread_info) {
     // to avoid showing the old value (for example the AUTO_INCREMENT) after
     // a change, clear the cache
-    PMA_Table::$cache = array();
+    $GLOBALS['dbi']->clearTableCache();
     $page_checksum = $checksum = $delay_key_write = 0;
     include 'libraries/tbl_info.inc.php';
 }
@@ -410,7 +434,7 @@ if ($cfgRelation['relwork'] && ! $is_innodb) {
     $GLOBALS['dbi']->selectDb($GLOBALS['db']);
     $foreign = PMA_getForeigners($GLOBALS['db'], $GLOBALS['table'], '', 'internal');
 
-    if ($foreign) {
+    if (! empty($foreign)) {
         $response->addHTML(
             PMA_getHtmlForReferentialIntegrityCheck($foreign, $url_params)
         );
@@ -419,5 +443,3 @@ if ($cfgRelation['relwork'] && ! $is_innodb) {
 } // end  if (!empty($cfg['Server']['relation']))
 
 $response->addHTML('</div>');
-
-?>

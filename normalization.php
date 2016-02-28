@@ -12,7 +12,6 @@
 require_once 'libraries/common.inc.php';
 require_once 'libraries/transformations.lib.php';
 require_once 'libraries/normalization.lib.php';
-require_once 'libraries/tbl_columns_definition_form.lib.php';
 require_once 'libraries/Index.class.php';
 
 if (isset($_REQUEST['getColumns'])) {
@@ -61,6 +60,8 @@ if (isset($_REQUEST['getNewTables3NF'])) {
     $dependencies = json_decode($_REQUEST['pd']);
     $tables = json_decode($_REQUEST['tables']);
     $newTables = PMA_getHtmlForNewTables3NF($dependencies, $tables, $db);
+    PMA_Response::getInstance()->disable();
+    PMA_headerJSON();
     echo json_encode($newTables);
     exit;
 }

@@ -17,6 +17,10 @@ if (! PMA_DRIZZLE) {
 }
 require 'libraries/build_html_for_db.lib.php';
 
+if (! isset($_POST['new_db'])) {
+    PMA_Util::checkParameters(array('new_db'));
+}
+
 /**
  * Defines the url to return to in case of error in a sql statement
  */
@@ -130,12 +134,16 @@ if (! $result) {
             )
         );
         $response->addJSON(
-            'url_query', $GLOBALS['cfg']['DefaultTabDatabase']
+            'url_query',
+            PMA_Util::getScriptNameForOption(
+                $GLOBALS['cfg']['DefaultTabDatabase'], 'database'
+            )
             . $url_query . '&amp;db='
             . urlencode($current['SCHEMA_NAME'])
         );
     } else {
-        include_once '' . $cfg['DefaultTabDatabase'];
+        include_once '' .  PMA_Util::getScriptNameForOption(
+                $GLOBALS['cfg']['DefaultTabDatabase'], 'database'
+            );
     }
 }
-?>

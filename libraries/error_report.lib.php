@@ -27,7 +27,7 @@ if (is_readable('js/line_counts.php')) {
 /**
  * the url where to submit reports to
  */
-define('SUBMISSION_URL', "http://reports.phpmyadmin.net/incidents/create");
+define('SUBMISSION_URL', "https://reports.phpmyadmin.net/incidents/create");
 
 /**
  * returns the pretty printed error report data collected from the
@@ -95,13 +95,14 @@ function PMA_getReportData($exception_type = 'js')
     } elseif ($exception_type == 'php') {
         $errors = array();
         // create php error report
-        $i=0;
+        $i = 0;
         if (!isset($_SESSION['prev_errors'])
             || $_SESSION['prev_errors'] == ''
         ) {
             return array();
         }
         foreach ($_SESSION['prev_errors'] as $errorObj) {
+            /* @var $errorObj PMA_Error */
             if ($errorObj->getLine()
                 && $errorObj->getType()
                 && $errorObj->getNumber() != E_USER_WARNING
@@ -193,7 +194,7 @@ function PMA_sendErrorReport($report)
             array(
                 'method'  => 'POST',
                 'content' => $data_string,
-                'header' => "Content-Type: multipart/form-data\r\n",
+                'header' => "Content-Type: application/json\r\n",
             )
         );
         $context = PMA_Util::handleContext($context);
@@ -215,7 +216,10 @@ function PMA_sendErrorReport($report)
     }
     $curl_handle = PMA_Util::configureCurl($curl_handle);
     curl_setopt($curl_handle, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($curl_handle, CURLOPT_HTTPHEADER, array('Expect:'));
+    curl_setopt(
+        $curl_handle, CURLOPT_HTTPHEADER,
+        array('Expect:', 'Content-Type: application/json')
+    );
     curl_setopt($curl_handle, CURLOPT_POSTFIELDS, $data_string);
     curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($curl_handle);
@@ -342,49 +346,20 @@ function PMA_translateStacktrace($stack)
  */
 function PMA_getErrorReportForm()
 {
-    $html = "";
-    $html .= '<form action="error_report.php" method="post" name="report_frm"'
-            . ' id="report_frm" class="ajax">'
-            . '<fieldset style="padding-top:0px">';
-
-    $html .= '<p>' . __(
-        'phpMyAdmin has encountered an error. We have collected data about'
-        . ' this error as well as information about relevant configuration'
-        . ' settings to send to the phpMyAdmin team to help us in'
-        . ' debugging the problem.'
-    ) . '</p>';
-
-    $html .= '<div class="label"><label><p>'
-            . __('You may examine the data in the error report:')
-            . '</p></label></div>'
-            . '<pre class="report-data">'
-            . htmlspecialchars(PMA_getPrettyReportData())
-            . '</pre>';
-
-    $html .= '<div class="label"><label><p>'
-            . __('Please explain the steps that lead to the error:')
-            . '</p></label></div>'
-            . '<textarea class="report-description" name="description"'
-            . 'id="report_description"></textarea>';
-
-    $html .= '<input type="checkbox" name="always_send"'
-            . ' id="always_send_checkbox"/>'
-            . '<label for="always_send_checkbox">'
-            . __('Automatically send report next time')
-            . '</label>';
-
-    $html .= '</fieldset>';
-
-    $html .= PMA_URL_getHiddenInputs();
+    $datas = array(
+        'report_data' => PMA_getPrettyReportData(),
+        'hidden_inputs' => PMA_URL_getHiddenInputs(),
+        'hidden_fields' => null,
+    );
 
     $reportData = PMA_getReportData();
-    if (! empty($reportData)) {
-        $html .= PMA_getHiddenFields($reportData);
+    if (!empty($reportData)) {
+        $datas['hidden_fields'] = PMA_getHiddenFields($reportData);
     }
 
-    $html .= '</form>';
-
-    return $html;
+    include_once './libraries/Template.class.php';
+    return PMA\Template::get('error/report_form')
+        ->render($datas);
 }
 
 /**
@@ -429,4 +404,3 @@ function PMA_prettyPrint($object, $namespace="")
     return $output;
 }
 
-?>

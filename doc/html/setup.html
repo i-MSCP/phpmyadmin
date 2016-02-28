@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; phpMyAdmin 4.4.15.4 documentation</title>
+    <title>Installation &mdash; phpMyAdmin 4.5.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.4.15.4',
+        VERSION:     '4.5.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.15.4 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.5.5 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Requirements" href="require.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="require.html" title="Requirements"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.5.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -129,6 +129,7 @@ which include phpMyAdmin together with a database and web server such as
 Downloads page. Some kits contain only the English messages, others
 contain all languages. We&#8217;ll assume you chose a kit whose name
 looks like <tt class="docutils literal"><span class="pre">phpMyAdmin-x.x.x</span> <span class="pre">-all-languages.tar.gz</span></tt>.</li>
+<li>Ensure you have downloaded a genuine archive, see <a class="reference internal" href="#verify"><em>Verifying phpMyAdmin releases</em></a>.</li>
 <li>Untar or unzip the distribution (be sure to unzip the subdirectories):
 <tt class="docutils literal"><span class="pre">tar</span> <span class="pre">-xzvf</span> <span class="pre">phpMyAdmin_x.x.x-all-languages.tar.gz</span></tt> in your
 webserver&#8217;s document root. If you don&#8217;t have direct access to your
@@ -256,6 +257,84 @@ webserver or limit access by web server configuration, see
 </ol>
 </div>
 </div>
+<div class="section" id="verifying-phpmyadmin-releases">
+<span id="verify"></span><h2>Verifying phpMyAdmin releases<a class="headerlink" href="#verifying-phpmyadmin-releases" title="Permalink to this headline">¶</a></h2>
+<p>Since July 2015 all phpMyAdmin releases are cryptographically signed by the
+releasing developer, who through January 2016 was Marc Delisle. His key id is
+0x81AF644A, his PGP fingerprint is:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">436F F188 4B1A 0C3F DCBF 0D79 FEFC 65D1 81AF 644A</span>
+</pre></div>
+</div>
+<p>and you can get more identification information from <a class="reference external" href="https://keybase.io/lem9">https://keybase.io/lem9</a>.</p>
+<p>Beginning in January 2016, the release manager is Isaac Bennetch. His key id is
+0x8259BD92, and his PGP fingerprint is:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="go">3D06 A59E CE73 0EB7 1B51 1C17 CE75 2F17 8259 BD92</span>
+</pre></div>
+</div>
+<p>and you can get more identification information from <a class="reference external" href="https://keybase.io/ibennetch">https://keybase.io/ibennetch</a>.</p>
+<p>You should verify that the signature matches
+the archive you have downloaded. This way you can be sure that you are using
+the same code that was released.</p>
+<p>Each archive is accompanied with <tt class="docutils literal"><span class="pre">.asc</span></tt> files which contains the PGP signature
+for it. Once you have both of them in the same folder, you can verify the signature:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> gpg --verify phpMyAdmin-4.5.4.1-all-languages.zip.asc
+<span class="go">gpg: Signature made Fri 29 Jan 2016 08:59:37 AM EST using RSA key ID 8259BD92</span>
+<span class="go">gpg: Can&#39;t check signature: public key not found</span>
+</pre></div>
+</div>
+<p>As you can see gpg complains that it does not know the public key. At this
+point you should do one of the following steps:</p>
+<ul class="simple">
+<li>Download the keyring from <a class="reference external" href="https://files.phpmyadmin.net/phpmyadmin.keyring">our download server</a>, then import it with:</li>
+</ul>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> gpg --import phpmyadmin.keyring
+</pre></div>
+</div>
+<ul class="simple">
+<li>Download and import the key from one of the key servers:</li>
+</ul>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> gpg --keyserver hkp://pgp.mit.edu --recv-keys 8259BD92
+<span class="go">gpg: requesting key 8259BD92 from hkp server pgp.mit.edu</span>
+<span class="go">gpg: key 8259BD92: public key &quot;Isaac Bennetch &lt;bennetch@gmail.com&gt;&quot; imported</span>
+<span class="go">gpg: no ultimately trusted keys found</span>
+<span class="go">gpg: Total number processed: 1</span>
+<span class="go">gpg:               imported: 1  (RSA: 1)</span>
+</pre></div>
+</div>
+<p>This will improve the situation a bit - at this point you can verify that the
+signature from the given key is correct but you still can not trust the name used
+in the key:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> gpg --verify phpMyAdmin-4.5.4.1-all-languages.zip.asc
+<span class="go">gpg: Signature made Fri 29 Jan 2016 08:59:37 AM EST using RSA key ID 8259BD92</span>
+<span class="go">gpg: Good signature from &quot;Isaac Bennetch &lt;bennetch@gmail.com&gt;&quot;</span>
+<span class="go">gpg:                 aka &quot;Isaac Bennetch &lt;isaac@bennetch.org&gt;&quot;</span>
+<span class="go">gpg: WARNING: This key is not certified with a trusted signature!</span>
+<span class="go">gpg:          There is no indication that the signature belongs to the owner.</span>
+<span class="go">Primary key fingerprint: 3D06 A59E CE73 0EB7 1B51  1C17 CE75 2F17 8259 BD92</span>
+</pre></div>
+</div>
+<p>The problem here is that anybody could issue the key with this name.  You need to
+ensure that the key is actually owned by the mentioned person.  The GNU Privacy
+Handbook covers this topic in the chapter <a class="reference external" href="https://www.gnupg.org/gph/en/manual.html#AEN335">Validating other keys on your public
+keyring</a>. The most reliable method is to meet the developer in person and
+exchange key fingerprints, however you can also rely on the web of trust. This way
+you can trust the key transitively though signatures of others, who have met
+the developer in person. For example you can see how <a class="reference external" href="http://pgp.cs.uu.nl/mk_path.cgi?FROM=00411886&amp;TO=8259BD92">Isaac&#8217;s key links to
+Linus&#8217;s key</a>.</p>
+<p>Once the key is trusted, the warning will not occur:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> gpg --verify phpMyAdmin-4.5.4.1-all-languages.zip.asc
+<span class="go">gpg: Signature made Fri 29 Jan 2016 08:59:37 AM EST using RSA key ID 8259BD92</span>
+<span class="go">gpg: Good signature from &quot;Isaac Bennetch &lt;bennetch@gmail.com&gt;&quot; [full]</span>
+</pre></div>
+</div>
+<p>Should the signature be invalid (the archive has been changed), you would get a
+clear error regardless of the fact that the key is trusted or not:</p>
+<div class="highlight-console"><div class="highlight"><pre><span class="gp">$</span> gpg --verify phpMyAdmin-4.5.4.1-all-languages.zip.asc
+<span class="go">gpg: Signature made Fri 29 Jan 2016 08:59:37 AM EST using RSA key ID 8259BD92</span>
+<span class="go">gpg: BAD signature from &quot;Isaac Bennetch &lt;bennetch@gmail.com&gt;&quot; [unknown]</span>
+</pre></div>
+</div>
+</div>
 <div class="section" id="phpmyadmin-configuration-storage">
 <span id="linked-tables"></span><span id="index-1"></span><h2>phpMyAdmin configuration storage<a class="headerlink" href="#phpmyadmin-configuration-storage" title="Permalink to this headline">¶</a></h2>
 <p>For a whole set of additional features (bookmarks, comments, <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a>-history,
@@ -338,6 +417,8 @@ should run the <a class="reference internal" href="glossary.html#term-sql"><em c
 newer (&lt;= 4.2.x) and if you use the phpMyAdmin configuration storage, you
 should run the <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a> script found in
 <tt class="file docutils literal"><span class="pre">sql/upgrade_column_info_4_3_0+.sql</span></tt>.</p>
+<p>Do not forget to clear the browser cache and to empty the old session by
+logging out and logging in again.</p>
 </div>
 <div class="section" id="using-authentication-modes">
 <span id="authentication-modes"></span><span id="index-5"></span><h2>Using authentication modes<a class="headerlink" href="#using-authentication-modes" title="Permalink to this headline">¶</a></h2>
@@ -685,8 +766,6 @@ in <tt class="file docutils literal"><span class="pre">examples/signon-script.ph
 
     <span class="k">return</span> <span class="nv">$credentials</span><span class="p">;</span>
 <span class="p">}</span>
-
-<span class="cp">?&gt;</span><span class="x"></span>
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -795,20 +874,52 @@ file <tt class="file docutils literal"><span class="pre">examples/swekey.sample.
 <h2>Securing your phpMyAdmin installation<a class="headerlink" href="#securing-your-phpmyadmin-installation" title="Permalink to this headline">¶</a></h2>
 <p>The phpMyAdmin team tries hard to make the application secure, however there
 are always ways to make your installation more secure:</p>
-<ul class="simple">
-<li>Remove the <tt class="docutils literal"><span class="pre">setup</span></tt> directory from phpMyAdmin, you will probably not
-use it after the initial setup.</li>
-<li>Properly choose an authentication method - <a class="reference internal" href="#cookie"><em>Cookie authentication mode</em></a>
-is probably the best choice for shared hosting.</li>
-<li>In case you don&#8217;t want all MySQL users to be able to access
-phpMyAdmin, you can use <span class="target" id="index-27"></span><a class="reference internal" href="config.html#cfg_Servers_AllowDeny_rules"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['AllowDeny']['rules']</span></tt></a> to limit them.</li>
-<li>Consider hiding phpMyAdmin behind an authentication proxy, so that
+<ul>
+<li><p class="first">Remove the <tt class="docutils literal"><span class="pre">setup</span></tt> directory from phpMyAdmin, you will probably not
+use it after the initial setup.</p>
+</li>
+<li><p class="first">Properly choose an authentication method - <a class="reference internal" href="#cookie"><em>Cookie authentication mode</em></a>
+is probably the best choice for shared hosting.</p>
+</li>
+<li><p class="first">In case you don&#8217;t want all MySQL users to be able to access
+phpMyAdmin, you can use <span class="target" id="index-27"></span><a class="reference internal" href="config.html#cfg_Servers_AllowDeny_rules"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['AllowDeny']['rules']</span></tt></a> to limit them.</p>
+</li>
+<li><p class="first">Consider hiding phpMyAdmin behind an authentication proxy, so that
 users need to authenticate prior to providing MySQL credentials
-to phpMyAdmin.</li>
-<li>If you are afraid of automated attacks, enabling Captcha by
+to phpMyAdmin. You can achieve this by configuring your web server to request
+HTTP authentication. For example in Apache this can be done with:</p>
+<div class="highlight-apache"><div class="highlight"><pre><span class="nb">AuthType</span> Basic
+<span class="nb">AuthName</span> <span class="s2">&quot;Restricted Access&quot;</span>
+<span class="nb">AuthUserFile</span> <span class="sx">/usr/share/phpmyadmin/passwd</span>
+<span class="nb">Require</span> valid-user
+</pre></div>
+</div>
+<p>Once you have changed the configuration, you need to create a list of users which
+can authenticate. This can be done using the <strong class="program">htpasswd</strong> utility:</p>
+<div class="highlight-sh"><div class="highlight"><pre>htpasswd -c /usr/share/phpmyadmin/passwd username
+</pre></div>
+</div>
+</li>
+<li><p class="first">If you are afraid of automated attacks, enabling Captcha by
 <span class="target" id="index-28"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPublicKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPublicKey']</span></tt></a> and
-<span class="target" id="index-29"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPrivateKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPrivateKey']</span></tt></a> might be an option.</li>
+<span class="target" id="index-29"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPrivateKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPrivateKey']</span></tt></a> might be an option.</p>
+</li>
 </ul>
+</div>
+<div class="section" id="known-issues">
+<h2>Known issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="users-with-column-specific-privileges-are-unable-to-browse">
+<h3>Users with column-specific privileges are unable to &#8220;Browse&#8221;<a class="headerlink" href="#users-with-column-specific-privileges-are-unable-to-browse" title="Permalink to this headline">¶</a></h3>
+<p>If a user has only column-specific privileges on some (but not all) columns in a table, &#8220;Browse&#8221;
+will fail with an error message.</p>
+<p>As a workaround, a bookmarked query with the same name as the table can be created, this will
+run when using the &#8220;Browse&#8221; link instead. <a class="reference external" href="https://github.com/phpmyadmin/phpmyadmin/issues/11922">Issue 11922</a>.</p>
+</div>
+<div class="section" id="trouble-logging-back-in-after-logging-out-using-http-authentication">
+<h3>Trouble logging back in after logging out using &#8216;http&#8217; authentication<a class="headerlink" href="#trouble-logging-back-in-after-logging-out-using-http-authentication" title="Permalink to this headline">¶</a></h3>
+<p>When using the &#8216;http&#8217; <tt class="docutils literal"><span class="pre">auth_type</span></tt>, it can be impossible to log back in (when the logout comes
+manually or after a period of inactivity). <a class="reference external" href="https://github.com/phpmyadmin/phpmyadmin/issues/11898">Issue 11898</a>.</p>
+</div>
 </div>
 </div>
 
@@ -837,6 +948,7 @@ to phpMyAdmin.</li>
 <li><a class="reference internal" href="#using-setup-script">Using Setup script</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#verifying-phpmyadmin-releases">Verifying phpMyAdmin releases</a></li>
 <li><a class="reference internal" href="#phpmyadmin-configuration-storage">phpMyAdmin configuration storage</a><ul>
 <li><a class="reference internal" href="#zero-configuration">Zero configuration</a></li>
 <li><a class="reference internal" href="#manual-configuration">Manual configuration</a></li>
@@ -852,6 +964,11 @@ to phpMyAdmin.</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#securing-your-phpmyadmin-installation">Securing your phpMyAdmin installation</a></li>
+<li><a class="reference internal" href="#known-issues">Known issues</a><ul>
+<li><a class="reference internal" href="#users-with-column-specific-privileges-are-unable-to-browse">Users with column-specific privileges are unable to &#8220;Browse&#8221;</a></li>
+<li><a class="reference internal" href="#trouble-logging-back-in-after-logging-out-using-http-authentication">Trouble logging back in after logging out using &#8216;http&#8217; authentication</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -896,7 +1013,7 @@ to phpMyAdmin.</li>
         <li class="right" >
           <a href="require.html" title="Requirements"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.5.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

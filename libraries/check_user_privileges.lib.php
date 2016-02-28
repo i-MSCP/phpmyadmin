@@ -15,6 +15,73 @@ if (! defined('PHPMYADMIN')) {
 $GLOBALS['is_superuser'] = $GLOBALS['dbi']->isSuperuser();
 
 /**
+ * Check if user has required privileges for
+ * performing 'Adjust privileges' operations
+ *
+ * @param string $show_grants_str     string containing grants for user
+ * @param string $show_grants_dbname  name of db extracted from grant string
+ * @param string $show_grants_tblname name of table extracted from grant string
+ *
+ * @return void
+ */
+function PMA_checkRequiredPrivilegesForAdjust(
+    $show_grants_str,
+    $show_grants_dbname,
+    $show_grants_tblname
+) {
+    // '... ALL PRIVILEGES ON *.* ...' OR '... ALL PRIVILEGES ON `mysql`.* ..'
+    // OR
+    // SELECT, INSERT, UPDATE, DELETE .... ON *.* OR `mysql`.*
+    if ($show_grants_str == 'ALL'
+        || $show_grants_str == 'ALL PRIVILEGES'
+        || (mb_strpos(
+                $show_grants_str, "SELECT, INSERT, UPDATE, DELETE"
+            ) !== false)
+    ) {
+        if ($show_grants_dbname == '*'
+            && $show_grants_tblname == '*'
+        ) {
+            $GLOBALS['col_priv'] = true;
+            $GLOBALS['db_priv'] = true;
+            $GLOBALS['proc_priv'] = true;
+            $GLOBALS['table_priv'] = true;
+
+            if ($show_grants_str == 'ALL PRIVILEGES'
+                || $show_grants_str == 'ALL'
+            ) {
+                $GLOBALS['is_reload_priv'] = true;
+            }
+        }
+
+        // check for specific tables in `mysql` db
+        // Ex. '... ALL PRIVILEGES on `mysql`.`columns_priv` .. '
+        if ($show_grants_dbname == 'mysql') {
+            switch ($show_grants_tblname) {
+                case 'columns_priv':
+                    $GLOBALS['col_priv'] = true;
+                    break;
+                case 'db':
+                    $GLOBALS['db_priv'] = true;
+                    break;
+                case 'procs_priv':
+                    $GLOBALS['proc_priv'] = true;
+                    break;
+                case 'tables_priv':
+                    $GLOBALS['table_priv'] = true;
+                    break;
+                case '*':
+                    $GLOBALS['col_priv'] = true;
+                    $GLOBALS['db_priv'] = true;
+                    $GLOBALS['proc_priv'] = true;
+                    $GLOBALS['table_priv'] = true;
+                    break;
+                default:
+            }
+        }
+    }
+}
+
+/**
  * sets privilege information extracted from SHOW GRANTS result
  *
  * Detection for some CREATE privilege.
@@ -38,9 +105,6 @@ function PMA_analyseShowGrant()
         $GLOBALS['is_create_db_priv'] = PMA_Util::cacheGet(
             'is_create_db_priv'
         );
-        $GLOBALS['is_process_priv'] = PMA_Util::cacheGet(
-            'is_process_priv'
-        );
         $GLOBALS['is_reload_priv'] = PMA_Util::cacheGet(
             'is_reload_priv'
         );
@@ -53,16 +117,33 @@ function PMA_analyseShowGrant()
         $GLOBALS['dbs_to_test'] = PMA_Util::cacheGet(
             'dbs_to_test'
         );
+
+        $GLOBALS['db_priv'] = PMA_Util::cacheGet(
+            'db_priv'
+        );
+        $GLOBALS['col_priv'] = PMA_Util::cacheGet(
+            'col_priv'
+        );
+        $GLOBALS['table_priv'] = PMA_Util::cacheGet(
+            'table_priv'
+        );
+        $GLOBALS['proc_priv'] = PMA_Util::cacheGet(
+            'proc_priv'
+        );
+
         return;
     }
 
     // defaults
     $GLOBALS['is_create_db_priv']  = false;
-    $GLOBALS['is_process_priv']    = true;
     $GLOBALS['is_reload_priv']     = false;
     $GLOBALS['db_to_create']       = '';
     $GLOBALS['dbs_where_create_table_allowed'] = array();
     $GLOBALS['dbs_to_test']        = $GLOBALS['dbi']->getSystemSchemas();
+    $GLOBALS['proc_priv'] = false;
+    $GLOBALS['db_priv'] = false;
+    $GLOBALS['col_priv'] = false;
+    $GLOBALS['table_priv'] = false;
 
     $rs_usr = $GLOBALS['dbi']->tryQuery('SHOW GRANTS');
 
@@ -88,6 +169,16 @@ function PMA_analyseShowGrant()
             (/*overload*/mb_strpos($row[0], ' ON ') - 6)
         );
 
+        // extrac table from GRANT sytax
+        $tblname_start_offset = /*overload*/mb_strpos($row[0], '.') + 1;
+        $tblname_end_offset = /*overload*/mb_strpos($row[0], ' TO ');
+
+        $show_grants_tblname = /*overload*/mb_substr(
+            $row[0], $tblname_start_offset,
+            $tblname_end_offset - $tblname_start_offset
+        );
+        $show_grants_tblname = PMA_Util::unQuote($show_grants_tblname, '`');
+
         if ($show_grants_dbname == '*') {
             if ($show_grants_str != 'USAGE') {
                 $GLOBALS['dbs_to_test'] = false;
@@ -96,9 +187,19 @@ function PMA_analyseShowGrant()
             $GLOBALS['dbs_to_test'][] = $show_grants_dbname;
         }
 
-        if ($show_grants_str == 'RELOAD') {
+        if (
+            /*overload*/mb_strpos($show_grants_str,'RELOAD') !== false
+        ) {
             $GLOBALS['is_reload_priv'] = true;
         }
+
+
+        // check for the required privileges for adjust
+        PMA_checkRequiredPrivilegesForAdjust(
+            $show_grants_str,
+            $show_grants_dbname,
+            $show_grants_tblname
+        );
 
         /**
          * @todo if we find CREATE VIEW but not CREATE, do not offer
@@ -162,6 +263,7 @@ function PMA_analyseShowGrant()
                 } // end if
             } // end elseif
         } // end if
+
     } // end while
 
     $GLOBALS['dbi']->freeResult($rs_usr);
@@ -169,7 +271,6 @@ function PMA_analyseShowGrant()
     // must also cacheUnset() them in
     // libraries/plugins/auth/AuthenticationCookie.class.php
     PMA_Util::cacheSet('is_create_db_priv', $GLOBALS['is_create_db_priv']);
-    PMA_Util::cacheSet('is_process_priv', $GLOBALS['is_process_priv']);
     PMA_Util::cacheSet('is_reload_priv', $GLOBALS['is_reload_priv']);
     PMA_Util::cacheSet('db_to_create', $GLOBALS['db_to_create']);
     PMA_Util::cacheSet(
@@ -177,19 +278,37 @@ function PMA_analyseShowGrant()
         $GLOBALS['dbs_where_create_table_allowed']
     );
     PMA_Util::cacheSet('dbs_to_test', $GLOBALS['dbs_to_test']);
+
+    PMA_Util::cacheSet('proc_priv', $GLOBALS['proc_priv']);
+    PMA_Util::cacheSet('table_priv', $GLOBALS['table_priv']);
+    PMA_Util::cacheSet('col_priv', $GLOBALS['col_priv']);
+    PMA_Util::cacheSet('db_priv', $GLOBALS['db_priv']);
+
 } // end function
 
 if (!PMA_DRIZZLE) {
-    PMA_analyseShowGrant();
+    $user = $GLOBALS['dbi']->fetchValue("SELECT CURRENT_USER();");
+    if ($user == '@') { // MySQL is started with --skip-grant-tables
+        $GLOBALS['is_create_db_priv'] = true;
+        $GLOBALS['is_reload_priv']    = true;
+        $GLOBALS['db_to_create']      = '';
+        $GLOBALS['dbs_where_create_table_allowed'] = array('*');
+        $GLOBALS['dbs_to_test']       = false;
+        $GLOBALS['flush_priv'] = true;
+        $GLOBALS['db_priv'] = true;
+        $GLOBALS['col_priv'] = true;
+        $GLOBALS['table_priv'] = true;
+        $GLOBALS['proc_priv'] = true;
+    } else {
+        PMA_analyseShowGrant();
+    }
 } else {
     // todo: for simple_user_policy only database with user's login can be created
     // (unless logged in as root)
     $GLOBALS['is_create_db_priv'] = $GLOBALS['is_superuser'];
-    $GLOBALS['is_process_priv']   = false;
     $GLOBALS['is_reload_priv']    = false;
     $GLOBALS['db_to_create']      = '';
     $GLOBALS['dbs_where_create_table_allowed'] = array('*');
     $GLOBALS['dbs_to_test']       = false;
 }
 
-?>

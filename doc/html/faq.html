@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.4.15.4 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.5.5 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.4.15.4',
+        VERSION:     '4.5.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.15.4 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.5.5 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Import and export" href="import_export.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.5.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -319,8 +319,7 @@ MMCache but upgrading MMCache to version 2.3.21 solves the problem.</p>
 <div class="section" id="does-phpmyadmin-support-php-5">
 <span id="faq1-31"></span><h3>1.31 Does phpMyAdmin support PHP 5?<a class="headerlink" href="#does-phpmyadmin-support-php-5" title="Permalink to this headline">¶</a></h3>
 <p>Yes.</p>
-<p>Since release 4.1 phpMyAdmin supports only PHP 5.3 and newer. For PHP 5.2 you
-can use 4.0.x releases.</p>
+<p>Since release 4.5, phpMyAdmin supports only PHP 5.5 and newer. Since release 4.1 phpMyAdmin supports only PHP 5.3 and newer. For PHP 5.2 you can use 4.0.x releases.</p>
 </div>
 <div class="section" id="can-i-use-http-authentication-with-iis">
 <span id="faq1-32"></span><h3>1.32 Can I use HTTP authentication with IIS?<a class="headerlink" href="#can-i-use-http-authentication-with-iis" title="Permalink to this headline">¶</a></h3>
@@ -1237,37 +1236,36 @@ functions or empty mimetype definitions.</p>
 <p>Plus, you have a whole overview of available mimetypes. Who knows all those
 mimetypes by heart so he/she can enter it at will?</p>
 </div>
-<div class="section" id="bookmarks-where-can-i-store-bookmarks-why-can-t-i-see-any-bookmarks-below-the-query-box-what-is-this-variable-for">
-<span id="faqbookmark"></span><h3>6.18 Bookmarks: Where can I store bookmarks? Why can&#8217;t I see any bookmarks below the query box? What is this variable for?<a class="headerlink" href="#bookmarks-where-can-i-store-bookmarks-why-can-t-i-see-any-bookmarks-below-the-query-box-what-is-this-variable-for" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="bookmarks-where-can-i-store-bookmarks-why-can-t-i-see-any-bookmarks-below-the-query-box-what-are-these-variables-for">
+<span id="faqbookmark"></span><h3>6.18 Bookmarks: Where can I store bookmarks? Why can&#8217;t I see any bookmarks below the query box? What are these variables for?<a class="headerlink" href="#bookmarks-where-can-i-store-bookmarks-why-can-t-i-see-any-bookmarks-below-the-query-box-what-are-these-variables-for" title="Permalink to this headline">¶</a></h3>
 <p>Any query you have executed can be stored as a bookmark on the page
 where the results are displayed. You will find a button labeled
 &#8216;Bookmark this query&#8217; just at the end of the page. As soon as you have
 stored a bookmark, it is related to the database you run the query on.
 You can now access a bookmark dropdown on each page, the query box
 appears on for that database.</p>
-<p>You can also have, inside the query, a placeholder for a variable.
-This is done by inserting into the query a SQL comment between <tt class="docutils literal"><span class="pre">/*</span></tt> and
-<tt class="docutils literal"><span class="pre">*/</span></tt>. Inside the comment, the special string <tt class="docutils literal"><span class="pre">[VARIABLE]</span></tt> is used.
-Be aware that the whole query minus the SQL comment must be
+<p>You can also have, inside the query, placeholders for variables.
+This is done by inserting into the query SQL comments between <tt class="docutils literal"><span class="pre">/*</span></tt> and
+<tt class="docutils literal"><span class="pre">*/</span></tt>. Inside the comments, the special strings <tt class="docutils literal"><span class="pre">[VARIABLE{variable-number}]</span></tt> is used.
+Be aware that the whole query minus the SQL comments must be
 valid by itself, otherwise you won&#8217;t be able to store it as a bookmark.</p>
-<p>When you execute the bookmark, everything typed into the <em>value</em>
-input box on the query box page will replace the string <tt class="docutils literal"><span class="pre">/*[VARIABLE]*/</span></tt> in
+<p>When you execute the bookmark, everything typed into the <em>Variables</em>
+input boxes on the query box page will replace the strings <tt class="docutils literal"><span class="pre">/*[VARIABLE{variable-number}]*/</span></tt> in
 your stored query.</p>
-<p>Also remember, that everything else inside the <tt class="docutils literal"><span class="pre">/*[VARIABLE]*/</span></tt> string for
+<p>Also remember, that everything else inside the <tt class="docutils literal"><span class="pre">/*[VARIABLE{variable-number}]*/</span></tt> string for
 your query will remain the way it is, but will be stripped of the <tt class="docutils literal"><span class="pre">/**/</span></tt>
 chars. So you can use:</p>
-<div class="highlight-mysql"><div class="highlight"><pre><span class="cm">/*, [VARIABLE] AS myname */</span>
+<div class="highlight-mysql"><div class="highlight"><pre><span class="cm">/*, [VARIABLE1] AS myname */</span>
 </pre></div>
 </div>
 <p>which will be expanded to</p>
-<div class="highlight-mysql"><div class="highlight"><pre><span class="p">,</span> <span class="n">VARIABLE</span> <span class="k">as</span> <span class="n">myname</span>
+<div class="highlight-mysql"><div class="highlight"><pre><span class="p">,</span> <span class="n">VARIABLE1</span> <span class="k">as</span> <span class="n">myname</span>
 </pre></div>
 </div>
-<p>in your query, where VARIABLE is the string you entered in the input box. If an
-empty string is provided, no replacements are made.</p>
+<p>in your query, where VARIABLE1 is the string you entered in the Variable 1 input box.</p>
 <p>A more complex example. Say you have stored
 this query:</p>
-<div class="highlight-mysql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">Name</span><span class="p">,</span> <span class="n">Address</span> <span class="k">FROM</span> <span class="n">addresses</span> <span class="k">WHERE</span> <span class="mi">1</span> <span class="cm">/* AND Name LIKE &#39;%[VARIABLE]%&#39; */</span>
+<div class="highlight-mysql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">Name</span><span class="p">,</span> <span class="n">Address</span> <span class="k">FROM</span> <span class="n">addresses</span> <span class="k">WHERE</span> <span class="mi">1</span> <span class="cm">/* AND Name LIKE &#39;%[VARIABLE1]%&#39; */</span>
 </pre></div>
 </div>
 <p>Say, you now enter &#8220;phpMyAdmin&#8221; as the variable for the stored query, the full
@@ -1275,15 +1273,10 @@ query will be:</p>
 <div class="highlight-mysql"><div class="highlight"><pre><span class="k">SELECT</span> <span class="n">Name</span><span class="p">,</span> <span class="n">Address</span> <span class="k">FROM</span> <span class="n">addresses</span> <span class="k">WHERE</span> <span class="mi">1</span> <span class="k">AND</span> <span class="n">Name</span> <span class="k">LIKE</span> <span class="s1">&#39;%phpMyAdmin%&#39;</span>
 </pre></div>
 </div>
-<p>You can use multiple occurrences of <tt class="docutils literal"><span class="pre">/*[VARIABLE]*/</span></tt> in a single query
-(that is, multiple occurrences of the <em>same</em> variable).</p>
 <p><strong>NOTE THE ABSENCE OF SPACES</strong> inside the <tt class="docutils literal"><span class="pre">/**/</span></tt> construct. Any spaces
 inserted there will be later also inserted as spaces in your query and may lead
 to unexpected results especially when using the variable expansion inside of a
 &#8220;LIKE &#8216;&#8217;&#8221; expression.</p>
-<p>Your initial query which is going to be stored as a bookmark has to yield at
-least one result row so you can store the bookmark. You may have that to work
-around using well positioned <tt class="docutils literal"><span class="pre">/**/</span></tt> comments.</p>
 </div>
 <div class="section" id="how-can-i-create-simple-latex-document-to-include-exported-table">
 <span id="faq6-19"></span><h3>6.19 How can I create simple LATEX document to include exported table?<a class="headerlink" href="#how-can-i-create-simple-latex-document-to-include-exported-table" title="Permalink to this headline">¶</a></h3>
@@ -1559,14 +1552,65 @@ form as the following dependencies exists.</p>
 OwnerPhone depends on OwnerLastName and OwnerFirstName.
 PetType depends on PetBreed.</p>
 </div>
+<div class="section" id="how-can-i-reassign-auto-incremented-values">
+<span id="faq6-38"></span><h3>6.38 How can I reassign auto-incremented values?<a class="headerlink" href="#how-can-i-reassign-auto-incremented-values" title="Permalink to this headline">¶</a></h3>
+<p>Some users prefer their AUTO_INCREMENT values to be consecutive; this is not
+always the case after row deletion.</p>
+<p>Here are the steps to accomplish this. These are manual steps because they
+involve a manual verification at one point.</p>
+<ul class="simple">
+<li>Ensure that you have exclusive access to the table to rearrange</li>
+<li>On your primary key column (i.e. id), remove the AUTO_INCREMENT setting</li>
+<li>Delete your primary key in Structure &gt; indexes</li>
+<li>Create a new column future_id as primary key, AUTO_INCREMENT</li>
+<li>Browse your table and verify that the new increments correspond to what
+you&#8217;re expecting</li>
+<li>Drop your old id column</li>
+<li>Rename the future_id column to id</li>
+<li>Move the new id column via Structure &gt; Move columns</li>
+</ul>
+</div>
+<div class="section" id="what-is-the-adjust-privileges-option-when-renaming-copying-or-moving-a-database-table-column-or-procedure">
+<span id="faq6-39"></span><h3>6.39 What is the &#8220;Adjust privileges&#8221; option when renaming, copying, or moving a database, table, column, or procedure?<a class="headerlink" href="#what-is-the-adjust-privileges-option-when-renaming-copying-or-moving-a-database-table-column-or-procedure" title="Permalink to this headline">¶</a></h3>
+<p>When renaming/copying/moving a database/table/column/procedure,
+MySQL does not adjust the original privileges relating to these objects
+on its own. By selecting this option, phpMyAdmin will adjust the privilege
+table so that users have the same privileges on the new items.</p>
+<p>For example: A user <a class="reference external" href="mailto:'bob'&#37;&#52;&#48;'localhost">'bob'<span>&#64;</span>'localhost</a>&#8216; has a &#8216;SELECT&#8217; privilege on a
+column named &#8216;id&#8217;. Now, if this column is renamed to &#8216;id_new&#8217;, MySQL,
+on its own, would <strong>not</strong> adjust the column privileges to the new column name.
+phpMyAdmin can make this adjustment for you automatically.</p>
+<p>Notes:</p>
+<ul class="simple">
+<li>While adjusting privileges for a database, the privileges of all
+database-related elements (tables, columns and procedures) are also adjusted
+to the database&#8217;s new name.</li>
+<li>Similarly, while adjusting privileges for a table, the privileges of all
+the columns inside the new table are also adjusted.</li>
+<li>While adjusting privileges, the user performing the operation <strong>must</strong> have the following
+privileges:<ul>
+<li>SELECT, INSERT, UPDATE, DELETE privileges on following tables:
+<cite>mysql</cite>.`db`, <cite>mysql</cite>.`columns_priv`, <cite>mysql</cite>.`tables_priv`, <cite>mysql</cite>.`procs_priv`</li>
+<li>FLUSH privilege (GLOBAL)</li>
+</ul>
+</li>
+</ul>
+<p>Thus, if you want to replicate the database/table/column/procedure as it is
+while renaming/copying/moving these objects, make sure you have checked this option.</p>
+</div>
+<div class="section" id="i-see-bind-parameters-checkbox-in-the-sql-page-how-do-i-write-parameterized-sql-queries">
+<span id="faq6-40"></span><h3>6.40 I see &#8220;Bind parameters&#8221; checkbox in the &#8220;SQL&#8221; page. How do I write parameterized SQL queries?<a class="headerlink" href="#i-see-bind-parameters-checkbox-in-the-sql-page-how-do-i-write-parameterized-sql-queries" title="Permalink to this headline">¶</a></h3>
+<p>From version 4.5, phpMyAdmin allows users to execute parameterized queries in the &#8220;SQL&#8221; page.
+Parameters should be prefixed with a colon(:) and when the &#8220;Bind parameters&#8221; checkbox is checked
+these parameters will be identified and input fields for these parameters will be presented.
+Values entered in these field will be substituted in the query before being executed.</p>
+</div>
 </div>
 <div class="section" id="phpmyadmin-project">
 <span id="faqproject"></span><h2>phpMyAdmin project<a class="headerlink" href="#phpmyadmin-project" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="i-have-found-a-bug-how-do-i-inform-developers">
 <span id="faq7-1"></span><h3>7.1 I have found a bug. How do I inform developers?<a class="headerlink" href="#i-have-found-a-bug-how-do-i-inform-developers" title="Permalink to this headline">¶</a></h3>
-<p>Our Bug Tracker is located at &lt;<a class="reference external" href="http://sf.net/projects/phpmyadmin/">http://sf.net/projects/phpmyadmin/</a>&gt; under the
-Bugs section. But please first discuss your bug with other users:
-&lt;<a class="reference external" href="https://www.phpmyadmin.net/support/">https://www.phpmyadmin.net/support/</a>&gt;</p>
+<p>Our issues tracker is located at &lt;<a class="reference external" href="https://github.com/phpmyadmin/phpmyadmin/issues">https://github.com/phpmyadmin/phpmyadmin/issues</a>&gt;.</p>
 </div>
 <div class="section" id="i-want-to-translate-the-messages-to-a-new-language-or-upgrade-an-existing-language-where-do-i-start">
 <span id="faq7-2"></span><h3>7.2 I want to translate the messages to a new language or upgrade an existing language, where do I start?<a class="headerlink" href="#i-want-to-translate-the-messages-to-a-new-language-or-upgrade-an-existing-language-where-do-i-start" title="Permalink to this headline">¶</a></h3>
@@ -1768,7 +1812,7 @@ attempts.</p>
 <li><a class="reference internal" href="#i-want-to-add-a-blob-column-and-put-an-index-on-it-but-mysql-says-blob-column-used-in-key-specification-without-a-key-length">6.15 I want to add a BLOB column and put an index on it, but MySQL says &#8220;BLOB column &#8216;...&#8217; used in key specification without a key length&#8221;.</a></li>
 <li><a class="reference internal" href="#how-can-i-simply-move-in-page-with-plenty-editing-fields">6.16 How can I simply move in page with plenty editing fields?</a></li>
 <li><a class="reference internal" href="#transformations-i-can-t-enter-my-own-mimetype-wtf-is-this-feature-then-useful-for">6.17 Transformations: I can&#8217;t enter my own mimetype! WTF is this feature then useful for?</a></li>
-<li><a class="reference internal" href="#bookmarks-where-can-i-store-bookmarks-why-can-t-i-see-any-bookmarks-below-the-query-box-what-is-this-variable-for">6.18 Bookmarks: Where can I store bookmarks? Why can&#8217;t I see any bookmarks below the query box? What is this variable for?</a></li>
+<li><a class="reference internal" href="#bookmarks-where-can-i-store-bookmarks-why-can-t-i-see-any-bookmarks-below-the-query-box-what-are-these-variables-for">6.18 Bookmarks: Where can I store bookmarks? Why can&#8217;t I see any bookmarks below the query box? What are these variables for?</a></li>
 <li><a class="reference internal" href="#how-can-i-create-simple-latex-document-to-include-exported-table">6.19 How can I create simple LATEX document to include exported table?</a></li>
 <li><a class="reference internal" href="#i-see-a-lot-of-databases-which-are-not-mine-and-cannot-access-them">6.20 I see a lot of databases which are not mine, and cannot access them.</a></li>
 <li><a class="reference internal" href="#in-edit-insert-mode-how-can-i-see-a-list-of-possible-values-for-a-column-based-on-some-foreign-table">6.21 In edit/insert mode, how can I see a list of possible values for a column, based on some foreign table?</a></li>
@@ -1788,6 +1832,9 @@ attempts.</p>
 <li><a class="reference internal" href="#how-can-i-use-the-range-search-feature">6.35 How can I use the Range search feature?</a></li>
 <li><a class="reference internal" href="#what-is-central-columns-and-how-can-i-use-this-feature">6.36 What is Central columns and How can I use this feature?</a></li>
 <li><a class="reference internal" href="#how-can-i-use-improve-table-structure-feature">6.37 How can I use Improve Table structure feature?</a></li>
+<li><a class="reference internal" href="#how-can-i-reassign-auto-incremented-values">6.38 How can I reassign auto-incremented values?</a></li>
+<li><a class="reference internal" href="#what-is-the-adjust-privileges-option-when-renaming-copying-or-moving-a-database-table-column-or-procedure">6.39 What is the &#8220;Adjust privileges&#8221; option when renaming, copying, or moving a database, table, column, or procedure?</a></li>
+<li><a class="reference internal" href="#i-see-bind-parameters-checkbox-in-the-sql-page-how-do-i-write-parameterized-sql-queries">6.40 I see &#8220;Bind parameters&#8221; checkbox in the &#8220;SQL&#8221; page. How do I write parameterized SQL queries?</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#phpmyadmin-project">phpMyAdmin project</a><ul>
@@ -1850,7 +1897,7 @@ attempts.</p>
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.5.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

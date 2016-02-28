@@ -83,7 +83,7 @@ class PMA_File
      */
     public function __construct($name = false)
     {
-        if ($name) {
+        if ($name && is_string($name)) {
             $this->setName($name);
         }
     }
@@ -261,13 +261,21 @@ class PMA_File
         case 4: //UPLOAD_ERR_NO_FILE:
             break;
         case 1: //UPLOAD_ERR_INI_SIZE:
-            $this->_error_message = __('The uploaded file exceeds the upload_max_filesize directive in php.ini.');
+            $this->_error_message = __(
+                'The uploaded file exceeds the upload_max_filesize directive in '
+                . 'php.ini.'
+            );
             break;
         case 2: //UPLOAD_ERR_FORM_SIZE:
-            $this->_error_message = __('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.');
+            $this->_error_message = __(
+                'The uploaded file exceeds the MAX_FILE_SIZE directive that was '
+                . 'specified in the HTML form.'
+            );
             break;
         case 3: //UPLOAD_ERR_PARTIAL:
-            $this->_error_message = __('The uploaded file was only partially uploaded.');
+            $this->_error_message = __(
+                'The uploaded file was only partially uploaded.'
+            );
             break;
         case 6: //UPLOAD_ERR_NO_TMP_DIR:
             $this->_error_message = __('Missing a temporary folder.');
@@ -433,10 +441,7 @@ class PMA_File
     {
         // suppress warnings from being displayed, but not from being logged
         // any file access outside of open_basedir will issue a warning
-        ob_start();
-        $is_readable = is_readable($this->getName());
-        ob_end_clean();
-        return $is_readable;
+        return @is_readable($this->getName());
     }
 
     /**
@@ -455,10 +460,12 @@ class PMA_File
         }
 
         if (empty($GLOBALS['cfg']['TempDir'])
-            || ! is_writable($GLOBALS['cfg']['TempDir'])
+            || ! @is_writable($GLOBALS['cfg']['TempDir'])
         ) {
             // cannot create directory or access, point user to FAQ 1.11
-            $this->_error_message = __('Error moving the uploaded file, see [doc@faq1-11]FAQ 1.11[/doc].');
+            $this->_error_message = __(
+                'Error moving the uploaded file, see [doc@faq1-11]FAQ 1.11[/doc].'
+            );
             return false;
         }
 
@@ -484,7 +491,7 @@ class PMA_File
         $this->isTemp(true);
 
         if (! $this->isReadable()) {
-            $this->_error_message = __('Cannot read (moved) upload file.');
+            $this->_error_message = __('Cannot read uploaded file.');
             return false;
         }
 
@@ -575,7 +582,11 @@ class PMA_File
     public function errorUnsupported()
     {
         $this->_error_message = sprintf(
-            __('You attempted to load file with unsupported compression (%s). Either support for it is not implemented or disabled by your configuration.'),
+            __(
+                'You attempted to load file with unsupported compression (%s). '
+                . 'Either support for it is not implemented or disabled by your '
+                . 'configuration.'
+            ),
             $this->getCompression()
         );
     }
@@ -729,4 +740,3 @@ class PMA_File
 
     }
 }
-?>

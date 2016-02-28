@@ -43,21 +43,26 @@ if (!defined('TESTSUITE')) {
     $post_params = array(
             'db',
             'table',
+            'what',
             'single_table',
             'export_type',
             'export_method',
             'quick_or_custom',
             'db_select',
             'table_select',
+            'table_structure',
+            'table_data',
             'limit_to',
             'limit_from',
             'allrows',
+            'lock_tables',
             'output_format',
             'filename_template',
             'maxsize',
             'remember_template',
-            'charset_of_file',
+            'charset',
             'compression',
+            'as_separate_files',
             'knjenc',
             'xkana',
             'htmlword_structure_or_data',
@@ -85,6 +90,7 @@ if (!defined('TESTSUITE')) {
             'ods_structure_or_data',
             'ods_columns',
             'json_structure_or_data',
+            'json_pretty_print',
             'xml_structure_or_data',
             'xml_export_events',
             'xml_export_functions',
@@ -109,7 +115,6 @@ if (!defined('TESTSUITE')) {
             'sql_create_database',
             'sql_drop_table',
             'sql_procedure_function',
-            'sql_create_table_statements',
             'sql_create_table',
             'sql_create_view',
             'sql_create_trigger',
@@ -126,6 +131,7 @@ if (!defined('TESTSUITE')) {
             'sql_utc_time',
             'sql_drop_database',
             'sql_views_as_tables',
+            'sql_metadata',
             'csv_separator',
             'csv_enclosed',
             'csv_escaped',
@@ -158,12 +164,14 @@ if (!defined('TESTSUITE')) {
     }
 
     $table = $GLOBALS['table'];
-    // sanitize this parameter which will be used below in a file inclusion
-    $what = PMA_securePath($_POST['what']);
 
     PMA_Util::checkParameters(array('what', 'export_type'));
 
+    // sanitize this parameter which will be used below in a file inclusion
+    $what = PMA_securePath($_POST['what']);
+
     // export class instance, not array of properties, as before
+    /* @var $export_plugin ExportPlugin */
     $export_plugin = PMA_getPlugin(
         "export",
         $what,
@@ -178,13 +186,8 @@ if (!defined('TESTSUITE')) {
     $type = $what;
 
     // Check export type
-    if (! isset($export_plugin)) {
+    if (empty($export_plugin)) {
         PMA_fatalError(__('Bad type!'));
-    }
-
-    // Avoid warning from PHP Analyzer
-    if (is_null($export_plugin)) {
-        $export_plugin = new stdClass();
     }
 
     /**
@@ -207,9 +210,10 @@ if (!defined('TESTSUITE')) {
     $file_handle = '';
     $err_url = '';
     $filename = '';
+    $separate_files = '';
 
     // Is it a quick or custom export?
-    if ($_REQUEST['quick_or_custom'] == 'quick') {
+    if (isset($_REQUEST['quick_or_custom']) && $_REQUEST['quick_or_custom'] == 'quick') {
         $quick_export = true;
     } else {
         $quick_export = false;
@@ -219,6 +223,16 @@ if (!defined('TESTSUITE')) {
         $asfile = false;
     } else {
         $asfile = true;
+        if (isset($_REQUEST['as_separate_files'])
+            && ! empty($_REQUEST['as_separate_files'])
+        ) {
+            if (isset($_REQUEST['compression'])
+                && ! empty($_REQUEST['compression'])
+                && $_REQUEST['compression'] == 'zip'
+            ) {
+                $separate_files = $_REQUEST['as_separate_files'];
+            }
+        }
         if (in_array($_REQUEST['compression'], $compression_methods)) {
             $compression = $_REQUEST['compression'];
             $buffer_needed = true;
@@ -266,14 +280,20 @@ if (!defined('TESTSUITE')) {
     // Merge SQL Query aliases with Export aliases from
     // export page, Export page aliases are given more
     // preference over SQL Query aliases.
-    if (!empty($_REQUEST['aliases'])) {
-        $aliases = PMA_mergeAliases(
-            PMA_SQP_getAliasesFromQuery($sql_query, $db),
-            $_REQUEST['aliases']
-        );
-        $_SESSION['tmpval']['aliases'] = $_REQUEST['aliases'];
-    } else {
-        $aliases = PMA_SQP_getAliasesFromQuery($sql_query, $db);
+    $parser = new SqlParser\Parser($sql_query);
+    $aliases = array();
+    if ((!empty($parser->statements[0]))
+        && ($parser->statements[0] instanceof SqlParser\Statements\SelectStatement)
+    ) {
+        if (!empty($_REQUEST['aliases'])) {
+            $aliases = PMA_mergeAliases(
+                SqlParser\Utils\Misc::getAliases($parser->statements[0], $db),
+                $_REQUEST['aliases']
+            );
+            $_SESSION['tmpval']['aliases'] = $_REQUEST['aliases'];
+        } else {
+            $aliases = SqlParser\Utils\Misc::getAliases($parser->statements[0], $db);
+        }
     }
 
     /**
@@ -287,6 +307,9 @@ if (!defined('TESTSUITE')) {
     // Start with empty buffer
     $dump_buffer = '';
     $dump_buffer_len = 0;
+
+    // Array of dump_buffers - used in separate file exports
+    $dump_buffer_objects = array();
 
     // We send fake headers to avoid browser timeout when buffering
     $time_start = time();
@@ -305,7 +328,7 @@ if (!defined('TESTSUITE')) {
     // Do we need to convert charset?
     $output_charset_conversion = $asfile
         && $GLOBALS['PMA_recoding_engine'] != PMA_CHARSET_NONE
-        && isset($charset_of_file) && $charset_of_file != 'utf-8'
+        && isset($charset) && $charset != 'utf-8'
         && $type != 'xls';
 
     // Use on the fly compression?
@@ -375,9 +398,12 @@ if (!defined('TESTSUITE')) {
     // Fake loop just to allow skip of remain of this code by break, I'd really
     // need exceptions here :-)
     do {
+        // Re - initialize
+        $dump_buffer = '';
+        $dump_buffer_len = 0;
 
         // Add possibly some comments to export
-        if (! $export_plugin->exportHeader($db)) {
+        if (! $export_plugin->exportHeader()) {
             break;
         }
 
@@ -408,14 +434,40 @@ if (!defined('TESTSUITE')) {
             PMA_exportServer(
                 $db_select, $whatStrucOrData, $export_plugin, $crlf, $err_url,
                 $export_type, $do_relation, $do_comments, $do_mime, $do_dates,
-                $aliases
+                $aliases, $separate_files
             );
         } elseif ($export_type == 'database') {
-            PMA_exportDatabase(
-                $db, $tables, $whatStrucOrData, $export_plugin, $crlf, $err_url,
-                $export_type, $do_relation, $do_comments, $do_mime, $do_dates,
-                $aliases
-            );
+            if (!isset($table_structure) || !is_array($table_structure)) {
+                $table_structure = array();
+            }
+            if (!isset($table_data) || !is_array($table_data)) {
+                $table_data = array();
+            }
+            if (!empty($_REQUEST['structure_or_data_forced'])) {
+                $table_structure = $tables;
+                $table_data = $tables;
+            }
+            if (isset($lock_tables)) {
+                PMA_lockTables($db, $tables, "READ");
+                try {
+                    PMA_exportDatabase(
+                        $db, $tables, $whatStrucOrData, $table_structure,
+                        $table_data, $export_plugin, $crlf, $err_url, $export_type,
+                        $do_relation, $do_comments, $do_mime, $do_dates, $aliases,
+                        $separate_files
+                    );
+                    PMA_unlockTables();
+                } catch (Exception $e) { // TODO use finally when PHP version is 5.5
+                    PMA_unlockTables();
+                    throw $e;
+                }
+            } else {
+                PMA_exportDatabase(
+                    $db, $tables, $whatStrucOrData, $table_structure, $table_data,
+                    $export_plugin, $crlf, $err_url, $export_type, $do_relation,
+                    $do_comments, $do_mime, $do_dates, $aliases, $separate_files
+                );
+            }
         } else {
             // We export just one table
             // $allrows comes from the form when "Dump all rows" has been selected
@@ -428,11 +480,27 @@ if (!defined('TESTSUITE')) {
             if (! isset($limit_from)) {
                 $limit_from = 0;
             }
-            PMA_exportTable(
-                $db, $table, $whatStrucOrData, $export_plugin, $crlf, $err_url,
-                $export_type, $do_relation, $do_comments, $do_mime, $do_dates,
-                $allrows, $limit_to, $limit_from, $sql_query, $aliases
-            );
+            if (isset($lock_tables)) {
+                try {
+                    PMA_lockTables($db, array($table), "READ");
+                    PMA_exportTable(
+                        $db, $table, $whatStrucOrData, $export_plugin, $crlf,
+                        $err_url, $export_type, $do_relation, $do_comments,
+                        $do_mime, $do_dates, $allrows, $limit_to, $limit_from,
+                        $sql_query, $aliases
+                    );
+                    PMA_unlockTables();
+                } catch (Exception $e) { // TODO use finally when PHP version is 5.5
+                    PMA_unlockTables();
+                    throw $e;
+                }
+            } else {
+                PMA_exportTable(
+                    $db, $table, $whatStrucOrData, $export_plugin, $crlf, $err_url,
+                    $export_type, $do_relation, $do_comments, $do_mime, $do_dates,
+                    $allrows, $limit_to, $limit_from, $sql_query, $aliases
+                );
+            }
         }
         if (! $export_plugin->exportFooter()) {
             break;
@@ -448,33 +516,39 @@ if (!defined('TESTSUITE')) {
     /**
      * Send the dump as a file...
      */
-    if (! empty($asfile)) {
-        // Convert the charset if required.
-        if ($output_charset_conversion) {
-            $dump_buffer = PMA_convertString(
-                'utf-8',
-                $GLOBALS['charset_of_file'],
-                $dump_buffer
-            );
-        }
-
-        // Compression needed?
-        if ($compression) {
-            $dump_buffer
-                = PMA_compressExport($dump_buffer, $compression, $filename);
-        }
-
-        /* If we saved on server, we have to close file now */
-        if ($save_on_server) {
-            $message = PMA_closeExportFile(
-                $file_handle, $dump_buffer, $save_filename
-            );
-            PMA_showExportPage($db, $table, $export_type);
-        } else {
-            echo $dump_buffer;
-        }
-    } else {
+    if (empty($asfile)) {
         echo PMA_getHtmlForDisplayedExportFooter($back_button);
+        return;
     } // end if
+
+    // Convert the charset if required.
+    if ($output_charset_conversion) {
+        $dump_buffer = PMA_convertString(
+            'utf-8',
+            $GLOBALS['charset'],
+            $dump_buffer
+        );
+    }
+
+    // Compression needed?
+    if ($compression) {
+        if (! empty($separate_files)) {
+            $dump_buffer = PMA_compressExport(
+                $dump_buffer_objects, $compression, $filename
+            );
+        } else {
+            $dump_buffer = PMA_compressExport($dump_buffer, $compression, $filename);
+        }
+
+    }
+
+    /* If we saved on server, we have to close file now */
+    if ($save_on_server) {
+        $message = PMA_closeExportFile(
+            $file_handle, $dump_buffer, $save_filename
+        );
+        PMA_showExportPage($db, $table, $export_type);
+    } else {
+        echo $dump_buffer;
+    }
 }
-?>

@@ -88,7 +88,7 @@ class ImportShp extends ImportPlugin
             // and use the files in it for import
             if ($compression == 'application/zip'
                 && ! empty($GLOBALS['cfg']['TempDir'])
-                && is_writable($GLOBALS['cfg']['TempDir'])
+                && @is_writable($GLOBALS['cfg']['TempDir'])
             ) {
                 $dbf_file_name = PMA_findFileFromZipArchive(
                     '/^.*\.dbf$/i', $import_file
@@ -208,6 +208,7 @@ class ImportShp extends ImportPlugin
 
         if (isset($gis_type)) {
             include_once './libraries/gis/GIS_Factory.class.php';
+            /** @var PMA_GIS_Multilinestring|PMA_GIS_Multipoint|PMA_GIS_Point|PMA_GIS_Polygon $gis_obj */
             $gis_obj =  PMA_GIS_Factory::factory($gis_type);
         } else {
             $gis_obj = null;

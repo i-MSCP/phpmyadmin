@@ -4,11 +4,35 @@
  */
 
 /**
+ * checks whether browser supports web storage
+ *
+ * @param type the type of storage i.e. localStorage or sessionStorage
+ *
+ * @returns bool
+ */
+function isStorageSupported(type)
+{
+    try {
+        window[type].setItem('PMATest', 'test');
+        // Check whether key-value pair was set successfully
+        if (window[type].getItem('PMATest') === 'test') {
+            // Supported, remove test variable from storage
+            window[type].removeItem('PMATest');
+            return true;
+        }
+    } catch(error) {
+        // Not supported
+        PMA_ajaxShowMessage(PMA_messages.strNoLocalStorage, false);
+    }
+    return false;
+}
+
+/**
  * Unbind all event handlers before tearing down a page
  */
 AJAX.registerTeardown('config.js', function () {
-    $('input[id], select[id], textarea[id]').unbind('change').unbind('keyup');
-    $('input[type=button][name=submit_reset]').unbind('click');
+    $('.optbox input[id], .optbox select[id], .optbox textarea[id]').unbind('change').unbind('keyup');
+    $('.optbox input[type=button][name=submit_reset]').unbind('click');
     $('div.tabs_contents').undelegate();
     $('#import_local_storage, #export_local_storage').unbind('click');
     $('form.prefs-form').unbind('change').unbind('submit');
@@ -17,8 +41,9 @@ AJAX.registerTeardown('config.js', function () {
 });
 
 AJAX.registerOnload('config.js', function () {
-    $('#topmenu2').find('li.active a').attr('rel', 'samepage');
-    $('#topmenu2').find('li:not(.active) a').attr('rel', 'newpage');
+    var $topmenu_upt = $('#topmenu2.user_prefs_tabs');
+    $topmenu_upt.find('li.active a').attr('rel', 'samepage');
+    $topmenu_upt.find('li:not(.active) a').attr('rel', 'newpage');
 });
 
 // default values for fields
@@ -41,6 +66,35 @@ function getFieldType(field)
         return 'text';
     }
     return '';
+}
+
+/**
+ * Enables or disables the "restore default value" button
+ *
+ * @param {Element} field
+ * @param {boolean} display
+ */
+function setRestoreDefaultBtn(field, display)
+{
+    var $el = $(field).closest('td').find('.restore-default img');
+    $el[display ? 'show' : 'hide']();
+}
+
+/**
+ * Marks field depending on its value (system default or custom)
+ *
+ * @param {Element} field
+ */
+function markField(field)
+{
+    var $field = $(field);
+    var type = getFieldType($field);
+    var isDefault = checkFieldDefault($field, type);
+
+    // checkboxes uses parent <span> for marking
+    var $fieldMarker = (type == 'checkbox') ? $field.parent() : $field;
+    setRestoreDefaultBtn($field, !isDefault);
+    $fieldMarker[isDefault ? 'removeClass' : 'addClass']('custom');
 }
 
 /**
@@ -299,7 +353,7 @@ function validateField(id, type, onKeyUp, params)
 function getFieldValidators(field_id, onKeyUpOnly)
 {
     // look for field bound validator
-    var name = field_id.match(/[^-]+$/)[0];
+    var name = field_id && field_id.match(/[^-]+$/)[0];
     if (typeof validators._field[name] != 'undefined') {
         return [[validators._field[name], null]];
     }
@@ -423,7 +477,7 @@ function validate_field(field, isKeyUp, errors)
             args = [];
         }
         args.unshift(isKeyUp);
-        result = functions[i][0].apply(field[0], args);
+        result = functions[i][0].apply($field[0], args);
         if (result !== true) {
             if (typeof result == 'string') {
                 result = [result];
@@ -444,43 +498,30 @@ function validate_field_and_fieldset(field, isKeyUp)
     var $field = $(field);
     var errors = {};
     validate_field($field, isKeyUp, errors);
-    validate_fieldset($field.closest('fieldset'), isKeyUp, errors);
+    validate_fieldset($field.closest('fieldset.optbox'), isKeyUp, errors);
     displayErrors(errors);
 }
 
-/**
- * Marks field depending on its value (system default or custom)
- *
- * @param {Element} field
- */
-function markField(field)
-{
-    var $field = $(field);
-    var type = getFieldType($field);
-    var isDefault = checkFieldDefault($field, type);
-
-    // checkboxes uses parent <span> for marking
-    var $fieldMarker = (type == 'checkbox') ? $field.parent() : $field;
-    setRestoreDefaultBtn($field, !isDefault);
-    $fieldMarker[isDefault ? 'removeClass' : 'addClass']('custom');
+function loadInlineConfig() {
+    if (!Array.isArray(configInlineParams)) {
+        return;
+    }
+    for (var i = 0; i < configInlineParams.length; ++i) {
+        if (typeof configInlineParams[i] === 'function') {
+            configInlineParams[i]();
+        }
+    }
 }
 
-/**
- * Enables or disables the "restore default value" button
- *
- * @param {Element} field
- * @param {boolean} display
- */
-function setRestoreDefaultBtn(field, display)
-{
-    var $el = $(field).closest('td').find('.restore-default img');
-    $el[display ? 'show' : 'hide']();
-}
-
-AJAX.registerOnload('config.js', function () {
+function setupValidation() {
+    validate = {};
+    configScriptLoaded = true;
+    if (configScriptLoaded && typeof configInlineParams !== "undefined") {
+        loadInlineConfig();
+    }
     // register validators and mark custom values
-    var $elements = $('input[id], select[id], textarea[id]');
-    $('input[id], select[id], textarea[id]').each(function () {
+    var $elements = $('.optbox input[id], .optbox select[id], .optbox textarea[id]');
+    $elements.each(function () {
         markField(this);
         var $el = $(this);
         $el.bind('change', function () {
@@ -511,7 +552,7 @@ AJAX.registerOnload('config.js', function () {
             validate_field($elements[i], false, errors);
         }
         // run all fieldset validators
-        $('fieldset').each(function () {
+        $('fieldset.optbox').each(function () {
             validate_fieldset(this, false, errors);
         });
 
@@ -519,6 +560,10 @@ AJAX.registerOnload('config.js', function () {
     } else if ($check_page_refresh) {
         $check_page_refresh.val('1');
     }
+}
+
+AJAX.registerOnload('config.js', function () {
+    setupValidation();
 });
 
 //
@@ -536,27 +581,42 @@ AJAX.registerOnload('config.js', function () {
  */
 function setTab(tab_id)
 {
-    $('ul.tabs li').removeClass('active').find('a[href=#' + tab_id + ']').parent().addClass('active');
-    $('div.tabs_contents fieldset').hide().filter('#' + tab_id).show();
-    location.hash = 'tab_' + tab_id;
-    $('form.config-form input[name=tab_hash]').val(location.hash);
+    $('ul.tabs').each(function() {
+        var $this = $(this);
+        if (!$this.find('li a[href=#' + tab_id + ']').length) {
+            return;
+        }
+        $this.find('li').removeClass('active').find('a[href=#' + tab_id + ']').parent().addClass('active');
+        $this.parent().find('div.tabs_contents fieldset').hide().filter('#' + tab_id).show();
+        location.hash = 'tab_' + tab_id;
+        $this.parent().find('input[name=tab_hash]').val(location.hash);
+    });
+}
+
+function setupConfigTabs() {
+    var forms = $('form.config-form');
+    forms.each(function() {
+        var $this = $(this);
+        var $tabs = $this.find('ul.tabs');
+        if (!$tabs.length) {
+            return;
+        }
+        // add tabs events and activate one tab (the first one or indicated by location hash)
+        $tabs.find('li').removeClass('active');
+        $tabs.find('a')
+            .click(function (e) {
+                e.preventDefault();
+                setTab($(this).attr('href').substr(1));
+            })
+            .filter(':first')
+            .parent()
+            .addClass('active');
+        $this.find('div.tabs_contents fieldset').hide().filter(':first').show();
+    });
 }
 
 AJAX.registerOnload('config.js', function () {
-    var $tabs = $('ul.tabs');
-    if (!$tabs.length) {
-        return;
-    }
-    // add tabs events and activate one tab (the first one or indicated by location hash)
-    $tabs.find('a')
-        .click(function (e) {
-            e.preventDefault();
-            setTab($(this).attr('href').substr(1));
-        })
-        .filter(':first')
-        .parent()
-        .addClass('active');
-    $('div.tabs_contents fieldset').hide().filter(':first').show();
+    setupConfigTabs();
 
     // tab links handling, check each 200ms
     // (works with history in FF, further browser support here would be an overkill)
@@ -564,7 +624,7 @@ AJAX.registerOnload('config.js', function () {
     var tab_check_fnc = function () {
         if (location.hash != prev_hash) {
             prev_hash = location.hash;
-            if (location.hash.match(/^#tab_.+/) && $('#' + location.hash.substr(5)).length) {
+            if (location.hash.match(/^#tab_[a-zA-Z0-9_]+/) && $('#' + location.hash.substr(5)).length) {
                 setTab(location.hash.substr(5));
             }
         }
@@ -582,7 +642,7 @@ AJAX.registerOnload('config.js', function () {
 //
 
 AJAX.registerOnload('config.js', function () {
-    $('input[type=button][name=submit_reset]').click(function () {
+    $('.optbox input[type=button][name=submit_reset]').click(function () {
         var fields = $(this).closest('fieldset').find('input, select, textarea');
         for (var i = 0, imax = fields.length; i < imax; i++) {
             setFieldValue(fields[i], getFieldType(fields[i]));
@@ -612,7 +672,7 @@ function restoreField(field_id)
     setFieldValue($field, getFieldType($field), defaultValues[field_id]);
 }
 
-AJAX.registerOnload('config.js', function () {
+function setupRestoreField() {
     $('div.tabs_contents')
         .delegate('.restore-default, .set-value', 'mouseenter', function () {
             $(this).css('opacity', 1);
@@ -637,6 +697,10 @@ AJAX.registerOnload('config.js', function () {
         .find('.restore-default, .set-value')
         // inline-block for IE so opacity inheritance works
         .css({display: 'inline-block', opacity: 0.25});
+}
+
+AJAX.registerOnload('config.js', function () {
+    setupRestoreField();
 });
 
 //
@@ -671,7 +735,7 @@ AJAX.registerOnload('config.js', function () {
         });
 
     // detect localStorage state
-    var ls_supported = window.localStorage || false;
+    var ls_supported = isStorageSupported('localStorage');
     var ls_exists = ls_supported ? (window.localStorage.config || false) : false;
     $('div.localStorage-' + (ls_supported ? 'un' : '') + 'supported').hide();
     $('div.localStorage-' + (ls_exists ? 'empty' : 'exists')).hide();
@@ -763,7 +827,7 @@ function updatePrefsDate()
         '@DATE@',
         PMA_formatDateTime(d)
     );
-    $('#opts_import_local_storage div.localStorage-exists').html(msg);
+    $('#opts_import_local_storage').find('div.localStorage-exists').html(msg);
 }
 
 /**
@@ -771,7 +835,7 @@ function updatePrefsDate()
  */
 function offerPrefsAutoimport()
 {
-    var has_config = (window.localStorage || false) && (window.localStorage.config || false);
+    var has_config = (isStorageSupported('localStorage')) && (window.localStorage.config || false);
     var $cnt = $('#prefs_autoload');
     if (!$cnt.length || !has_config) {
         return;
