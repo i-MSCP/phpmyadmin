@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.5.5.1 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.6.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.5.5.1',
+        VERSION:     '4.6.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.5.5.1 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.6.0 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Import and export" href="import_export.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.5.5.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -190,7 +190,6 @@ MySQL:</p>
 For older MySQL versions, our <a class="reference external" href="https://www.phpmyadmin.net/downloads/">Downloads</a> page offers older phpMyAdmin versions
 (which may have become unsupported).</p>
 <p>For <a class="reference external" href="http://mariadb.org/">MariaDB</a>, versions 5.5 and newer are supported.</p>
-<p>For <a class="reference external" href="http://www.drizzle.org">Drizzle</a>, versions 7.1 and newer are supported.</p>
 </div>
 <div class="section" id="a-i-cannot-connect-to-the-mysql-server-it-always-returns-the-error-message-client-does-not-support-authentication-protocol-requested-by-server-consider-upgrading-mysql-client">
 <span id="faq1-17a"></span><h3>1.17a I cannot connect to the MySQL server. It always returns the error message, &#8220;Client does not support authentication protocol requested by server; consider upgrading MySQL client&#8221;<a class="headerlink" href="#a-i-cannot-connect-to-the-mysql-server-it-always-returns-the-error-message-client-does-not-support-authentication-protocol-requested-by-server-consider-upgrading-mysql-client" title="Permalink to this headline">¶</a></h3>
@@ -495,6 +494,23 @@ some robots accessing your installation.</p>
 <span id="faq1-43"></span><h3>1.43 Why can&#8217;t I display the structure of my table containing hundreds of columns?<a class="headerlink" href="#why-can-t-i-display-the-structure-of-my-table-containing-hundreds-of-columns" title="Permalink to this headline">¶</a></h3>
 <p>Because your PHP&#8217;s <tt class="docutils literal"><span class="pre">memory_limit</span></tt> is too low; adjust it in <tt class="file docutils literal"><span class="pre">php.ini</span></tt>.</p>
 </div>
+<div class="section" id="how-can-i-reduce-the-installed-size-of-phpmyadmin-on-disk">
+<span id="faq1-44"></span><h3>1.44 How can I reduce the installed size of phpMyAdmin on disk?<a class="headerlink" href="#how-can-i-reduce-the-installed-size-of-phpmyadmin-on-disk" title="Permalink to this headline">¶</a></h3>
+<p>Some users have requested to be able to reduce the size of the phpMyAdmin installation.
+This is not recommended and could lead to confusion over missing features, but can be done.
+A list of files and corresponding functionality which degrade gracefully when removed include:</p>
+<ul class="simple">
+<li><tt class="file docutils literal"><span class="pre">./libraries/tcpdf</span></tt> folder (exporting to PDF)</li>
+<li><tt class="file docutils literal"><span class="pre">./locale/</span></tt> folder, or unused subfolders (interface translations)</li>
+<li>Any unused themes in <tt class="file docutils literal"><span class="pre">./themes/</span></tt></li>
+<li><tt class="file docutils literal"><span class="pre">./js/jquery/src/</span></tt> (included for licensing reasons)</li>
+<li><tt class="file docutils literal"><span class="pre">./js/line_counts.php</span></tt></li>
+<li><tt class="file docutils literal"><span class="pre">./doc/</span></tt> (documentation)</li>
+<li><tt class="file docutils literal"><span class="pre">./setup/</span></tt> (setup script)</li>
+<li><tt class="file docutils literal"><span class="pre">./examples/</span></tt></li>
+<li><tt class="file docutils literal"><span class="pre">./sql/</span></tt> (SQL scripts to configure advanced functionality)</li>
+</ul>
+</div>
 </div>
 <div class="section" id="configuration">
 <span id="faqconfig"></span><h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
@@ -555,8 +571,10 @@ revision.</p>
 </div>
 <div class="section" id="each-time-i-want-to-insert-or-change-a-row-or-drop-a-database-or-a-table-an-error-404-page-not-found-is-displayed-or-with-http-or-cookie-authentication-i-m-asked-to-log-in-again-what-s-wrong">
 <span id="faq2-5"></span><h3>2.5 Each time I want to insert or change a row or drop a database or a table, an error 404 (page not found) is displayed or, with HTTP or cookie authentication, I&#8217;m asked to log in again. What&#8217;s wrong?<a class="headerlink" href="#each-time-i-want-to-insert-or-change-a-row-or-drop-a-database-or-a-table-an-error-404-page-not-found-is-displayed-or-with-http-or-cookie-authentication-i-m-asked-to-log-in-again-what-s-wrong" title="Permalink to this headline">¶</a></h3>
-<p>Check the value you set for the <span class="target" id="index-8"></span><a class="reference internal" href="config.html#cfg_PmaAbsoluteUri"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['PmaAbsoluteUri']</span></tt></a> directive in the phpMyAdmin
-configuration file.</p>
+<p>Check your webserver setup if it correctly fills in either PHP_SELF or REQUEST_URI variables.</p>
+<p>If you are running phpMyAdmin older than 4.6.0, you can also check the value
+you set for the <span class="target" id="index-8"></span><a class="reference internal" href="config.html#cfg_PmaAbsoluteUri"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['PmaAbsoluteUri']</span></tt></a> directive in the
+phpMyAdmin configuration file.</p>
 </div>
 <div class="section" id="i-get-an-access-denied-for-user-root-localhost-using-password-yes-error-when-trying-to-access-a-mysql-server-on-a-host-which-is-port-forwarded-for-my-localhost">
 <span id="faq2-6"></span><h3>2.6 I get an &#8220;Access denied for user: <a class="reference external" href="mailto:'root&#37;&#52;&#48;localhost">'root<span>&#64;</span>localhost</a>&#8216; (Using password: YES)&#8221;-error when trying to access a MySQL-Server on a host which is port-forwarded for my localhost.<a class="headerlink" href="#i-get-an-access-denied-for-user-root-localhost-using-password-yes-error-when-trying-to-access-a-mysql-server-on-a-host-which-is-port-forwarded-for-my-localhost" title="Permalink to this headline">¶</a></h3>
@@ -1481,7 +1499,7 @@ of a table name in the list of tables of a Database and wait until it
 turns to <cite>Yellow</cite>.
 To remove a table from list, simply click on the <cite>Yellow</cite> star and
 wait until it turns <cite>Gray</cite> again.</p>
-<p>Using <span class="target" id="index-30"></span><tt class="xref config config-option docutils literal"><span class="pre">$cfg['NumFavoriteTables']</span></tt> in your <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt>
+<p>Using <span class="target" id="index-30"></span><a class="reference internal" href="config.html#cfg_NumFavoriteTables"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['NumFavoriteTables']</span></tt></a> in your <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt>
 file, you can define the  maximum number of favorite tables shown in the
 navigation panel. Its default value is <cite>10</cite>.</p>
 </div>
@@ -1724,6 +1742,7 @@ attempts.</p>
 <li><a class="reference internal" href="#when-i-view-a-database-and-ask-to-see-its-privileges-i-get-an-error-about-an-unknown-column">1.41 When I view a database and ask to see its privileges, I get an error about an unknown column.</a></li>
 <li><a class="reference internal" href="#how-can-i-prevent-robots-from-accessing-phpmyadmin">1.42 How can I prevent robots from accessing phpMyAdmin?</a></li>
 <li><a class="reference internal" href="#why-can-t-i-display-the-structure-of-my-table-containing-hundreds-of-columns">1.43 Why can&#8217;t I display the structure of my table containing hundreds of columns?</a></li>
+<li><a class="reference internal" href="#how-can-i-reduce-the-installed-size-of-phpmyadmin-on-disk">1.44 How can I reduce the installed size of phpMyAdmin on disk?</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#configuration">Configuration</a><ul>
@@ -1897,7 +1916,7 @@ attempts.</p>
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.5.5.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
