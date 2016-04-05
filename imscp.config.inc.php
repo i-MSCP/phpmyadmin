@@ -1,22 +1,20 @@
 <?php
+/* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
- * i-MSCP a internet Multi Server Control Panel
+ * phpMyAdmin sample configuration, you can use it as base for
+ * manual configuration. For easier setup you can use setup/
  *
- * phpMyAdmin configuration file preedided by i-MSCP
+ * All directives are explained in documentation in the doc/ folder
+ * or at <http://docs.phpmyadmin.net/>.
  *
- * All directives are explained in Documentation.html and on phpMyAdmin
- * wiki <http://wiki.phpmyadmin.net>.
- *
- * @package     phpMyAdmin
- * @copyright   2010-2012 by i-MSCP | http://i-mscp.net
- * @link        http://i-mscp.net
- * @author      i-MSCP Team
+ * @package PhpMyAdmin
  */
 
 /**
- * This is needed for cookie based authentication to encrypt password in cookie
+ * This is needed for cookie based authentication to encrypt password in
+ * cookie
  */
-$cfg['blowfish_secret'] = '{BLOWFISH}';
+$cfg['blowfish_secret'] = '{BLOWFISH}'; /* YOU MUST FILL IN THIS FOR COOKIE AUTH! */
 
 /**
  * Servers configuration
@@ -27,47 +25,27 @@ $i = 0;
  * First server
  */
 $i++;
-
-/**
- *Authentication type
- */
+/* Authentication type */
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
-
-/**
- * Parameters set by i-MSCP
- */
-$cfg['Servers'][$i]['user'] = $_POST['pma_username'];
-$cfg['Servers'][$i]['password'] = $_POST['pma_password'];
-
-/**
- * Server parameters
- */
+/* Server parameters */
 $cfg['Servers'][$i]['host'] = '{HOSTNAME}';
 $cfg['Servers'][$i]['port'] = '{PORT}';
-$cfg['Servers'][$i]['connect_type'] = 'tcp';
+//$cfg['Servers'][$i]['connect_type'] = 'tcp';
 $cfg['Servers'][$i]['compress'] = true;
-$cfg['Servers'][$i]['extension'] = 'mysqli';
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
 
 /**
- * rajk - for blobstreaming
+ * phpMyAdmin configuration storage settings.
  */
-$cfg['Servers'][$i]['bs_garbage_threshold'] = 50;
-$cfg['Servers'][$i]['bs_repository_threshold'] = '32M';
-$cfg['Servers'][$i]['bs_temp_blob_timeout'] = 600;
-$cfg['Servers'][$i]['bs_temp_log_threshold'] = '32M';
 
-/**
- * User for advanced features
- */
-// $cfg['Servers'][$i]['controlhost'] = '';
+/* User used to manipulate with storage */
+$cfg['Servers'][$i]['controlhost'] = '{HOSTNAME}';
+$cfg['Servers'][$i]['controlport'] = '{PORT}';
 $cfg['Servers'][$i]['controluser'] = '{PMA_USER}';
 $cfg['Servers'][$i]['controlpass'] = '{PMA_PASS}';
 
-/**
- * Advanced phpMyAdmin features
- */
-$cfg['Servers'][$i]['pmadb']    = '{PMA_DATABASE}';
+/* Storage database and tables */
+$cfg['Servers'][$i]['pmadb'] = '{PMA_DATABASE}';
 $cfg['Servers'][$i]['bookmarktable'] = 'pma__bookmark';
 $cfg['Servers'][$i]['relation'] = 'pma__relation';
 $cfg['Servers'][$i]['table_info'] = 'pma__table_info';
@@ -77,12 +55,16 @@ $cfg['Servers'][$i]['column_info'] = 'pma__column_info';
 $cfg['Servers'][$i]['history'] = 'pma__history';
 $cfg['Servers'][$i]['table_uiprefs'] = 'pma__table_uiprefs';
 $cfg['Servers'][$i]['tracking'] = 'pma__tracking';
-$cfg['Servers'][$i]['designer_coords'] = 'pma__designer_coords';
 $cfg['Servers'][$i]['userconfig'] = 'pma__userconfig';
 $cfg['Servers'][$i]['recent'] = 'pma__recent';
+$cfg['Servers'][$i]['favorite'] = 'pma__favorite';
 $cfg['Servers'][$i]['users'] = 'pma__users';
 $cfg['Servers'][$i]['usergroups'] = 'pma__usergroups';
 $cfg['Servers'][$i]['navigationhiding'] = 'pma__navigationhiding';
+$cfg['Servers'][$i]['savedsearches'] = 'pma__savedsearches';
+$cfg['Servers'][$i]['central_columns'] = 'pma__central_columns';
+$cfg['Servers'][$i]['designer_settings'] = 'pma__designer_settings';
+$cfg['Servers'][$i]['export_templates'] = 'pma__export_templates';
 
 /**
  * Hidden databases
@@ -90,141 +72,54 @@ $cfg['Servers'][$i]['navigationhiding'] = 'pma__navigationhiding';
 $cfg['Servers'][$i]['hide_db'] = '(information_schema|performance_schema|mysql|sys)';
 
 /**
- * Disabling some warnings (disabled features, suhosin)
+ * End of servers configuration
+ */
+
+/**
+ * Warnings configuration
  */
 $cfg['PmaNoRelation_DisableWarning'] = true;
 $cfg['SuhosinDisableWarning'] = true;
 $cfg['ServerLibraryDifference_DisableWarning'] = true;
 
-/** Disable new version check */
+/**
+ * Disable new version check
+ */
 $cfg['VersionCheck'] = false;
-
-/* Name of the Server displayed */
-/*$cfg['Servers'][$i]['verbose'] = 'mysql.myserver.com';*/
-
-$cfg['Servers'][$i]['SignonSession'] = 'i-MSCP';
-
-/* Contrib / Swekey authentication */
-// $cfg['Servers'][$i]['auth_swekey_config'] = '/etc/swekey-pma.conf';
 
 /**
  * Directories for saving/loading files from server
  */
 $cfg['UploadDir'] = '{UPLOADS_DIR}';
+//$cfg['SaveDir'] = '';
 
 /**
- * The name of the directory where dumps can be saved. (not used)
- */
-//$cfg['SaveDir'] = '{TMP_DIR}';
-
-/**
- * The name of the directory where temporary files can be stored.
- */
-$cfg['TempDir'] = '{TMP_DIR}';
-
-/**
- * Defines whether a user should be displayed a "show all (records)"
- * button in browse mode or not.
- * default = false
- */
-//$cfg['ShowAll'] = true;
-
-/**
- * Number of rows displayed when browsing a result set. If the result
- * set contains more rows, "Previous" and "Next".
- * default = 30
- */
-//$cfg['MaxRows'] = 50;
-
-/**
- * Use graphically less intense menu tabs
- * default = false
- */
-//$cfg['LightTabs'] = true;
-
-/**
- * disallow editing of binary fields
- * valid values are:
- *   false  allow editing
- *   'blob' allow editing except for BLOB fields
- *   'all'  disallow editing
- * default = blob
- */
-//$cfg['ProtectBinary'] = 'false';
-
-/**
- * Default language to use, if not browser-defined or user-defined
- * (you find all languages in the locale folder)
- * uncomment the desired line:
- * default = 'en'
- */
-//$cfg['DefaultLang'] = 'en';
-//$cfg['DefaultLang'] = 'de';
-
-/**
- * default display direction (horizontal|vertical|horizontalflipped)
- */
-//$cfg['DefaultDisplay'] = 'vertical';
-
-/**
- * How many columns should be used for table display of a database?
- * (a value larger than 1 results in some information being hidden)
- * default = 1
- */
-//$cfg['PropertiesNumColumns'] = 2;
-
-/**
- * Set to true if you want DB-based query history.If false, this utilizes
- * JS-routines to display query history (lost by window close)
+ * Whether or not to query the user before sending the error report to
+ * the phpMyAdmin team when a JavaScript error occurs
  *
- * This requires configuration storage enabled, see above.
- * default = false
+ * Available options
+ * ('ask' | 'always' | 'never')
+ * default = 'ask'
  */
-//$cfg['QueryHistoryDB'] = true;
+$cfg['SendErrorReports'] = 'never';
 
 /**
- * When using DB-based query history, how many entries should be kept?
- *
- * default = 25
+ * Extra parameters
  */
-//$cfg['QueryHistoryMax'] = 100;
 
-/**
- * Layout preferences
- */
-$cfg['LeftFrameLight'] = true;
-$cfg['LeftFrameDBTree'] = true;
-$cfg['LeftFrameDBSeparator'] = '_';
-$cfg['LeftFrameTableSeparator'] = '__';
-$cfg['LeftFrameTableLevel'] = 1;
-$cfg['LeftDisplayLogo'] = true;
-$cfg['LeftDisplayServers'] = false;
-$cfg['LeftPointerEnable'] = true;
-$cfg['QueryHistoryDB'] = true;
-$cfg['QueryHistoryMax'] = 25;
-$cfg['BrowseMIME'] = true;
-$cfg['PDFDefaultPageSize'] = 'A4';
 $cfg['ShowPhpInfo'] = false;
 $cfg['ShowChgPassword'] = false;
 $cfg['AllowArbitraryServer'] = false;
-$cfg['LoginCookieRecall'] = 'something';
 $cfg['LoginCookieValidity'] = 1440;
-$cfg['AllowAnywhereRecoding'] = true;
+$cfg['BrowseMIME'] = true;
+$cfg['PDFDefaultPageSize'] = 'A4';
 $cfg['DefaultCharset'] = 'utf-8';
-$cfg['ForceSSL'] = false;
-
 $cfg['RecodingEngine'] = 'iconv';
+$cfg['AllowAnywhereRecoding'] = true;
 $cfg['IconvExtraParams'] = '//TRANSLIT';
 $cfg['GD2Available'] = 'yes';
-$cfg['BrowseMIME'] = true;
 
-/* Default Theme */
-$cfg['ThemeDefault'] = 'pmahomme';
-
-/* switch off new 'hex as binaray' mode */
-$cfg['DisplayBinaryAsHex'] = false;
-
-/*
- * You can find more configuration options in Documentation.html
- * or here: http://wiki.phpmyadmin.net/pma/Config
+/**
+ * You can find more configuration options in the documentation
+ * in the doc/ folder or at <http://docs.phpmyadmin.net/>.
  */
