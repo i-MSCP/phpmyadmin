@@ -27,6 +27,14 @@ $i = 0;
 $i++;
 /* Authentication type */
 $cfg['Servers'][$i]['auth_type'] = 'cookie';
+
+/**
+ * Parameters set by i-MSCP
+ */
+$cfg['Servers'][$i]['user'] = $_POST['pma_username'];
+$cfg['Servers'][$i]['password'] = $_POST['pma_password'];
+
+
 /* Server parameters */
 $cfg['Servers'][$i]['host'] = '{HOSTNAME}';
 $cfg['Servers'][$i]['port'] = '{PORT}';
@@ -94,6 +102,11 @@ $cfg['UploadDir'] = '{UPLOADS_DIR}';
 //$cfg['SaveDir'] = '';
 
 /**
+ * The name of the directory where temporary files can be stored.
+ */
+$cfg['TempDir'] = '{TMP_DIR}';
+
+/**
  * Whether or not to query the user before sending the error report to
  * the phpMyAdmin team when a JavaScript error occurs
  *
@@ -118,6 +131,8 @@ $cfg['RecodingEngine'] = 'iconv';
 $cfg['AllowAnywhereRecoding'] = true;
 $cfg['IconvExtraParams'] = '//TRANSLIT';
 $cfg['GD2Available'] = 'yes';
+$cfg['ShowServerInfo'] = false;
+$cfg['ShowStats'] = false;
 
 /**
  * You can find more configuration options in the documentation
