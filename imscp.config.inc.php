@@ -41,6 +41,7 @@ $cfg['Servers'][$i]['port'] = '{PORT}';
 //$cfg['Servers'][$i]['connect_type'] = 'tcp';
 $cfg['Servers'][$i]['compress'] = true;
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
+$cfg['Servers'][$i]['AllowRoot'] = false;
 
 /**
  * phpMyAdmin configuration storage settings.
