@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; phpMyAdmin 4.6.0 documentation</title>
+    <title>Installation &mdash; phpMyAdmin 4.6.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.6.0',
+        VERSION:     '4.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.6.0 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.6.1 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Requirements" href="require.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="require.html" title="Requirements"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -492,8 +492,14 @@ using following statement:</p>
 </div>
 <div class="section" id="upgrading-from-an-older-version">
 <span id="upgrading"></span><h2>Upgrading from an older version<a class="headerlink" href="#upgrading-from-an-older-version" title="Permalink to this headline">¶</a></h2>
-<p><strong>Never</strong> extract the new version over an existing installation
-of phpMyAdmin; we had evidence of problems caused by this.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><strong>Never</strong> extract the new version over an existing installation of
+phpMyAdmin, always first remove the old files keeping just the
+configuration.</p>
+<p class="last">This way you will not leave old no longer working code in the directory,
+which can have severe security implications or can cause various breakages.</p>
+</div>
 <p>Simply copy <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt> from your previous installation into
 the newly unpacked one. Configuration files from old versions may
 require some tweaking as some options have been changed or removed.
@@ -552,8 +558,8 @@ method and allows you to log in as any valid MySQL user.</p>
 support using <a class="reference internal" href="glossary.html#term-cgi"><em class="xref std std-term">CGI</em></a> PHP see <a class="reference internal" href="faq.html#faq1-32"><em>1.32 Can I use HTTP authentication with IIS?</em></a>, for using with Apache
 <a class="reference internal" href="glossary.html#term-cgi"><em class="xref std std-term">CGI</em></a> see <a class="reference internal" href="faq.html#faq1-35"><em>1.35 Can I use HTTP authentication with Apache CGI?</em></a>.</p>
 </li>
-<li><p class="first">When PHP is running under Apache&#8217;s <em class="xref std std-term">mod_proxy_fcgi</em> (e.g. with PHP-FPM),
-<em class="xref std std-term">Authorization</em> headers are not passed to the underlying FCGI application,
+<li><p class="first">When PHP is running under Apache&#8217;s <a class="reference internal" href="glossary.html#term-mod-proxy-fcgi"><em class="xref std std-term">mod_proxy_fcgi</em></a> (e.g. with PHP-FPM),
+<tt class="docutils literal"><span class="pre">Authorization</span></tt> headers are not passed to the underlying FCGI application,
 such that your credentials will not reach the application. In this case, you can
 add the following configuration directive:</p>
 <div class="highlight-apache"><div class="highlight"><pre><span class="nb">SetEnvIf</span> Authorization <span class="s2">&quot;(.*)&quot;</span> HTTP_AUTHORIZATION=$1
@@ -1126,7 +1132,7 @@ manually or after a period of inactivity). <a class="reference external" href="h
         <li class="right" >
           <a href="require.html" title="Requirements"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

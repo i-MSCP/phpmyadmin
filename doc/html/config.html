@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; phpMyAdmin 4.6.0 documentation</title>
+    <title>Configuration &mdash; phpMyAdmin 4.6.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.6.0',
+        VERSION:     '4.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.6.0 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.6.1 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -418,6 +418,10 @@ resulting information displayed will be the socket used.</p>
 <p>When using the <tt class="docutils literal"><span class="pre">'mysql'</span></tt> extension,
 none of the remaining <tt class="docutils literal"><span class="pre">'ssl...'</span></tt> configuration options apply.</p>
 <p>We strongly recommend the <tt class="docutils literal"><span class="pre">'mysqli'</span></tt> extension when using this option.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#example-google-ssl"><em>Google Cloud SQL with SSL</em></a></p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -438,6 +442,10 @@ none of the remaining <tt class="docutils literal"><span class="pre">'ssl...'</s
 <div class="highlight-php"><div class="highlight"><pre><span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;ssl_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/etc/mysql/server-key.pem&#39;</span><span class="p">;</span>
 </pre></div>
 </div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#example-google-ssl"><em>Google Cloud SQL with SSL</em></a></p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -454,6 +462,10 @@ none of the remaining <tt class="docutils literal"><span class="pre">'ssl...'</s
 </tbody>
 </table>
 <p>Path to the cert file when using SSL for connecting to the MySQL server.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#example-google-ssl"><em>Google Cloud SQL with SSL</em></a></p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -470,6 +482,10 @@ none of the remaining <tt class="docutils literal"><span class="pre">'ssl...'</s
 </tbody>
 </table>
 <p>Path to the CA file when using SSL for connecting to the MySQL server.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#example-google-ssl"><em>Google Cloud SQL with SSL</em></a></p>
+</div>
 </dd></dl>
 
 <dl class="option">
@@ -517,13 +533,23 @@ none of the remaining <tt class="docutils literal"><span class="pre">'ssl...'</s
 </tr>
 </tbody>
 </table>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 4.6.0: </span>This is supported since phpMyAdmin 4.6.0.</p>
+</div>
 <p>If your PHP install uses the MySQL Native Driver (mysqlnd), your
 MySQL server is 5.6 or later, and your SSL certificate is self-signed,
 there is a chance your SSL connection will fail due to validation.
 Setting this to <tt class="docutils literal"><span class="pre">false</span></tt> will disable the validation check.</p>
+<p>Since PHP 5.6.0 it also verifies whether server name matches CN of it&#8217;s
+certificate. There is currently no way to disable just this check without
+disabling complete SSL verification.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This flag only works with PHP 5.6.16 or later</p>
+<p class="last">This flag only works with PHP 5.6.16 or later.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#example-google-ssl"><em>Google Cloud SQL with SSL</em></a></p>
 </div>
 </dd></dl>
 
@@ -4978,6 +5004,49 @@ This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.
 </dd></dl>
 
 </div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>See following configuration snippets for usual setups of phpMyAdmin.</p>
+<div class="section" id="google-cloud-sql-with-ssl">
+<span id="example-google-ssl"></span><h3>Google Cloud SQL with SSL<a class="headerlink" href="#google-cloud-sql-with-ssl" title="Permalink to this headline">¶</a></h3>
+<p>To connect to Google Could SQL, you currently need to disable certificate
+verification. This is caused by the certficate being issued for CN matching
+your instance name, but you connect to an IP address and PHP tries to match
+these two. With verfication you end up with error message like:</p>
+<div class="highlight-python"><div class="highlight"><pre>Peer certificate CN=`api-project-851612429544:pmatest&#39; did not match expected CN=`8.8.8.8&#39;
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">With disabled verification your traffic is encrypted, but you&#8217;re open to
+man in the middle attacks.</p>
+</div>
+<p>To connect phpMyAdmin to Google Cloud SQL using SSL download the client and
+server certificates and tell phpMyAdmin to use them:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// IP address of your instance</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;host&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;8.8.8.8&#39;</span><span class="p">;</span>
+<span class="c1">// Use SSL for connection</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;ssl&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="c1">// Client secret key</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;ssl_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;../client-key.pem&#39;</span><span class="p">;</span>
+<span class="c1">// Client certificate</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;ssl_cert&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;../client-cert.pem&#39;</span><span class="p">;</span>
+<span class="c1">// Server certification authority</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;ssl_ca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;../server-ca.pem&#39;</span><span class="p">;</span>
+<span class="c1">// Disable SSL verification (see above note)</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;ssl_verify&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><span class="target" id="index-87"></span><a class="reference internal" href="#cfg_Servers_ssl"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['ssl']</span></tt></a>,
+<span class="target" id="index-88"></span><a class="reference internal" href="#cfg_Servers_ssl_key"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['ssl_key']</span></tt></a>,
+<span class="target" id="index-89"></span><a class="reference internal" href="#cfg_Servers_ssl_cert"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['ssl_cert']</span></tt></a>,
+<span class="target" id="index-90"></span><a class="reference internal" href="#cfg_Servers_ssl_ca"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['ssl_ca']</span></tt></a>,
+<span class="target" id="index-91"></span><a class="reference internal" href="#cfg_Servers_ssl_verify"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['ssl_verify']</span></tt></a></p>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -5014,6 +5083,10 @@ This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.
 <li><a class="reference internal" href="#default-queries">Default queries</a></li>
 <li><a class="reference internal" href="#mysql-settings">MySQL settings</a></li>
 <li><a class="reference internal" href="#developer">Developer</a></li>
+<li><a class="reference internal" href="#examples">Examples</a><ul>
+<li><a class="reference internal" href="#google-cloud-sql-with-ssl">Google Cloud SQL with SSL</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -5058,7 +5131,7 @@ This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

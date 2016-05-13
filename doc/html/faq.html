@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.6.0 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.6.1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.6.0',
+        VERSION:     '4.6.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.6.0 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.6.1 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Import and export" href="import_export.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -1676,6 +1676,10 @@ by allow/deny rules), <tt class="docutils literal"><span class="pre">root-denied
 <p>You can then use any log analyzing tools to detect possible break-in
 attempts.</p>
 </div>
+<div class="section" id="why-are-there-path-disclosures-when-directly-loading-certain-files">
+<span id="faq8-3"></span><h3>8.3 Why are there path disclosures when directly loading certain files?<a class="headerlink" href="#why-are-there-path-disclosures-when-directly-loading-certain-files" title="Permalink to this headline">¶</a></h3>
+<p>This is a server configuration problem. Never enable <tt class="docutils literal"><span class="pre">display_errors</span></tt> on a production site.</p>
+</div>
 </div>
 <div class="section" id="synchronization">
 <span id="faqsynchronization"></span><h2>Synchronization<a class="headerlink" href="#synchronization" title="Permalink to this headline">¶</a></h2>
@@ -1865,6 +1869,7 @@ attempts.</p>
 <li><a class="reference internal" href="#security">Security</a><ul>
 <li><a class="reference internal" href="#where-can-i-get-information-about-the-security-alerts-issued-for-phpmyadmin">8.1 Where can I get information about the security alerts issued for phpMyAdmin?</a></li>
 <li><a class="reference internal" href="#how-can-i-protect-phpmyadmin-against-brute-force-attacks">8.2 How can I protect phpMyAdmin against brute force attacks?</a></li>
+<li><a class="reference internal" href="#why-are-there-path-disclosures-when-directly-loading-certain-files">8.3 Why are there path disclosures when directly loading certain files?</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#synchronization">Synchronization</a><ul>
@@ -1916,7 +1921,7 @@ attempts.</p>
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

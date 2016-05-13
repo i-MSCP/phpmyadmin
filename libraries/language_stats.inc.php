@@ -63,7 +63,7 @@ $GLOBALS["language_stats"] = array (
     'pt_BR' => 92,
     'ro' => 53,
     'ru' => 96,
-    'si' => 59,
+    'si' => 60,
     'sk' => 83,
     'sl' => 100,
     'sq' => 97,
@@ -84,6 +84,6 @@ $GLOBALS["language_stats"] = array (
     'vi' => 86,
     'vls' => 2,
     'zh_CN' => 88,
-    'zh_TW' => 98,
+    'zh_TW' => 100,
 );
 ?>
