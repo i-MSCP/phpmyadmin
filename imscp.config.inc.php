@@ -88,7 +88,7 @@ $cfg['Servers'][$i]['navigationhiding'] = 'pma__navigationhiding';
 /**
  * Hidden databases
  */
-$cfg['Servers'][$i]['hide_db'] = '(information_schema|performance_schema|mysql|sys)';
+$cfg['Servers'][$i]['hide_db'] = '^((information|performance)_schema|mysql|sys)$';
 
 /**
  * Disabling some warnings (disabled features, suhosin)
