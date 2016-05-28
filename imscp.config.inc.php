@@ -78,7 +78,7 @@ $cfg['Servers'][$i]['export_templates'] = 'pma__export_templates';
 /**
  * Hidden databases
  */
-$cfg['Servers'][$i]['hide_db'] = '(information_schema|performance_schema|mysql|sys)';
+$cfg['Servers'][$i]['hide_db'] = '^((information|performance)_schema|mysql|sys)$';
 
 /**
  * End of servers configuration
