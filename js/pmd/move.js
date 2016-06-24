@@ -1039,10 +1039,16 @@ function Export_pages()
             PMA_ajaxRemoveMessage($msgbox);
 
             var $form = $(data.message);
-            $form.attr('action', $form.attr('action') + '?' + (Get_url_pos(true).substring(1)));
             if (!pmd_tables_enabled) {
                 $form.append('<input type="hidden" name="offline_export" value="true" />');
             }
+            $.each(Get_url_pos(true).substring(1).split('&'), function() {
+                var pair = this.split('=');
+                var input = $('<input type="hidden" />');
+                input.attr('name', pair[0]);
+                input.attr('value', pair[1]);
+                $form.append(input);
+            });
             var $formatDropDown = $form.find('#plugins');
             $formatDropDown.change(function() {
                 var format = $formatDropDown.val();
@@ -1254,9 +1260,10 @@ function Start_tab_upd(table)
 
 function Small_tab_all(id_this) // max/min all tables
 {
-    var icon = id_this.childNodes[0];
+    var icon = id_this.children[0];
     var key;
     var value_sent = '';
+
     if (icon.alt == "v") {
         for (key in j_tabs) {
             if (document.getElementById('id_hide_tbody_' + key).innerHTML == "v") {
@@ -1303,7 +1310,6 @@ function Small_tab_refresh()
 {
     for (var key in j_tabs) {
         if (document.getElementById('id_hide_tbody_' + key).innerHTML != "v") {
-            Small_tab(key, 0);
             Small_tab(key, 0);
         }
     }
@@ -1590,7 +1596,7 @@ function General_scroll_end()
 
 function Show_left_menu(id_this) // max/min all tables
 {
-    var icon = id_this.childNodes[0];
+    var icon = id_this.children[0];
     $('#key_Show_left_menu').toggleClass('M_butt_Selected_down');
     if (icon.alt == "v") {
         document.getElementById("layer_menu").style.top = '0px';

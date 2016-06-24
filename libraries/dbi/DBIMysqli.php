@@ -126,9 +126,6 @@ class DBIMysqli implements DBIExtension
         global $cfg;
 
         $server_port = $GLOBALS['dbi']->getServerPort($server);
-        if ($server_port === null) {
-            $server_port = 0;
-        }
         $server_socket = $GLOBALS['dbi']->getServerSocket($server);
 
         if ($server) {
@@ -152,14 +149,17 @@ class DBIMysqli implements DBIExtension
 
         /* Optionally enable SSL */
         if ($cfg['Server']['ssl']) {
-            mysqli_ssl_set(
-                $link,
-                $cfg['Server']['ssl_key'],
-                $cfg['Server']['ssl_cert'],
-                $cfg['Server']['ssl_ca'],
-                $cfg['Server']['ssl_ca_path'],
-                $cfg['Server']['ssl_ciphers']
-            );
+            $client_flags |= MYSQLI_CLIENT_SSL;
+            if (!empty($cfg['Server']['ssl_key'])) {
+                mysqli_ssl_set(
+                    $link,
+                    $cfg['Server']['ssl_key'],
+                    $cfg['Server']['ssl_cert'],
+                    $cfg['Server']['ssl_ca'],
+                    $cfg['Server']['ssl_ca_path'],
+                    $cfg['Server']['ssl_ciphers']
+                );
+            }
             /*
              * disables SSL certificate validation on mysqlnd for MySQL 5.6 or later
              * @link https://bugs.php.net/bug.php?id=68344
@@ -215,7 +215,7 @@ class DBIMysqli implements DBIExtension
             );
         }
 
-        if ($return_value === false) {
+        if ($return_value === false || is_null($return_value)) {
             return false;
         }
 
@@ -600,7 +600,7 @@ class DBIMysqli implements DBIExtension
                 $flags[] = $name;
             }
         }
-        // See http://dev.mysql.com/doc/refman/6.0/en/c-api-datatypes.html:
+        // See https://dev.mysql.com/doc/refman/6.0/en/c-api-datatypes.html:
         // to determine if a string is binary, we should not use MYSQLI_BINARY_FLAG
         // but instead the charsetnr member of the MYSQL_FIELD
         // structure. Watch out: some types like DATE returns 63 in charsetnr

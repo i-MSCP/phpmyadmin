@@ -46,7 +46,7 @@ if (isset($_REQUEST['console_bookmark_add'])) {
         $bookmarkFields = array(
             'bkm_database' => $_REQUEST['db'],
             'bkm_user'  => $cfgBookmark['user'],
-            'bkm_sql_query' => urlencode($_REQUEST['bookmark_query']),
+            'bkm_sql_query' => $_REQUEST['bookmark_query'],
             'bkm_label' => $_REQUEST['label']
         );
         $isShared = ($_REQUEST['shared'] == 'true' ? true : false);
@@ -111,7 +111,7 @@ if (! empty($sql_query)) {
         && is_array($_REQUEST['parameters'])) {
         $parameters = $_REQUEST['parameters'];
         foreach ($parameters as $parameter => $replacement) {
-            $quoted = preg_quote($parameter);
+            $quoted = preg_quote($parameter, '/');
             // making sure that :param does not apply values to :param1
             $sql_query = preg_replace(
                 '/' . $quoted . '([^a-zA-Z0-9_])/',

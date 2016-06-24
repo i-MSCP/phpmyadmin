@@ -13,7 +13,7 @@ if (! defined('PHPMYADMIN')) {
 define('LINE_COUNTS', true);
 $LINE_COUNT = array();
 
-$LINE_COUNT["server_variables.js"] = 155;
+$LINE_COUNT["server_variables.js"] = 160;
 $LINE_COUNT["cross_framing_protection.js"] = 14;
 $LINE_COUNT["tbl_zoom_plot_jqplot.js"] = 645;
 $LINE_COUNT["tbl_relation.js"] = 234;
@@ -24,9 +24,9 @@ $LINE_COUNT["pmd/history.js"] = 850;
 $LINE_COUNT["pmd/init.js"] = 41;
 $LINE_COUNT["pmd/designer_db.js"] = 136;
 $LINE_COUNT["pmd/designer_page.js"] = 172;
-$LINE_COUNT["pmd/move.js"] = 2094;
+$LINE_COUNT["pmd/move.js"] = 2100;
 $LINE_COUNT["error_report.js"] = 310;
-$LINE_COUNT["console.js"] = 1536;
+$LINE_COUNT["console.js"] = 1539;
 $LINE_COUNT["jqplot/plugins/jqplot.canvasTextRenderer.js"] = 448;
 $LINE_COUNT["jqplot/plugins/jqplot.byteFormatter.js"] = 46;
 $LINE_COUNT["jqplot/plugins/jqplot.pointLabels.js"] = 376;

@@ -203,13 +203,12 @@ class DatabaseInterface
         }
         $dbgInfo['query'] = htmlspecialchars($query);
         $dbgInfo['time'] = $time;
-        // Get and slightly format backtrace
-        $dbgInfo['trace'] = debug_backtrace();
-        foreach ($dbgInfo['trace'] as $key => $step) {
-            if (isset($step['file'])) {
-                $dbgInfo['trace'][$key]['file'] = Error::relPath($step['file']);
-            }
-        }
+        // Get and slightly format backtrace, this is used
+        // in the javascript console.
+        // Strip call to _dbgQuery
+        $dbgInfo['trace'] = Error::processBacktrace(
+            array_slice(debug_backtrace(), 1)
+        );
         $dbgInfo['hash'] = md5($query);
 
         $_SESSION['debug']['queries'][] = $dbgInfo;
@@ -2151,7 +2150,7 @@ class DatabaseInterface
                     );
             } else {
                 /* InnoDB constraints, see
-                 * http://dev.mysql.com/doc/refman/5.0/en/
+                 * https://dev.mysql.com/doc/refman/5.0/en/
                  *  innodb-foreign-key-constraints.html
                  */
                 $error .= ' - ' . $error_message .
@@ -2705,7 +2704,7 @@ class DatabaseInterface
      *
      * @param array|null $server host/port/socket/persistent
      *
-     * @return null|integer
+     * @return int
      */
     public function getServerPort($server = null)
     {
@@ -2713,11 +2712,7 @@ class DatabaseInterface
             $server = &$GLOBALS['cfg']['Server'];
         }
 
-        if (empty($server['port'])) {
-            return null;
-        } else {
-            return intval($server['port']);
-        }
+        return intval($server['port']);
     }
 
     /**

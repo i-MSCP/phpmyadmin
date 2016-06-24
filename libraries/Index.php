@@ -695,11 +695,7 @@ class Index
         $r .= '<th>' . __('Unique') . '</th>';
         $r .= '<th>' . __('Packed') . '</th>';
         $r .= '<th>' . __('Column') . '</th>';
-        /**
-         * The htmlentities is there to workaround PHP bug on Windows
-         * see https://github.com/phpmyadmin/phpmyadmin/issues/11705
-         */
-        $r .= '<th>' . htmlentities(__('Cardinality')) . '</th>';
+        $r .= '<th>' . __('Cardinality') . '</th>';
         $r .= '<th>' . __('Collation') . '</th>';
         $r .= '<th>' . __('Null') . '</th>';
         $r .= '<th>' . __('Comment') . '</th>';
@@ -739,7 +735,7 @@ class Index
                         . Util::backquote($table) . ' DROP INDEX '
                         . Util::backquote($index->getName()) . ';';
                     $this_params['message_to_show'] = sprintf(
-                        __('Index %s has been dropped.'), $index->getName()
+                        __('Index %s has been dropped.'), htmlspecialchars($index->getName())
                     );
 
                     $js_msg = PMA_jsFormat(
@@ -786,7 +782,7 @@ class Index
                 }
                 $r .= '<td>' . htmlspecialchars($column->getName());
                 if ($column->getSubPart()) {
-                    $r .= ' (' . $column->getSubPart() . ')';
+                    $r .= ' (' . htmlspecialchars($column->getSubPart()) . ')';
                 }
                 $r .= '</td>';
                 $r .= '<td>'

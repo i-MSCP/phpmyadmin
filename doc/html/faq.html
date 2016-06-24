@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.6.1 documentation</title>
+    <title>FAQ - Frequently Asked Questions &mdash; phpMyAdmin 4.6.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.6.1',
+        VERSION:     '4.6.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.6.1 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.6.3 documentation" href="index.html" />
     <link rel="next" title="Developers Information" href="developers.html" />
     <link rel="prev" title="Import and export" href="import_export.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -138,7 +138,7 @@ and after execution of your <a class="reference internal" href="glossary.html#te
 </div>
 <div class="section" id="i-have-lost-my-mysql-root-password-what-can-i-do">
 <span id="faq1-12"></span><h3>1.12 I have lost my MySQL root password, what can I do?<a class="headerlink" href="#i-have-lost-my-mysql-root-password-what-can-i-do" title="Permalink to this headline">¶</a></h3>
-<p>The MySQL manual explains how to <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/resetting-permissions.html">reset the permissions</a>.</p>
+<p>The MySQL manual explains how to <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/resetting-permissions.html">reset the permissions</a>.</p>
 </div>
 <div class="section" id="faq1-13">
 <span id="id2"></span><h3>1.13 (withdrawn).<a class="headerlink" href="#faq1-13" title="Permalink to this headline">¶</a></h3>
@@ -201,7 +201,7 @@ generally caused by using MySQL version 4.1 or newer. MySQL changed
 the authentication hash and your PHP is trying to use the old method.
 The proper solution is to use the <a class="reference external" href="http://www.php.net/mysqli">mysqli extension</a> with the proper client library to match
 your MySQL installation. More
-information (and several workarounds) are located in the <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/old-client.html">MySQL
+information (and several workarounds) are located in the <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/old-client.html">MySQL
 Documentation</a>.</p>
 </div>
 <div class="section" id="faq1-18">
@@ -558,7 +558,7 @@ phpMyAdmin, you need to complete the socket information in the
 the permissions of this file allow to be readable by your webserver (i.e.
 &#8216;0755&#8217;).</li>
 </ul>
-<p>Have also a look at the <a class="reference external" href="http://dev.mysql.com/doc/en/can-not-connect-to-server.html">corresponding section of the MySQL
+<p>Have also a look at the <a class="reference external" href="https://dev.mysql.com/doc/en/can-not-connect-to-server.html">corresponding section of the MySQL
 documentation</a>.</p>
 </div>
 <div class="section" id="nothing-is-displayed-by-my-browser-when-i-try-to-run-phpmyadmin-what-can-i-do">
@@ -646,7 +646,7 @@ might want to increase <a class="reference external" href="http://www.hardened-p
 <div class="section" id="seeing-an-upload-progress-bar">
 <span id="faq2-9"></span><h3>2.9 Seeing an upload progress bar<a class="headerlink" href="#seeing-an-upload-progress-bar" title="Permalink to this headline">¶</a></h3>
 <p>To be able to see a progress bar during your uploads, your server must
-have the <a class="reference external" href="http://pecl.php.net/package/APC">APC</a> extension, the
+have the <a class="reference external" href="http://php.net/manual/en/book.apc.php">APC</a> extension, the
 <a class="reference external" href="http://pecl.php.net/package/uploadprogress">uploadprogress</a> one, or
 you must be running PHP 5.4.0 or higher. Moreover, the JSON extension
 has to be enabled in your PHP.</p>
@@ -680,7 +680,7 @@ dump, you have to use another way.</p>
 </div>
 <div class="section" id="with-innodb-tables-i-lose-foreign-key-relationships-when-i-rename-a-table-or-a-column">
 <span id="faq3-3"></span><h3>3.3 With InnoDB tables, I lose foreign key relationships when I rename a table or a column.<a class="headerlink" href="#with-innodb-tables-i-lose-foreign-key-relationships-when-i-rename-a-table-or-a-column" title="Permalink to this headline">¶</a></h3>
-<p>This is an InnoDB bug, see &lt;<a class="reference external" href="http://bugs.mysql.com/bug.php?id=21704">http://bugs.mysql.com/bug.php?id=21704</a>&gt;.</p>
+<p>This is an InnoDB bug, see &lt;<a class="reference external" href="https://bugs.mysql.com/bug.php?id=21704">https://bugs.mysql.com/bug.php?id=21704</a>&gt;.</p>
 </div>
 <div class="section" id="i-am-unable-to-import-dumps-i-created-with-the-mysqldump-tool-bundled-with-the-mysql-server-distribution">
 <span id="faq3-4"></span><h3>3.4 I am unable to import dumps I created with the mysqldump tool bundled with the MySQL server distribution.<a class="headerlink" href="#i-am-unable-to-import-dumps-i-created-with-the-mysqldump-tool-bundled-with-the-mysql-server-distribution" title="Permalink to this headline">¶</a></h3>
@@ -738,7 +738,7 @@ official phpMyAdmin-homepage.</p>
 <span id="faq3-9"></span><h3>3.9 I get error messages when using &#8220;&#8211;sql_mode=ANSI&#8221; for the MySQL server.<a class="headerlink" href="#i-get-error-messages-when-using-sql-mode-ansi-for-the-mysql-server" title="Permalink to this headline">¶</a></h3>
 <p>When MySQL is running in ANSI-compatibility mode, there are some major
 differences in how <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a> is structured (see
-&lt;<a class="reference external" href="http://dev.mysql.com/doc/mysql/en/ansi-mode.html">http://dev.mysql.com/doc/mysql/en/ansi-mode.html</a>&gt;). Most important of all, the
+&lt;<a class="reference external" href="https://dev.mysql.com/doc/mysql/en/ansi-mode.html">https://dev.mysql.com/doc/mysql/en/ansi-mode.html</a>&gt;). Most important of all, the
 quote-character (&#8221;) is interpreted as an identifier quote character and not as
 a string quote character, which makes many internal phpMyAdmin operations into
 invalid <a class="reference internal" href="glossary.html#term-sql"><em class="xref std std-term">SQL</em></a> statements. There is no
@@ -1174,7 +1174,7 @@ not have this problem.</li>
 </div>
 <div class="section" id="phpmyadmin-is-changing-the-type-of-one-of-my-columns">
 <span id="faq6-9"></span><h3>6.9 phpMyAdmin is changing the type of one of my columns!<a class="headerlink" href="#phpmyadmin-is-changing-the-type-of-one-of-my-columns" title="Permalink to this headline">¶</a></h3>
-<p>No, it&#8217;s MySQL that is doing <a class="reference external" href="http://dev.mysql.com/doc/en/silent-column-changes.html">silent column type changing</a>.</p>
+<p>No, it&#8217;s MySQL that is doing <a class="reference external" href="https://dev.mysql.com/doc/en/silent-column-changes.html">silent column type changing</a>.</p>
 </div>
 <div class="section" id="when-creating-a-privilege-what-happens-with-underscores-in-the-database-name">
 <span id="underscore"></span><h3>6.10 When creating a privilege, what happens with underscores in the database name?<a class="headerlink" href="#when-creating-a-privilege-what-happens-with-underscores-in-the-database-name" title="Permalink to this headline">¶</a></h3>
@@ -1192,7 +1192,7 @@ that the database name will have a real underscore.</p>
 <span id="faqexport"></span><h3>6.12 I want to understand some Export options.<a class="headerlink" href="#i-want-to-understand-some-export-options" title="Permalink to this headline">¶</a></h3>
 <p><strong>Structure:</strong></p>
 <ul class="simple">
-<li>&#8220;Add DROP TABLE&#8221; will add a line telling MySQL to <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/drop-table.html">drop the table</a>, if it already
+<li>&#8220;Add DROP TABLE&#8221; will add a line telling MySQL to <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/drop-table.html">drop the table</a>, if it already
 exists during the import. It does NOT drop the table after your
 export, it only affects the import file.</li>
 <li>&#8220;If Not Exists&#8221; will only create the table if it doesn&#8217;t exist.
@@ -1212,9 +1212,9 @@ types set in the pmadb in the dump as <a class="reference internal" href="glossa
 better documentation (but resulting file is bigger).</li>
 <li>&#8220;Extended inserts&#8221; provides a shorter dump file by using only once the
 INSERT verb and the table name.</li>
-<li>&#8220;Delayed inserts&#8221; are best explained in the <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/insert-delayed.html">MySQL manual - INSERT DELAYED Syntax</a>.</li>
+<li>&#8220;Delayed inserts&#8221; are best explained in the <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/insert-delayed.html">MySQL manual - INSERT DELAYED Syntax</a>.</li>
 <li>&#8220;Ignore inserts&#8221; treats errors as a warning instead. Again, more info
-is provided in the <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/insert.html">MySQL manual - INSERT Syntax</a>, but basically with
+is provided in the <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/insert.html">MySQL manual - INSERT Syntax</a>, but basically with
 this selected, invalid values are adjusted and inserted rather than
 causing the entire statement to fail.</li>
 </ul>
@@ -1317,7 +1317,7 @@ database names. So if your users do not need those privileges, you can remove
 them and their databases list will shorten.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last">&lt;<a class="reference external" href="http://bugs.mysql.com/179">http://bugs.mysql.com/179</a>&gt;</p>
+<p class="last">&lt;<a class="reference external" href="https://bugs.mysql.com/179">https://bugs.mysql.com/179</a>&gt;</p>
 </div>
 </div>
 <div class="section" id="in-edit-insert-mode-how-can-i-see-a-list-of-possible-values-for-a-column-based-on-some-foreign-table">
@@ -1364,7 +1364,7 @@ in Browse mode or on the Structure page.</p>
 <div class="section" id="what-format-strings-can-i-use">
 <span id="faq6-27"></span><h3>6.27 What format strings can I use?<a class="headerlink" href="#what-format-strings-can-i-use" title="Permalink to this headline">¶</a></h3>
 <p>In all places where phpMyAdmin accepts format strings, you can use
-<tt class="docutils literal"><span class="pre">&#64;VARIABLE&#64;</span></tt> expansion and <a class="reference external" href="http://php.net/strftime">strftime</a>
+<tt class="docutils literal"><span class="pre">&#64;VARIABLE&#64;</span></tt> expansion and <a class="reference external" href="https://php.net/strftime">strftime</a>
 format strings. The expanded variables depend on a context (for
 example, if you haven&#8217;t chosen a table, you can not get the table
 name), but the following variables can be used:</p>
@@ -1921,7 +1921,7 @@ attempts.</p>
         <li class="right" >
           <a href="import_export.html" title="Import and export"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

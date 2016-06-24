@@ -96,7 +96,7 @@ function PMA_ifSetOr(&$var, $default = null, $type = 'similar')
  * @return boolean whether valid or not
  *
  * @todo add some more var types like hex, bin, ...?
- * @see     http://php.net/gettype
+ * @see     https://php.net/gettype
  */
 function PMA_isValid(&$var, $type = 'length', $compare = null)
 {
@@ -286,7 +286,7 @@ function PMA_getPHPDocLink($target)
         $lang = $GLOBALS['lang'];
     }
 
-    return PMA_linkURL('http://php.net/manual/' . $lang . '/' . $target);
+    return PMA_linkURL('https://php.net/manual/' . $lang . '/' . $target);
 }
 
 /**
@@ -498,6 +498,14 @@ function PMA_sendHeaderLocation($uri, $use_refresh = false)
         return;
     }
 
+    /*
+     * Avoid relative path redirect problems in case user entered URL
+     * like /phpmyadmin/index.php/ which some web servers happily accept.
+     */
+    if ($uri[0] == '.') {
+        $uri = $GLOBALS['PMA_Config']->getCookiePath() . substr($uri, 2);
+    }
+
     $response = PMA\libraries\Response::getInstance();
 
     if (SID) {
@@ -514,7 +522,7 @@ function PMA_sendHeaderLocation($uri, $use_refresh = false)
     if ($response->headersSent()) {
         if (function_exists('debug_print_backtrace')) {
             echo '<pre>';
-            debug_print_backtrace();
+            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
             echo '</pre>';
         }
         trigger_error(
@@ -724,7 +732,7 @@ function PMA_arrayRemove($path, &$array)
  */
 function PMA_linkURL($url)
 {
-    if (!preg_match('#^https?://#', $url) || defined('PMA_SETUP')) {
+    if (!preg_match('#^https?://#', $url)) {
         return $url;
     }
 
@@ -739,7 +747,12 @@ function PMA_linkURL($url)
     $arr = parse_url($url);
     parse_str($arr["query"], $vars);
     $query = http_build_query(array("url" => $vars["url"]));
-    $url = './url.php?' . $query;
+
+    if (defined('PMA_SETUP')) {
+        $url = '../url.php?' . $query;
+    } else {
+        $url = './url.php?' . $query;
+    }
 
     return $url;
 }
@@ -767,20 +780,17 @@ function PMA_isAllowedDomain($url)
         /* mysql.com domains */
         'dev.mysql.com','bugs.mysql.com',
         /* mariadb domains */
-        'mariadb.org',
+        'mariadb.org', 'mariadb.com',
         /* php.net domains */
         'php.net',
         /* sourceforge.net domain */
         'sourceforge.net',
         /* Github domains*/
         'github.com','www.github.com',
-        /* Following are doubtful ones. */
-        'www.primebase.com',
-        'pbxt.blogspot.com',
+        /* Percona domains */
         'www.percona.com',
+        /* Following are doubtful ones. */
         'mysqldatabaseadministration.blogspot.com',
-        'ronaldbradford.com',
-        'xaprb.com',
     );
     if (in_array(mb_strtolower($domain), $domainWhiteList)) {
         return true;
@@ -930,15 +940,20 @@ function PMA_setGlobalDbOrTable($param)
  */
 function PMA_cleanupPathInfo()
 {
-    global $PMA_PHP_SELF, $_PATH_INFO;
+    global $PMA_PHP_SELF;
 
     $PMA_PHP_SELF = PMA_getenv('PHP_SELF');
+    if (empty($PMA_PHP_SELF)) {
+        $PMA_PHP_SELF = urldecode(PMA_getenv('REQUEST_URI'));
+    }
     $_PATH_INFO = PMA_getenv('PATH_INFO');
     if (! empty($_PATH_INFO) && ! empty($PMA_PHP_SELF)) {
         $path_info_pos = mb_strrpos($PMA_PHP_SELF, $_PATH_INFO);
-        $pathLength = $path_info_pos + mb_strlen($_PATH_INFO);
-        if ($pathLength === mb_strlen($PMA_PHP_SELF)) {
-            $PMA_PHP_SELF = mb_substr($PMA_PHP_SELF, 0, $path_info_pos);
+        if ($path_info_pos !== false) {
+            $path_info_part = mb_substr($PMA_PHP_SELF, $path_info_pos, mb_strlen($_PATH_INFO));
+            if ($path_info_part == $_PATH_INFO) {
+                $PMA_PHP_SELF = mb_substr($PMA_PHP_SELF, 0, $path_info_pos);
+            }
         }
     }
     $PMA_PHP_SELF = htmlspecialchars($PMA_PHP_SELF);

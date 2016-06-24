@@ -594,7 +594,7 @@ class ExportSql extends ExportPlugin
         if (isset($GLOBALS['sql_include_comments'])
             && $GLOBALS['sql_include_comments']
         ) {
-            // see http://dev.mysql.com/doc/refman/5.0/en/ansi-diff-comments.html
+            // see https://dev.mysql.com/doc/refman/5.0/en/ansi-diff-comments.html
             return '--' . (empty($text) ? '' : ' ') . $text . $GLOBALS['crlf'];
         } else {
             return '';
@@ -677,7 +677,7 @@ class ExportSql extends ExportPlugin
         }
         $head = $this->_exportComment('phpMyAdmin SQL Dump')
             . $this->_exportComment('version ' . PMA_VERSION)
-            . $this->_exportComment('http://www.phpmyadmin.net')
+            . $this->_exportComment('https://www.phpmyadmin.net/')
             . $this->_exportComment();
         $host_string = __('Host:') . ' ' . $cfg['Server']['host'];
         if (!empty($cfg['Server']['port'])) {
@@ -1506,7 +1506,7 @@ class ExportSql extends ExportPlugin
              */
             if ($view) {
                 $create_query = preg_replace(
-                    '/' . preg_quote(Util::backquote($db)) . '\./',
+                    '/' . preg_quote(Util::backquote($db), '/') . '\./',
                     '',
                     $create_query
                 );
@@ -1563,23 +1563,30 @@ class ExportSql extends ExportPlugin
                 if (($compat === 'MSSQL') || ($sql_backquotes === '"')) {
                     Context::$MODE |= Context::ANSI_QUOTES;
                 }
-
-                /**
-                 * Parser used for analysis.
-                 *
-                 * @var Parser
-                 */
-                $parser = new Parser($create_query);
             }
 
-            if (!empty($parser->statements[0]->fields)) {
+            /**
+             * Parser used for analysis.
+             *
+             * @var Parser
+             */
+            $parser = new Parser($create_query);
 
-                /**
-                 * `CREATE TABLE` statement.
-                 *
-                 * @var SelectStatement
-                 */
-                $statement = $parser->statements[0];
+            /**
+             * `CREATE TABLE` statement.
+             *
+             * @var SelectStatement
+             */
+            $statement = $parser->statements[0];
+
+            if (!empty($statement->entityOptions)) {
+                $engine = $statement->entityOptions->has('ENGINE');
+            } else {
+                $engine = '';
+            }
+
+            /* Avoid operation on ARCHIVE tables as those can not be altered */
+            if (!empty($statement->fields) && (empty($engine) || strtoupper($engine) != 'ARCHIVE')) {
 
                 /**
                  * Fragments containining definition of each constraint.

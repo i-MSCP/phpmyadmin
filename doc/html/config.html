@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; phpMyAdmin 4.6.1 documentation</title>
+    <title>Configuration &mdash; phpMyAdmin 4.6.3 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.6.1',
+        VERSION:     '4.6.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.6.1 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.6.3 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.3 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -845,7 +845,7 @@ starting with the letter &#8220;a&#8221;, use</p>
 <div class="highlight-php"><div class="highlight"><pre><span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;hide_db&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;^(db1|db2)$&#39;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>More information on regular expressions can be found in the <a class="reference external" href="http://php.net/manual/en/reference.pcre.pattern.syntax.php">PCRE
+<p>More information on regular expressions can be found in the <a class="reference external" href="https://php.net/manual/en/reference.pcre.pattern.syntax.php">PCRE
 pattern syntax</a> portion
 of the PHP reference manual.</p>
 </dd></dl>
@@ -1109,7 +1109,7 @@ remember that the Variable in <tt class="file docutils literal"><span class="pre
 <p class="first admonition-title">Note</p>
 <p class="last">For auto-upgrade functionality to work, your
 <tt class="docutils literal"><span class="pre">$cfg['Servers'][$i]['controluser']</span></tt> must have ALTER privilege on
-<tt class="docutils literal"><span class="pre">phpmyadmin</span></tt> database. See the <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/grant.html">MySQL documentation for GRANT</a> on how to
+<tt class="docutils literal"><span class="pre">phpmyadmin</span></tt> database. See the <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/grant.html">MySQL documentation for GRANT</a> on how to
 <tt class="docutils literal"><span class="pre">GRANT</span></tt> privileges to a user.</p>
 </div>
 </dd></dl>
@@ -1597,7 +1597,7 @@ delete older rows.</p>
 </table>
 <p>Sets the time zone used by phpMyAdmin. Leave blank to use the time zone of your
 database server. Possible values are explained at
-<a class="reference external" href="http://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html">http://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html</a></p>
+<a class="reference external" href="https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html">https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html</a></p>
 <p>This is useful when your database server uses a time zone which is different from the
 time zone you want to use in phpMyAdmin.</p>
 </dd></dl>
@@ -2058,11 +2058,11 @@ query&#8217;s length exceeds this limit, this query is not saved in the history.
 </tr>
 </tbody>
 </table>
-<p>Whether <a class="reference external" href="http://php.net/manual/en/features.persistent-connections.php">persistent connections</a> should be used or not. Works with
+<p>Whether <a class="reference external" href="https://php.net/manual/en/features.persistent-connections.php">persistent connections</a> should be used or not. Works with
 following extensions:</p>
 <ul class="simple">
-<li>mysql (<a class="reference external" href="http://php.net/manual/en/function.mysql-pconnect.php">mysql_pconnect</a>),</li>
-<li>mysqli (requires PHP 5.3.0 or newer, <a class="reference external" href="http://php.net/manual/en/mysqli.persistconns.php">more information</a>).</li>
+<li>mysql (<a class="reference external" href="https://php.net/manual/en/function.mysql-pconnect.php">mysql_pconnect</a>),</li>
+<li>mysqli (requires PHP 5.3.0 or newer, <a class="reference external" href="https://php.net/manual/en/mysqli.persistconns.php">more information</a>).</li>
 </ul>
 </dd></dl>
 
@@ -2125,7 +2125,7 @@ no effect when PHP is running in safe mode.</p>
 </tr>
 </tbody>
 </table>
-<p>Path for storing session data (<a class="reference external" href="http://php.net/session_save_path">session_save_path PHP parameter</a>).</p>
+<p>Path for storing session data (<a class="reference external" href="https://php.net/session_save_path">session_save_path PHP parameter</a>).</p>
 </dd></dl>
 
 <dl class="option">
@@ -2384,7 +2384,7 @@ configured <span class="target" id="index-68"></span><a class="reference interna
 </tbody>
 </table>
 <p>Define how long a login cookie is valid. Please note that php
-configuration option <a class="reference external" href="http://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime">session.gc_maxlifetime</a> might limit session validity and if the session is lost,
+configuration option <a class="reference external" href="https://php.net/manual/en/session.configuration.php#ini.session.gc-maxlifetime">session.gc_maxlifetime</a> might limit session validity and if the session is lost,
 the login cookie is also invalidated. So it is a good idea to set
 <tt class="docutils literal"><span class="pre">session.gc_maxlifetime</span></tt> at least to the same value of
 <span class="target" id="index-69"></span><a class="reference internal" href="#cfg_LoginCookieValidity"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['LoginCookieValidity']</span></tt></a>.</p>
@@ -3763,7 +3763,7 @@ locale/<em>code</em>/LC_MESSAGES/phpmyadmin.mo.</p>
 </tbody>
 </table>
 <p>Defines the default connection collation to use, if not user-defined.
-See the <a class="reference external" href="http://dev.mysql.com/doc/mysql/en/charset-charsets.html">MySQL documentation for charsets</a>
+See the <a class="reference external" href="https://dev.mysql.com/doc/mysql/en/charset-charsets.html">MySQL documentation for charsets</a>
 for list of possible values.</p>
 </dd></dl>
 
@@ -5131,7 +5131,7 @@ server certificates and tell phpMyAdmin to use them:</p>
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.6.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.6.3 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
