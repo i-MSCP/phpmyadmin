@@ -12,8 +12,6 @@ if (! defined('PHPMYADMIN')) {
 
 /* Get the transformations interface */
 require_once 'libraries/plugins/TransformationsPlugin.class.php';
-/* For PMA_Transformation_globalHtmlReplace */
-require_once 'libraries/transformations.lib.php';
 
 /**
  * Provides common methods for all of the link transformations plugins.
@@ -47,24 +45,21 @@ abstract class TextLinkTransformationsPlugin extends TransformationsPlugin
      */
     public function applyTransformation($buffer, $options = array(), $meta = '')
     {
-
-        $append_part = (isset($options[2]) && $options[2]) ? '' : $buffer;
-
-        $transform_options = array (
-            'string' => '<a href="'
-                . (isset($options[0]) ? $options[0] : '') . $append_part
-                . '" title="'
-                . htmlspecialchars(isset($options[1]) ? $options[1] : '')
-                . '" target="_new">'
-                . htmlspecialchars(isset($options[1]) ? $options[1] : $buffer)
-                . '</a>'
-        );
-
-        return PMA_Transformation_globalHtmlReplace(
-            $buffer,
-            $transform_options
-        );
+        $url = (isset($options[0]) ? $options[0] : '') . ((isset($options[2]) && $options[2]) ? '' : $buffer);
+        $parsed = parse_url($url);
+        /* Do not allow javascript links */
+        if (isset($parsed['scheme']) && $parsed['scheme'] == 'javascript') {
+            return htmlspecialchars($url);
+        }
+        return '<a href="'
+            . htmlspecialchars($url)
+            . '" title="'
+            . htmlspecialchars(isset($options[1]) ? $options[1] : '')
+            . '" target="_new">'
+            . htmlspecialchars(isset($options[1]) ? $options[1] : $buffer)
+            . '</a>';
     }
+
 
     /* ~~~~~~~~~~~~~~~~~~~~ Getters and Setters ~~~~~~~~~~~~~~~~~~~~ */
 

@@ -1089,7 +1089,7 @@ class PMA_TableSearch
                 .= '<input type="hidden" name="criteriaColumnTypes[' . $i . ']"'
                 . ' id="types_' . $i . '" ';
             if (isset($_POST['criteriaColumnTypes'][$i])) {
-                $html_output .= 'value="' . $_POST['criteriaColumnTypes'][$i] . '" ';
+                $html_output .= 'value="' . htmlspecialchars($_POST['criteriaColumnTypes'][$i]) . '" ';
             }
             $html_output .= '/>';
             $html_output .= '<input type="hidden" name="criteriaColumnCollations['
@@ -1405,9 +1405,22 @@ class PMA_TableSearch
         $result = $GLOBALS['dbi']->fetchResult($sql_query, 0);
 
         if (is_array($result)) {
+            /* Iterate over possible delimiters to get one */
+            $delimiters = array('/', '@', '#', '~', '!', '$', '%', '^', '&', '_');
+            $found = false;
+            for ($i = 0; $i < count($delimiters); $i++) {
+                if (strpos($find, $delimiters[$i]) === false) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (! $found) {
+                return false;
+            }
+            $find = $delimiters[$i] . $find . $delimiters[$i];
             foreach ($result as $index=>$row) {
                 $result[$index][1] = preg_replace(
-                    "/" . $find . "/",
+                    $find,
                     $replaceWith,
                     $row[0]
                 );
