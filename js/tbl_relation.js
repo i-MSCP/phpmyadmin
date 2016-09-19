@@ -23,7 +23,7 @@ function setDropdownValues($dropdown, values, selectedValue) {
     // add an empty string to the beginning for empty selection
     values.unshift('');
     $.each(values, function () {
-        optionsAsString += "<option value='" + this + "'" + (selectedValue == this ? " selected='selected'" : "") + ">" + this + "</option>";
+        optionsAsString += "<option value='" + escapeHtml(this) + "'" + (selectedValue == this ? " selected='selected'" : "") + ">" + escapeHtml(this) + "</option>";
     });
     $dropdown.append($(optionsAsString));
 }
@@ -219,7 +219,7 @@ AJAX.registerOnload('tbl_relation.js', function () {
 
         $anchor.PMA_confirm(question, $anchor.attr('href'), function (url) {
             var $msg = PMA_ajaxShowMessage(PMA_messages.strDroppingForeignKey, false);
-            $.get(url, {'is_js_confirmed': 1, 'ajax_request': true}, function (data) {
+            $.post(url, {'is_js_confirmed': 1, 'ajax_request': true}, function (data) {
                 if (data.success === true) {
                     PMA_ajaxRemoveMessage($msg);
                     PMA_commonActions.refreshMain(false, function () {
@@ -228,7 +228,7 @@ AJAX.registerOnload('tbl_relation.js', function () {
                 } else {
                     PMA_ajaxShowMessage(PMA_messages.strErrorProcessingRequest + " : " + data.error, false);
                 }
-            }); // end $.get()
+            }); // end $.post()
         }); // end $.PMA_confirm()
     }); //end Drop Foreign key
 });

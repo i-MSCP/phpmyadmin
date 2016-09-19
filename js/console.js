@@ -191,14 +191,17 @@ var PMA_console = {
                 PMA_consoleMessages.showInstructions(PMA_console.config.enterExecutes);
             });
 
-            $(document).ajaxComplete(function (event, xhr) {
+            $(document).ajaxComplete(function (event, xhr, ajaxOptions) {
+                if (ajaxOptions.dataType != 'json') {
+                    return;
+                }
                 try {
                     var data = $.parseJSON(xhr.responseText);
                     PMA_console.ajaxCallback(data);
                 } catch (e) {
                     console.log("Invalid JSON!" + e.message);
                     if (AJAX.xhr && AJAX.xhr.status === 0 && AJAX.xhr.statusText !== 'abort') {
-                        PMA_ajaxShowMessage($('<div />',{'class':'error','html':PMA_messages.strRequestFailed+' ( '+AJAX.xhr.statusText+' )'}));
+                        PMA_ajaxShowMessage($('<div />',{'class':'error','html':PMA_messages.strRequestFailed+' ( '+escapeHtml(AJAX.xhr.statusText)+' )'}));
                         AJAX.active = false;
                         AJAX.xhr = null;
                     }

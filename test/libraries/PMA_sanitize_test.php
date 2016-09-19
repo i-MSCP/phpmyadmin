@@ -11,8 +11,7 @@
  */
 require_once 'libraries/sanitizing.lib.php';
 require_once 'libraries/url_generating.lib.php';
-require_once 'libraries/core.lib.php';
-require_once 'libraries/Util.class.php';
+
 
 /**
  * tests for PMA_sanitize()
@@ -54,8 +53,8 @@ class PMA_Sanitize_Test extends PHPUnit_Framework_TestCase
         unset($GLOBALS['lang']);
         unset($GLOBALS['collation_connection']);
         $this->assertEquals(
-            '<a href="./url.php?url=http%3A%2F%2Fwww.phpmyadmin.net%2F" target="target">link</a>',
-            PMA_sanitize('[a@http://www.phpmyadmin.net/@target]link[/a]')
+            '<a href="./url.php?url=https%3A%2F%2Fwww.phpmyadmin.net%2F" target="target">link</a>',
+            PMA_sanitize('[a@https://www.phpmyadmin.net/@target]link[/a]')
         );
     }
 
@@ -63,12 +62,29 @@ class PMA_Sanitize_Test extends PHPUnit_Framework_TestCase
      * Tests links to documentation.
      *
      * @return void
+     *
+     * @dataProvider docLinks
      */
-    public function testDoc()
+    public function testDoc($link, $expected)
     {
         $this->assertEquals(
-            '<a href="./url.php?url=http%3A%2F%2Fdocs.phpmyadmin.net%2Fen%2Flatest%2Fsetup.html%23foo" target="documentation">doclink</a>',
-            PMA_sanitize('[doc@foo]doclink[/doc]')
+            '<a href="./url.php?url=https%3A%2F%2Fdocs.phpmyadmin.net%2Fen%2Flatest%2F' . $expected . '" target="documentation">doclink</a>',
+            PMA_sanitize('[doc@' . $link . ']doclink[/doc]')
+        );
+    }
+
+    /**
+     * Data provider for sanitize [doc@foo] markup
+     *
+     * @return array
+     */
+    public function docLinks()
+    {
+        return array(
+            array('foo', 'setup.html%23foo'),
+            array('cfg_TitleTable', 'config.html%23cfg_TitleTable'),
+            array('faq3-11', 'faq.html%23faq3-11'),
+            array('bookmarks@', 'bookmarks.html'),
         );
     }
 
@@ -106,8 +122,8 @@ class PMA_Sanitize_Test extends PHPUnit_Framework_TestCase
     public function testLinkAndXssInHref()
     {
         $this->assertEquals(
-            '<a href="./url.php?url=http%3A%2F%2Fdocs.phpmyadmin.net%2F">doc</a>[a@javascript:alert(\'XSS\');@target]link</a>',
-            PMA_sanitize('[a@http://docs.phpmyadmin.net/]doc[/a][a@javascript:alert(\'XSS\');@target]link[/a]')
+            '<a href="./url.php?url=https%3A%2F%2Fdocs.phpmyadmin.net%2F">doc</a>[a@javascript:alert(\'XSS\');@target]link</a>',
+            PMA_sanitize('[a@https://docs.phpmyadmin.net/]doc[/a][a@javascript:alert(\'XSS\');@target]link[/a]')
         );
     }
 

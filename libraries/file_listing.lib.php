@@ -5,9 +5,6 @@
  *
  * @package PhpMyAdmin
  */
-if (! defined('PHPMYADMIN')) {
-    exit;
-}
 
 /**
  * Returns array of filtered file names
@@ -29,12 +26,13 @@ function PMA_getDirContent($dir, $expression = '')
     }
     while ($file = @readdir($handle)) {
         if (@is_file($dir . $file)
+            && ! @is_link($dir . $file)
             && ($expression == '' || preg_match($expression, $file))
         ) {
             $result[] = $file;
         }
     }
-    @closedir($handle);
+    closedir($handle);
     asort($result);
     return $result;
 }

@@ -199,7 +199,7 @@ class BufferedQuery
              * treated differently, because of the preceding backslash, it will
              * be ignored.
              */
-            if (($this->status & static::STATUS_COMMENT == 0) && ($this->query[$i] === '\\')) {
+            if ((($this->status & static::STATUS_COMMENT) == 0) && ($this->query[$i] === '\\')) {
                 $this->current .= $this->query[$i] . $this->query[++$i];
                 continue;
             }
