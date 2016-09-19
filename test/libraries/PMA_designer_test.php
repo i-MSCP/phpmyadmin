@@ -8,19 +8,17 @@
  * Include to test.
  */
 require_once 'libraries/db_designer.lib.php';
-
 require_once 'libraries/database_interface.inc.php';
-require_once 'libraries/Util.class.php';
-require_once 'libraries/php-gettext/gettext.inc';
 require_once 'libraries/url_generating.lib.php';
 require_once 'libraries/relation.lib.php';
+require_once 'libraries/plugin_interface.lib.php';
 
 /**
  * Tests for libraries/db_designer.lib.php
  *
  * @package PhpMyAdmin-test
  */
-class PMA_DesginerTest extends PHPUnit_Framework_TestCase
+class PMA_DesignerTest extends PHPUnit_Framework_TestCase
 {
 
     /**
@@ -34,6 +32,8 @@ class PMA_DesginerTest extends PHPUnit_Framework_TestCase
         $GLOBALS['cfg']['ServerDefault'] = 1;
         $GLOBALS['cfg']['PDFPageSizes'] = array('A3', 'A4');
         $GLOBALS['cfg']['PDFDefaultPageSize'] = 'A4';
+        $GLOBALS['cfg']['Schema']['pdf_orientation'] = 'L';
+        $GLOBALS['cfg']['Schema']['pdf_paper'] = 'A4';
 
         $_SESSION = array(
             'relation' => array(
@@ -57,7 +57,7 @@ class PMA_DesginerTest extends PHPUnit_Framework_TestCase
      */
     private function _mockDatabaseInteraction($db)
     {
-        $dbi = $this->getMockBuilder('PMA_DatabaseInterface')
+        $dbi = $this->getMockBuilder('PMA\libraries\DatabaseInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -67,7 +67,7 @@ class PMA_DesginerTest extends PHPUnit_Framework_TestCase
                 "SELECT `page_nr`, `page_descr` FROM `pmadb`.`pdf_pages`"
                 . " WHERE db_name = '" . $db . "' ORDER BY `page_descr`",
                 2,
-                PMA_DatabaseInterface::QUERY_STORE,
+                PMA\libraries\DatabaseInterface::QUERY_STORE,
                 false
             )
             ->will($this->returnValue('dummyRS'));
@@ -136,8 +136,10 @@ class PMA_DesginerTest extends PHPUnit_Framework_TestCase
             $result
         );
         $this->assertContains('<option value="0">', $result);
-        $this->assertContains('<option value="1">page1</option>', $result);
-        $this->assertContains('<option value="2">page2</option>', $result);
+        $this->assertContains('<option value="1">', $result);
+        $this->assertContains('page1', $result);
+        $this->assertContains('<option value="2">', $result);
+        $this->assertContains('page2', $result);
     }
 
     /**
@@ -160,8 +162,10 @@ class PMA_DesginerTest extends PHPUnit_Framework_TestCase
             $result
         );
         $this->assertContains('<option value="0">', $result);
-        $this->assertContains('<option value="1">page1</option>', $result);
-        $this->assertContains('<option value="2">page2</option>', $result);
+        $this->assertContains('<option value="1">', $result);
+        $this->assertContains('page1', $result);
+        $this->assertContains('<option value="2">', $result);
+        $this->assertContains('page2', $result);
 
         $this->assertContains(
             '<input type="radio" name="save_page" id="save_page_same" value="same"'

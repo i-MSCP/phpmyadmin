@@ -10,8 +10,7 @@
 /*
  * Include to test.
  */
-require_once 'libraries/Util.class.php';
-require_once 'libraries/php-gettext/gettext.inc';
+
 
 /**
  * Test for format number and byte
@@ -70,7 +69,7 @@ class PMA_FormatNumberByteDown_Test extends PHPUnit_Framework_TestCase
             array(0.00003, 3, 2, '30 &micro;'),
             array(0.003, 3, 3, '3 m'),
             array(-0.003, 6, 0, '-3,000 &micro;'),
-            array(100.98, 0, 2, '100.98')
+            array(100.98, 0, 2, '100.98'),
         );
     }
 
@@ -90,7 +89,7 @@ class PMA_FormatNumberByteDown_Test extends PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             $d,
-            (string) PMA_Util::formatNumber(
+            (string) PMA\libraries\Util::formatNumber(
                 $a, $b, $c, false
             )
         );
@@ -111,7 +110,8 @@ class PMA_FormatNumberByteDown_Test extends PHPUnit_Framework_TestCase
             array(1034, 3, 2, array('1.01', __('KiB'))),
             array(100233, 3, 3, array('97.884', __('KiB'))),
             array(2206451, 1, 2, array('2.10', __('MiB'))),
-            array(21474836480, 4, 0, array('20', __('GiB')))
+            array(21474836480, 4, 0, array('20', __('GiB'))),
+            array(doubleval(52) + doubleval(2048), 3, 1, array('2.1', 'KiB')),
         );
     }
 
@@ -129,7 +129,7 @@ class PMA_FormatNumberByteDown_Test extends PHPUnit_Framework_TestCase
      */
     public function testFormatByteDown($a, $b, $c, $e)
     {
-        $result = PMA_Util::formatByteDown($a, $b, $c);
+        $result = PMA\libraries\Util::formatByteDown($a, $b, $c);
         $result[0] = trim($result[0]);
         $this->assertEquals($e, $result);
     }

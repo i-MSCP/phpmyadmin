@@ -75,9 +75,10 @@ AJAX.registerOnload('server_variables.js', function () {
 
     /* Allows the user to edit a server variable */
     function editVariable(link) {
-        var $cell = $(link).parent();
-        var $valueCell = $(link).parents('.var-row').find('.var-value');
-        var varName = $cell.parent().find('.var-name').text().replace(/ /g, '_');
+        var $link = $(link);
+        var $cell = $link.parent();
+        var $valueCell = $link.parents('.var-row').find('.var-value');
+        var varName = $link.data('variable');
         var $mySaveLink = $saveLink.clone().show();
         var $myCancelLink = $cancelLink.clone().show();
         var $msgbox = PMA_ajaxShowMessage();
@@ -88,7 +89,7 @@ AJAX.registerOnload('server_variables.js', function () {
 
         $mySaveLink.click(function () {
             var $msgbox = PMA_ajaxShowMessage(PMA_messages.strProcessingRequest);
-            $.get($(this).attr('href'), {
+            $.post($(this).attr('href'), {
                     ajax_request: true,
                     type: 'setval',
                     varName: varName,
@@ -100,7 +101,11 @@ AJAX.registerOnload('server_variables.js', function () {
                             .data('content', data.variable);
                         PMA_ajaxRemoveMessage($msgbox);
                     } else {
-                        PMA_ajaxShowMessage(data.error, false);
+                        if (data.error == '') {
+                            PMA_ajaxShowMessage(PMA_messages.strRequestFailed, false);
+                        } else {
+                            PMA_ajaxShowMessage(data.error, false);
+                        }
                         $valueCell.html($valueCell.data('content'));
                     }
                     $cell.removeClass('edit').html($myEditLink);

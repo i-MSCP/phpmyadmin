@@ -6,45 +6,43 @@
  * @package PhpMyAdmin
  */
 
+use PMA\libraries\ServerStatusData;
+
 require_once 'libraries/common.inc.php';
 require_once 'libraries/server_common.inc.php';
-require_once 'libraries/ServerStatusData.class.php';
 require_once 'libraries/server_status_processes.lib.php';
 
 /**
  * Replication library
  */
-if (PMA_DRIZZLE) {
-    $GLOBALS['replication_info'] = array();
-    $GLOBALS['replication_info']['master']['status'] = false;
-    $GLOBALS['replication_info']['slave']['status'] = false;
-} else {
-    include_once 'libraries/replication.inc.php';
-    include_once 'libraries/replication_gui.lib.php';
-}
+require_once 'libraries/replication.inc.php';
+require_once 'libraries/replication_gui.lib.php';
 
-$ServerStatusData = new PMA_ServerStatusData();
-$response = PMA_Response::getInstance();
+$ServerStatusData = new ServerStatusData();
+$response = PMA\libraries\Response::getInstance();
 
 /**
  * Kills a selected process
  * on ajax request
  */
 if ($response->isAjax() && !empty($_REQUEST['kill'])) {
-    $query = $GLOBALS['dbi']->getKillQuery((int)$_REQUEST['kill']);
+    $kill = intval($_REQUEST['kill']);
+    $query = $GLOBALS['dbi']->getKillQuery($kill);
     if ($GLOBALS['dbi']->tryQuery($query)) {
-        $message = PMA_Message::success(__('Thread %s was successfully killed.'));
-        $response->isSuccess(true);
+        $message = PMA\libraries\Message::success(
+            __('Thread %s was successfully killed.')
+        );
+        $response->setRequestStatus(true);
     } else {
-        $message = PMA_Message::error(
+        $message = PMA\libraries\Message::error(
             __(
                 'phpMyAdmin was unable to kill thread %s.'
                 . ' It probably has already been closed.'
             )
         );
-        $response->isSuccess(false);
+        $response->setRequestStatus(false);
     }
-    $message->addParam($_REQUEST['kill']);
+    $message->addParam($kill);
     $response->addJSON('message', $message);
 } elseif ($response->isAjax() && !empty($_REQUEST['refresh'])) {
     // Only sends the process list table
