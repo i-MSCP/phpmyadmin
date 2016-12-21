@@ -8,12 +8,13 @@
  *
  * @package PhpMyAdmin
  */
+
 if (! defined('PHPMYADMIN')) {
     exit;
 }
 
 // Check parameters
-PMA_Util::checkParameters(array('db', 'table'));
+PMA\libraries\Util::checkParameters(array('db', 'table'));
 
 /**
  * Defining global variables, in case this script is included by a function.
@@ -32,16 +33,15 @@ $GLOBALS['dbi']->selectDb($GLOBALS['db']);
 /**
  * Holds information about the current table
  *
- * @todo replace this by PMA_Table
+ * Table::getStatusInfo() does caching by default, but here
+ * we force reading of the current table status
+ * if $reread_info is true (for example, coming from tbl_operations.php
+ * and we just changed the table's storage engine)
+ *
+ * @todo replace this by Table
  * @global array $GLOBALS['showtable']
  * @name $showtable
  */
-$GLOBALS['showtable'] = array();
-
-// PMA_Table::getStatusInfo() does caching by default, but here
-// we force reading of the current table status
-// if $reread_info is true (for example, coming from tbl_operations.php
-// and we just changed the table's storage engine)
 $GLOBALS['showtable'] = $GLOBALS['dbi']->getTable(
     $GLOBALS['db'],
     $GLOBALS['table']
@@ -55,9 +55,6 @@ $GLOBALS['showtable'] = $GLOBALS['dbi']->getTable(
 // and we don't want to mess up the $tbl_storage_engine coming from the form
 
 if ($showtable) {
-    /** @var PMA_String $pmaString */
-    $pmaString = $GLOBALS['PMA_String'];
-
     if ($GLOBALS['dbi']->getTable($GLOBALS['db'], $GLOBALS['table'])->isView()) {
         $tbl_is_view     = true;
         $tbl_storage_engine = __('View');
@@ -65,7 +62,7 @@ if ($showtable) {
     } else {
         $tbl_is_view     = false;
         $tbl_storage_engine = isset($showtable['Engine'])
-            ? /*overload*/mb_strtoupper($showtable['Engine'])
+            ? mb_strtoupper($showtable['Engine'])
             : '';
         $show_comment = '';
         if (isset($showtable['Comment'])) {
@@ -87,25 +84,26 @@ if ($showtable) {
         ? $showtable['Auto_increment']
         : '';
 
-    $create_options      = isset($showtable['Create_options'])
+    $create_options_tmp      = isset($showtable['Create_options'])
         ? explode(' ', $showtable['Create_options'])
         : array();
+    $create_options = array();
 
     // export create options by its name as variables into global namespace
     // f.e. pack_keys=1 becomes available as $pack_keys with value of '1'
     unset($pack_keys);
-    foreach ($create_options as $each_create_option) {
+    foreach ($create_options_tmp as $each_create_option) {
         $each_create_option = explode('=', $each_create_option);
         if (isset($each_create_option[1])) {
             // ensure there is no ambiguity for PHP 5 and 7
-            ${$each_create_option[0]} = $each_create_option[1];
+            $create_options[$each_create_option[0]] = $each_create_option[1];
         }
     }
     // we need explicit DEFAULT value here (different from '0')
-    $pack_keys = (! isset($pack_keys) || /*overload*/mb_strlen($pack_keys) == 0)
+    $create_options['pack_keys'] = (! isset($create_options['pack_keys']) || strlen($create_options['pack_keys']) == 0)
         ? 'DEFAULT'
-        : $pack_keys;
-    unset($create_options, $each_create_option);
+        : $create_options['pack_keys'];
+    unset($create_options_tmp, $each_create_option);
 } else {
     $pack_keys = $row_format = null;
 }// end if

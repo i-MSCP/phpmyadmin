@@ -37,6 +37,23 @@ function PMA_urlencode(str)
 }
 
 /**
+ * Saves SQL query in local storage or cooie
+ *
+ * @param string SQL query
+ * @return void
+ */
+function PMA_autosaveSQL(query)
+{
+    if (query) {
+        if (isStorageSupported('localStorage')) {
+            window.localStorage.auto_saved_sql = query;
+        } else {
+            $.cookie('auto_saved_sql', query);
+        }
+    }
+}
+
+/**
  * Get the field name for the current field.  Required to construct the query
  * for grid editing
  *
@@ -135,17 +152,11 @@ AJAX.registerOnload('sql.js', function () {
     $(function () {
         if (codemirror_editor) {
             codemirror_editor.on('change', function () {
-                var query = codemirror_editor.getValue();
-                if (query) {
-                    $.cookie('auto_saved_sql', query);
-                }
+                PMA_autosaveSQL(codemirror_editor.getValue());
             });
         } else {
             $('#sqlquery').on('input propertychange', function () {
-                var query = $('#sqlquery').val();
-                if (query) {
-                    $.cookie('auto_saved_sql', query);
-                }
+                PMA_autosaveSQL($('#sqlquery').val());
             });
         }
     });
@@ -160,7 +171,7 @@ AJAX.registerOnload('sql.js', function () {
             if ($link.hasClass('formLinkSubmit')) {
                 submitFormLink($link);
             } else {
-                $.get(url, {'ajax_request': true, 'is_js_confirmed': true}, function (data) {
+                $.post(url, {'ajax_request': true, 'is_js_confirmed': true}, function (data) {
                     if (data.success) {
                         PMA_ajaxShowMessage(data.message);
                         $link.closest('tr').remove();
@@ -193,14 +204,24 @@ AJAX.registerOnload('sql.js', function () {
     }).trigger('keyup');
 
     /**
-     * Attach Event Handler for 'Print View'
+     * Attach Event Handler for 'Copy to clipbpard
+     */
+    $(document).on('click', "#copyToClipBoard", function (event) {
+        event.preventDefault();
+
+        // Print the page
+        copyToClipboard();
+    }); //end of Copy to Clipboard action
+
+    /**
+     * Attach Event Handler for 'Print' link
      */
     $(document).on('click', "#printView", function (event) {
         event.preventDefault();
 
-        // Print the page
-        printPage();
-    }); //end of Print View action
+        // Take to preview mode
+        printPreview();
+    }); //end of 'Print' action
 
     /**
      * Attach the {@link makegrid} function to a custom event, which will be
@@ -641,7 +662,11 @@ function PMA_changeClassForColumn($this_th, newclass, isAddClass)
     if (has_big_t) {
         th_index--;
     }
-    var $tds = $this_th.parents(".table_results").find('tbody tr').find('td.data:eq(' + th_index + ')');
+    var $table = $this_th.parents('.table_results');
+    if (! $table.length) {
+        $table = $this_th.parents('table').siblings('.table_results');
+    }
+    var $tds = $table.find('tbody tr').find('td.data:eq(' + th_index + ')');
     if (isAddClass === undefined) {
         $tds.toggleClass(newclass);
     } else {
@@ -771,7 +796,7 @@ function makeProfilingChart()
     $('#profilingchart').html('').show();
     $('#profilingChartData').html('');
 
-    PMA_createProfilingChartJqplot('profilingchart', data);
+    PMA_createProfilingChart('profilingchart', data);
 }
 
 /*
@@ -824,7 +849,7 @@ function setStickyColumnsPosition($sticky_columns, $table_results, position, top
  * Initialize sticky columns
  */
 function initStickyColumns($table_results) {
-    var $sticky_columns = $('<table class="sticky_columns"></table>')
+    return $('<table class="sticky_columns"></table>')
             .insertBefore($table_results)
             .css("position", "fixed")
             .css("z-index", "99")
@@ -832,7 +857,6 @@ function initStickyColumns($table_results) {
             .css("margin-left", $('#page_content').css("margin-left"))
             .css("top", $('#floating_menubar').height())
             .css("display", "none");
-    return $sticky_columns;
 }
 
 /*

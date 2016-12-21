@@ -22,8 +22,7 @@ use SqlParser\TokensList;
  * @category   Components
  * @package    SqlParser
  * @subpackage Components
- * @author     Dan Ungureanu <udan1107@gmail.com>
- * @license    http://opensource.org/licenses/GPL-2.0 GNU Public License
+ * @license    https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 class Expression extends Component
 {
@@ -34,7 +33,7 @@ class Expression extends Component
      * @var array
      */
     private static $ALLOWED_KEYWORDS = array(
-        'AS' => 1, 'DUAL' => 1, 'NULL' => 1, 'REGEXP' => 1
+        'AS' => 1, 'DUAL' => 1, 'NULL' => 1, 'REGEXP' => 1, 'CASE' => 1
     );
 
     /**
@@ -227,7 +226,8 @@ class Expression extends Component
                     // beginning of a statement, so this is a subquery.
                     $ret->subquery = $token->value;
                 } elseif (($token->flags & Token::FLAG_KEYWORD_FUNCTION)
-                    && (empty($options['parseField']))
+                    && (empty($options['parseField'])
+                    && ! $alias)
                 ) {
                     $isExpr = true;
                 } elseif (($token->flags & Token::FLAG_KEYWORD_RESERVED)
@@ -252,8 +252,18 @@ class Expression extends Component
                         }
                         $alias = true;
                         continue;
+                    } elseif ($token->value === 'CASE') {
+                        // For a use of CASE like
+                        // 'SELECT a = CASE .... END, b=1, `id`, ... FROM ...'
+                        $tempCaseExpr = CaseExpression::parse($parser, $list);
+                        $ret->expr .= CaseExpression::build($tempCaseExpr);
+                        $isExpr = true;
+                        continue;
                     }
                     $isExpr = true;
+                } elseif ($brackets === 0 && count($ret->expr) > 0 && ! $alias) {
+                    /* End of expression */
+                    break;
                 }
             }
 
@@ -290,6 +300,9 @@ class Expression extends Component
                     ) {
                         $ret->function = $prev[1]->value;
                     }
+                } elseif ($token->value === ')' && $brackets == 0) {
+                    // Not our bracket
+                    break;
                 } elseif ($token->value === ')') {
                     --$brackets;
                     if ($brackets === 0) {
@@ -390,7 +403,7 @@ class Expression extends Component
         // White-spaces might be added at the end.
         $ret->expr = trim($ret->expr);
 
-        if (empty($ret->expr)) {
+        if ($ret->expr === '') {
             return null;
         }
 
@@ -409,7 +422,7 @@ class Expression extends Component
         if (is_array($component)) {
             return implode($component, ', ');
         } else {
-            if (!empty($component->expr)) {
+            if ($component->expr !== '' && !is_null($component->expr)) {
                 $ret = $component->expr;
             } else {
                 $fields = array();

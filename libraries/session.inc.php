@@ -3,18 +3,13 @@
 /**
  * session handling
  *
- * @todo    add failover or warn if sessions are not configured properly
  * @todo    add an option to use mm-module for session handler
  *
  * @package PhpMyAdmin
- * @see     http://www.php.net/session
+ * @see     https://www.php.net/session
  */
 if (! defined('PHPMYADMIN')) {
     exit;
-}
-
-if (! function_exists('openssl_random_pseudo_bytes')) {
-    require_once PHPSECLIB_INC_DIR . '/Crypt/Random.php';
 }
 
 // verify if PHP supports session, die if it does not
@@ -33,7 +28,7 @@ if (!@function_exists('session_name')) {
 
 // session cookie settings
 session_set_cookie_params(
-    0, $GLOBALS['PMA_Config']->getCookiePath(),
+    0, $GLOBALS['PMA_Config']->getRootPath(),
     '', $GLOBALS['PMA_Config']->isHttps(), true
 );
 
@@ -46,15 +41,14 @@ if (!empty($path)) {
     session_save_path($path);
 }
 
-// but not all user allow cookies
-@ini_set('session.use_only_cookies', 'false');
-// do not force transparent session ids, see bug #3398788
-//@ini_set('session.use_trans_sid', 'true');
-@ini_set(
-    'url_rewriter.tags',
-    'a=href,frame=src,input=src,form=fakeentry,fieldset='
-);
-//ini_set('arg_separator.output', '&amp;');
+// use cookies only
+@ini_set('session.use_only_cookies', '1');
+// strict session mode (do not accept random string as session ID)
+@ini_set('session.use_strict_mode', '1');
+// make the session cookie HttpOnly
+@ini_set('session.cookie_httponly', '1');
+// do not force transparent session ids
+@ini_set('session.use_trans_sid', '0');
 
 // delete session/cookies when browser is closed
 @ini_set('session.cookie_lifetime', '0');
@@ -74,36 +68,64 @@ session_cache_limiter('private');
 // on some servers (for example, sourceforge.net), we get a permission error
 // on the session data directory, so I add some "@"
 
+
+function PMA_sessionFailed($errors)
+{
+    $messages = array();
+    foreach ($errors as $error) {
+        /*
+         * Remove path from open() in error message to avoid path disclossure
+         *
+         * This can happen with PHP 5 when nonexisting session ID is provided,
+         * since PHP 7, session existence is checked first.
+         *
+         * This error can also happen in case of session backed error (eg.
+         * read only filesystem) on any PHP version.
+         *
+         * The message string is currently hardcoded in PHP, so hopefully it
+         * will not change in future.
+         */
+        $messages[] = preg_replace(
+            '/open\(.*, O_RDWR\)/',
+            'open(SESSION_FILE, O_RDWR)',
+            htmlspecialchars($error->getMessage())
+        );
+    }
+
+    /*
+     * Session initialization is done before selecting language, so we
+     * can not use translations here.
+     */
+    PMA_fatalError(
+        'Error during session start; please check your PHP and/or '
+        . 'webserver log file and configure your PHP '
+        . 'installation properly. Also ensure that cookies are enabled '
+        . 'in your browser.'
+        . '<br /><br />'
+        . implode('<br /><br />', $messages)
+    );
+}
+
 // See bug #1538132. This would block normal behavior on a cluster
 //ini_set('session.save_handler', 'files');
 
 $session_name = 'phpMyAdmin';
 @session_name($session_name);
 
-if (! isset($_COOKIE[$session_name])) {
-    // on first start of session we check for errors
-    // f.e. session dir cannot be accessed - session file not created
-    $orig_error_count = $GLOBALS['error_handler']->countErrors();
-    $session_result = session_start();
-    if ($session_result !== true
-        || $orig_error_count != $GLOBALS['error_handler']->countErrors()
-    ) {
-        setcookie($session_name, '', 1);
-        /*
-         * Session initialization is done before selecting language, so we
-         * can not use translations here.
-         */
-        PMA_fatalError(
-            'Error during session start; please check your PHP and/or '
-            . 'webserver log file and configure your PHP '
-            . 'installation properly. Also ensure that cookies are enabled '
-            . 'in your browser.'
-        );
-    }
-    unset($orig_error_count, $session_result);
-} else {
-    session_start();
+// on first start of session we check for errors
+// f.e. session dir cannot be accessed - session file not created
+$orig_error_count = $GLOBALS['error_handler']->countErrors(false);
+
+$session_result = session_start();
+
+if ($session_result !== true
+    || $orig_error_count != $GLOBALS['error_handler']->countErrors(false)
+) {
+    setcookie($session_name, '', 1);
+    $errors = $GLOBALS['error_handler']->sliceErrors($orig_error_count);
+    PMA_sessionFailed($errors);
 }
+unset($orig_error_count, $session_result);
 
 /**
  * Disable setting of session cookies for further session_start() calls.
@@ -120,27 +142,28 @@ if (! isset($_SESSION[' PMA_token '])) {
     } else {
         $_SESSION[' PMA_token '] = bin2hex(openssl_random_pseudo_bytes(16));
     }
+
+    /**
+     * Check for disk space on session storage by trying to write it.
+     *
+     * This seems to be most reliable approach to test if sessions are working,
+     * otherwise the check would fail with custom session backends.
+     */
+    $orig_error_count = $GLOBALS['error_handler']->countErrors();
+    session_write_close();
+    if ($GLOBALS['error_handler']->countErrors() > $orig_error_count) {
+        $errors = $GLOBALS['error_handler']->sliceErrors($orig_error_count);
+        PMA_sessionFailed($errors);
+    }
+    session_start();
+}
+/**
+ * Check if token is properly generated (both above functions can return false).
+ */
+if (empty($_SESSION[' PMA_token '])) {
+    PMA_fatalError(
+        'Failed to generate random CSRF token!'
+    );
 }
 
-/**
- * tries to secure session from hijacking and fixation
- * should be called before login and after successful login
- * (only required if sensitive information stored in session)
- *
- * @return void
- */
-function PMA_secureSession()
-{
-    // prevent session fixation and XSS
-    // (better to use session_status() if available)
-    if ((PMA_PHP_INT_VERSION >= 50400 && session_status() === PHP_SESSION_ACTIVE)
-        || (PMA_PHP_INT_VERSION < 50400 && session_id() !== '')
-    ) {
-        session_regenerate_id(true);
-    }
-    if (! function_exists('openssl_random_pseudo_bytes')) {
-        $_SESSION[' PMA_token '] = bin2hex(phpseclib\Crypt\Random::string(16));
-    } else {
-        $_SESSION[' PMA_token '] = bin2hex(openssl_random_pseudo_bytes(16));
-    }
-}
+require_once 'libraries/session.lib.php';

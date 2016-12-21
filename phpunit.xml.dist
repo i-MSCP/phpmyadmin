@@ -15,7 +15,7 @@
 
     <testsuites>
         <testsuite name="Classes">
-            <directory suffix="_test.php">test/classes</directory>
+            <directory suffix="Test.php">test/classes</directory>
         </testsuite>
         <testsuite name="Engines">
             <directory suffix="_test.php">test/engines</directory>
@@ -27,9 +27,9 @@
             <directory suffix="_test.php">test/libraries/rte</directory>
             <directory suffix="_test.php">test/libraries</directory>
         </testsuite>
-        <testsuite name="Selenium">
+        <!-- <testsuite name="Selenium">
             <directory suffix="Test.php">test/selenium</directory>
-        </testsuite>
+        </testsuite> -->
     </testsuites>
 
     <logging>
@@ -48,11 +48,8 @@
                 <directory suffix=".php">libraries/bfShapeFiles</directory>
                 <directory suffix=".php">libraries/php-gettext</directory>
                 <directory suffix=".php">libraries/phpseclib</directory>
-                <directory suffix=".php">libraries/plugins/auth/swekey/</directory>
                 <directory suffix=".php">libraries/sql-parser</directory>
                 <directory suffix=".php">libraries/tcpdf</directory>
-                <!-- code sniffer checker -->
-                <directory suffix=".php">PMAStandard</directory>
                 <!-- examples for users -->
                 <directory suffix=".php">examples</directory>
                 <!-- maintenance scripts -->

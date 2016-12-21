@@ -126,8 +126,6 @@ document.onmouseup   = MouseUp;
 document.onmousemove = MouseMove;
 
 var isIE = document.all && !window.opera;
-var isNN = !document.all && document.getElementById;
-var isN4 = document.layers;
 
 if (isIE) {
     window.onscroll = General_scroll;
@@ -299,7 +297,6 @@ function setDefaultValuesFromSavedState()
 
 function Main()
 {
-    //alert( document.getElementById('osn_tab').offsetTop);
     //---CROSS
 
     document.getElementById("layer_menu").style.top = -1000 + 'px'; //fast scroll
@@ -402,14 +399,10 @@ function Re_load()
                         x2 = x2_left - sm_s;
                         s_left = 1;
                     }
-                    //alert(key2 + "." + key3);
 
                     var row_offset_top = 0;
-                    //alert('id_tbody_' + key2);
-                    //alert(document.getElementById('id_hide_tbody_' + key2));
                     var tab_hide_button = document.getElementById('id_hide_tbody_' + key2);
 
-                    //alert(tab_hide_button.innerHTML);
                     if (tab_hide_button.innerHTML == 'v') {
                         var fromColumn = document.getElementById(key2 + "." + key3);
                         if (fromColumn) {
@@ -683,6 +676,49 @@ function Save2(callback)
     }
 }
 
+
+function submitSaveDialogAndClose(callback)
+{
+    var $form = $("#save_page");
+    var name = $form.find('input[name="selected_value"]').val().trim();
+    if (name === '') {
+        PMA_ajaxShowMessage(PMA_messages.strEnterValidPageName, false);
+        return;
+    }
+    $('#page_save_dialog').dialog('close');
+
+    if (pmd_tables_enabled) {
+        var $msgbox = PMA_ajaxShowMessage(PMA_messages.strProcessingRequest);
+        PMA_prepareForAjaxRequest($form);
+        $.post($form.attr('action'), $form.serialize() + Get_url_pos(), function (data) {
+            if (data.success === false) {
+                PMA_ajaxShowMessage(data.error, false);
+            } else {
+                PMA_ajaxRemoveMessage($msgbox);
+                MarkSaved();
+                if (data.id) {
+                    selected_page = data.id;
+                }
+                $('#page_name').text(name);
+                if (typeof callback !== 'undefined') {
+                    callback();
+                }
+            }
+        });
+    } else {
+        Save_to_new_page(db, name, Get_url_pos(), function (page) {
+            MarkSaved();
+            if (page.pg_nr) {
+                selected_page = page.pg_nr;
+            }
+            $('#page_name').text(page.page_descr);
+            if (typeof callback !== 'undefined') {
+                callback();
+            }
+        });
+    }
+}
+
 function Save3(callback)
 {
     if (parseInt(selected_page) !== -1) {
@@ -691,44 +727,8 @@ function Save3(callback)
         var button_options = {};
         button_options[PMA_messages.strGo] = function () {
             var $form = $("#save_page");
-            var name = $form.find('input[name="selected_value"]').val().trim();
-            if (name === '') {
-                PMA_ajaxShowMessage(PMA_messages.strEnterValidPageName, false);
-                return;
-            }
-            $(this).dialog('close');
-
-            if (pmd_tables_enabled) {
-                var $msgbox = PMA_ajaxShowMessage(PMA_messages.strProcessingRequest);
-                PMA_prepareForAjaxRequest($form);
-                $.post($form.attr('action'), $form.serialize() + Get_url_pos(), function (data) {
-                    if (data.success === false) {
-                        PMA_ajaxShowMessage(data.error, false);
-                    } else {
-                        PMA_ajaxRemoveMessage($msgbox);
-                        MarkSaved();
-                        if (data.id) {
-                            selected_page = data.id;
-                        }
-                        $('#page_name').text(name);
-                        if (typeof callback !== 'undefined') {
-                            callback();
-                        }
-                    }
-                });
-            } else {
-                Save_to_new_page(db, name, Get_url_pos(), function (page) {
-                    MarkSaved();
-                    if (page.pg_nr) {
-                        selected_page = page.pg_nr;
-                    }
-                    $('#page_name').text(page.page_descr);
-                    if (typeof callback !== 'undefined') {
-                        callback();
-                    }
-                });
-            }
-        };
+            $form.submit();
+        }
         button_options[PMA_messages.strCancel] = function () {
             $(this).dialog('close');
         };
@@ -741,6 +741,10 @@ function Save3(callback)
             .append('<input type="hidden" name="save_page" value="new" />')
             .append('<label for="selected_value">' + PMA_messages.strPageName +
                 '</label>:<input type="text" name="selected_value" />');
+        $form.on('submit', function(e){
+            e.preventDefault();
+            submitSaveDialogAndClose(callback);
+        });
         $('<div id="page_save_dialog"></div>')
             .append($form)
             .dialog({
@@ -1041,10 +1045,16 @@ function Export_pages()
             PMA_ajaxRemoveMessage($msgbox);
 
             var $form = $(data.message);
-            $form.attr('action', $form.attr('action') + '?' + (Get_url_pos(true).substring(1)));
             if (!pmd_tables_enabled) {
                 $form.append('<input type="hidden" name="offline_export" value="true" />');
             }
+            $.each(Get_url_pos(true).substring(1).split('&'), function() {
+                var pair = this.split('=');
+                var input = $('<input type="hidden" />');
+                input.attr('name', pair[0]);
+                input.attr('value', pair[1]);
+                $form.append(input);
+            });
             var $formatDropDown = $form.find('#plugins');
             $formatDropDown.change(function() {
                 var format = $formatDropDown.val();
@@ -1091,7 +1101,7 @@ function Load_page(page) {
 
 function Grid()
 {
-	var value_sent = '';
+    var value_sent = '';
     if (!ON_grid) {
         ON_grid = 1;
         value_sent = 'on';
@@ -1185,18 +1195,12 @@ function Click_field(T, f, PK) // table field
     if (ON_display_field) {
         // if is display field
         if (display_field[T] == f) {
-            //alert(T);
-            //s = '';for(k in display_field)s += k + ' = ' + display_field[k] + ',';alert(s);
             old_class = 'tab_field';
-            //display_field.splice(T, 1);
             delete display_field[T];
-            //s = '';for(k in display_field)s += k + ' = ' + display_field[k] + ', ';alert(s);
-            //n = 0;for(k in display_field)n++;alert(n);
         } else {
             old_class = 'tab_field_3';
             if (display_field[T]) {
                 document.getElementById('id_tr_' + T + '.' + display_field[T]).className = 'tab_field';
-                //display_field.splice(T, 1);
                 delete display_field[T];
             }
             display_field[T] = f;
@@ -1233,8 +1237,7 @@ function New_relation()
             PMA_ajaxShowMessage(data.error, false);
         } else {
             PMA_ajaxRemoveMessage($msgbox);
-            // Load_page(selected_page);
-            $("#designer_tab").click();
+            Load_page(selected_page);
         }
     }); // end $.post()
 }
@@ -1256,9 +1259,10 @@ function Start_tab_upd(table)
 
 function Small_tab_all(id_this) // max/min all tables
 {
-    var icon = id_this.childNodes[0];
+    var icon = id_this.children[0];
     var key;
     var value_sent = '';
+
     if (icon.alt == "v") {
         for (key in j_tabs) {
             if (document.getElementById('id_hide_tbody_' + key).innerHTML == "v") {
@@ -1305,7 +1309,6 @@ function Small_tab_refresh()
 {
     for (var key in j_tabs) {
         if (document.getElementById('id_hide_tbody_' + key).innerHTML != "v") {
-            Small_tab(key, 0);
             Small_tab(key, 0);
         }
     }
@@ -1443,7 +1446,6 @@ function Canvas_click(id, event)
     }
     if (selected) {
         // select relations
-        //alert(Key0+' - '+Key1+' - '+Key2+' - '+Key3);
         var left = Glob_X - (document.getElementById('layer_upd_relation').offsetWidth>>1);
         document.getElementById('layer_upd_relation').style.left = left + 'px';
         var top = Glob_Y - document.getElementById('layer_upd_relation').offsetHeight - 10;
@@ -1465,8 +1467,7 @@ function Upd_relation()
             PMA_ajaxShowMessage(data.error, false);
         } else {
             PMA_ajaxRemoveMessage($msgbox);
-            // Load_page(selected_page);
-            $("#designer_tab").click();
+            Load_page(selected_page);
         }
     }); // end $.post()
 }
@@ -1592,7 +1593,7 @@ function General_scroll_end()
 
 function Show_left_menu(id_this) // max/min all tables
 {
-    var icon = id_this.childNodes[0];
+    var icon = id_this.children[0];
     $('#key_Show_left_menu').toggleClass('M_butt_Selected_down');
     if (icon.alt == "v") {
         document.getElementById("layer_menu").style.top = '0px';
@@ -1686,14 +1687,14 @@ function getColorByTarget(target)
         var j = (i - d) / 6;
         j = j % 4;
         j++;
-        var color_case = new Array(
-            new Array(1, 0, 0),
-            new Array(0, 1, 0),
-            new Array(0, 0, 1),
-            new Array(1, 1, 0),
-            new Array(1, 0, 1),
-            new Array(0, 1, 1)
-        );
+        var color_case = [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            [1, 1, 0],
+            [1, 0, 1],
+            [0, 1, 1]
+        ];
         var a = color_case[d][0];
         var b = color_case[d][1];
         var c = color_case[d][2];
@@ -1704,7 +1705,7 @@ function getColorByTarget(target)
         b = Math.round(c * 200 * e);
         color = "rgba(" + r + "," + g + "," + b + ",1)";
 
-        TargetColors.push(new Array(target, color));
+        TargetColors.push([target, color]);
     }
 
     return color;

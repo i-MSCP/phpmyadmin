@@ -21,15 +21,19 @@ PHP
   ("image/jpeg: inline") with their original aspect ratio.
 
 * When using the cookie authentication (the default), the `openssl
-  <http://www.php.net/openssl>`_ extension is strongly suggested.
+  <https://www.php.net/openssl>`_ extension is strongly suggested.
 
 * To support upload progress bars, see :ref:`faq2_9`.
 
 * To support XML and Open Document Spreadsheet importing, you need the
-  `libxml <http://www.php.net/libxml>`_ extension.
+  `libxml <https://www.php.net/libxml>`_ extension.
 
 * To support reCAPTCHA on the login page, you need the
-  `openssl <http://www.php.net/openssl>`_ extension.
+  `openssl <https://www.php.net/openssl>`_ extension.
+
+* To support displaying phpMyAdmin's latest version, you need to enable
+  ``allow_url_open`` in your :file:`php.ini` or to have the
+  `curl <https://www.php.net/curl>`_ extension.
 
 * Performance suggestion: install the ``ctype`` extension.
 
@@ -42,7 +46,6 @@ phpMyAdmin supports MySQL-compatible databases.
 
 * MySQL 5.5 or newer
 * MariaDB 5.5 or newer
-* Drizzle
 
 .. seealso:: :ref:`faq1_17`
 
@@ -52,3 +55,5 @@ Web browser
 To access phpMyAdmin you need a web browser with cookies and JavaScript
 enabled.
 
+You need browser which is supported by jQuery 2.0, see
+<https://jquery.com/browser-support/>.

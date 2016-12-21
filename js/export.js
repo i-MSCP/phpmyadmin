@@ -305,16 +305,16 @@ AJAX.registerOnload('export.js', function () {
         } else {
             // enable the SQL comment options
             if (comments_are_present) {
-                $("#checkbox_sql_dates").removeProp('disabled').parent().fadeTo('fast', 1);
+                $("#checkbox_sql_dates").prop('disabled', false).parent().fadeTo('fast', 1);
             }
-            $("#checkbox_sql_relation").removeProp('disabled').parent().fadeTo('fast', 1);
-            $("#checkbox_sql_mime").removeProp('disabled').parent().fadeTo('fast', 1);
+            $("#checkbox_sql_relation").prop('disabled', false).parent().fadeTo('fast', 1);
+            $("#checkbox_sql_mime").prop('disabled', false).parent().fadeTo('fast', 1);
         }
 
         if (show == 'structure') {
             $('#checkbox_sql_auto_increment').prop('disabled', true).parent().fadeTo('fast', 0.4);
         } else {
-            $("#checkbox_sql_auto_increment").removeProp('disabled').parent().fadeTo('fast', 1);
+            $("#checkbox_sql_auto_increment").prop('disabled', false).parent().fadeTo('fast', 1);
         }
     });
 
@@ -349,7 +349,7 @@ function setup_table_structure_or_data() {
     } else {
         $('input[name="structure_or_data_forced"]').val(0);
         $('.export_structure input[type="checkbox"], .export_data input[type="checkbox"]')
-            .removeProp('disabled');
+            .prop('disabled', false);
         $('.export_structure, .export_data').fadeTo('fast', 1);
 
         var structure_or_data = $('input[name="' + formElemName + '_default"]').val();
@@ -442,10 +442,10 @@ function toggle_sql_include_comments()
         } else {
             // If structure is not being exported, the comment options for structure should not be enabled
             if ($("#radio_sql_structure_or_data_data").prop("checked")) {
-                $("#text_sql_header_comment").removeProp('disabled').parent("li").fadeTo('fast', 1);
+                $("#text_sql_header_comment").prop('disabled', false).parent("li").fadeTo('fast', 1);
             } else {
                 $ulIncludeComments.find("> li").fadeTo('fast', 1);
-                $ulIncludeComments.find("> li > input").removeProp('disabled');
+                $ulIncludeComments.find("> li > input").prop('disabled', false);
             }
         }
     });
@@ -540,6 +540,16 @@ function toggle_table_select(row) {
     }
 }
 
+function handleAddProcCheckbox() {
+    if ($('#table_structure_all').is(':checked') === true
+        && $('#table_data_all').is(':checked') === true
+    ) {
+        $('#checkbox_sql_procedure_function').prop('checked', true);
+    } else {
+        $('#checkbox_sql_procedure_function').prop('checked', false);
+    }
+}
+
 AJAX.registerOnload('export.js', function () {
     /**
      * For SQL plugin, if "CREATE TABLE options" is checked/unchecked, check/uncheck each of its sub-options
@@ -579,26 +589,31 @@ AJAX.registerOnload('export.js', function () {
     $('input[name="table_select[]"]').on('change', function() {
         toggle_table_select($(this).closest('tr'));
         check_table_select_all();
+        handleAddProcCheckbox();
     });
 
     $('input[name="table_structure[]"]').on('change', function() {
         check_table_selected($(this).closest('tr'));
         check_table_select_all();
+        handleAddProcCheckbox();
     });
 
     $('input[name="table_data[]"]').on('change', function() {
         check_table_selected($(this).closest('tr'));
         check_table_select_all();
+        handleAddProcCheckbox();
     });
 
     $('#table_structure_all').on('change', function() {
         toggle_table_select_all_str();
         check_selected_tables();
+        handleAddProcCheckbox();
     });
 
     $('#table_data_all').on('change', function() {
         toggle_table_select_all_data();
         check_selected_tables();
+        handleAddProcCheckbox();
     });
 
     if ($("input[name='export_type']").val() == 'database') {
@@ -805,6 +820,8 @@ AJAX.registerOnload('export.js', function () {
     toggle_quick_or_custom();
     toggle_structure_data_opts();
     toggle_sql_include_comments();
+    check_table_select_all();
+    handleAddProcCheckbox();
 
     /**
      * Initially disables the "Dump some row(s)" sub-options

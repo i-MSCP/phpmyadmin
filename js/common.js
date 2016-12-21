@@ -7,8 +7,8 @@ $(function () {
 /**
  * Holds common parameters such as server, db, table, etc
  *
- * The content for this is normally loaded from Header.class.php or
- * Response.class.php and executed by ajax.js
+ * The content for this is normally loaded from Header.php or
+ * Response.php and executed by ajax.js
  */
 var PMA_commonParams = (function () {
     /**
@@ -98,8 +98,8 @@ var PMA_commonParams = (function () {
 /**
  * Holds common parameters such as server, db, table, etc
  *
- * The content for this is normally loaded from Header.class.php or
- * Response.class.php and executed by ajax.js
+ * The content for this is normally loaded from Header.php or
+ * Response.php and executed by ajax.js
  */
 var PMA_commonActions = {
     /**
@@ -298,6 +298,13 @@ PMA_DROP_IMPORT = {
      * @return void
      */
     _dragenter : function (event) {
+
+        // We don't want to prevent users from using
+        // browser's default drag-drop feature on some page(s)
+        if ($(".noDragDrop").length !== 0) {
+            return;
+        }
+
         event.stopPropagation();
         event.preventDefault();
         if (!PMA_DROP_IMPORT._hasFiles(event)) {
@@ -333,6 +340,12 @@ PMA_DROP_IMPORT = {
      * @return void
      */
     _dragover: function (event) {
+        // We don't want to prevent users from using
+        // browser's default drag-drop feature on some page(s)
+        if ($(".noDragDrop").length !== 0) {
+            return;
+        }
+
         event.stopPropagation();
         event.preventDefault();
         if (!PMA_DROP_IMPORT._hasFiles(event)) {
@@ -348,6 +361,11 @@ PMA_DROP_IMPORT = {
      * @return void
      */
     _dragleave: function (event) {
+        // We don't want to prevent users from using
+        // browser's default drag-drop feature on some page(s)
+        if ($(".noDragDrop").length !== 0) {
+            return;
+        }
         event.stopPropagation();
         event.preventDefault();
         var $pma_drop_handler = $(".pma_drop_handler");
@@ -408,7 +426,15 @@ PMA_DROP_IMPORT = {
      * @return void
      */
     _drop: function (event) {
+        // We don't want to prevent users from using
+        // browser's default drag-drop feature on some page(s)
+        if ($(".noDragDrop").length !== 0) {
+            return;
+        }
+
         var dbname = PMA_commonParams.get('db');
+        var server = PMA_commonParams.get('server');
+
         //if no database is selected -- no
         if (dbname !== '') {
             var files = event.originalEvent.dataTransfer.files;
@@ -447,9 +473,9 @@ PMA_DROP_IMPORT = {
                     //uploading
                     var fd = new FormData();
                     fd.append('import_file', files[i]);
-                    // todo: method to find the value below
-                    fd.append('noplugin', '539de66e760ee');
+                    fd.append('noplugin', Math.random().toString(36).substring(2, 12));
                     fd.append('db', dbname);
+                    fd.append('server', server);
                     fd.append('token', PMA_commonParams.get('token'));
                     fd.append('import_type', 'database');
                     // todo: method to find the value below

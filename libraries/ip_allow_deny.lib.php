@@ -6,9 +6,6 @@
  *
  * @package PhpMyAdmin
  */
-if (! defined('PHPMYADMIN')) {
-    exit;
-}
 
 /**
  * Gets the "true" IP address of the current user
@@ -33,14 +30,21 @@ function PMA_getIp()
         return $direct_ip;
     }
 
-    $trusted_header_value
-        = PMA_getenv($GLOBALS['cfg']['TrustedProxies'][$direct_ip]);
-    $matches = array();
+    /**
+     * Parse header in form:
+     * X-Forwarded-For: client, proxy1, proxy2
+     */
+    // Get header content
+    $value = PMA_getenv($GLOBALS['cfg']['TrustedProxies'][$direct_ip]);
+    // Grab first element what is client adddress
+    $value = explode(',', $value)[0];
+    // Extract IP address
     // the $ checks that the header contains only one IP address,
     // ?: makes sure the () don't capture
+    $matches = array();
     $is_ip = preg_match(
         '|^(?:[0-9]{1,3}\.){3,3}[0-9]{1,3}$|',
-        $trusted_header_value, $matches
+        $value, $matches
     );
 
     if ($is_ip && (count($matches) == 1)) {
@@ -48,8 +52,8 @@ function PMA_getIp()
         return $matches[0];
     }
 
-    /* Return true IP */
-    return $direct_ip;
+    // We could not parse header
+    return false;
 } // end of the 'PMA_getIp()' function
 
 
@@ -65,8 +69,8 @@ function PMA_getIp()
  */
 function PMA_ipMaskTest($testRange, $ipToTest)
 {
-    if (/*overload*/mb_strpos($testRange, ':') > -1
-        || /*overload*/mb_strpos($ipToTest, ':') > -1
+    if (mb_strpos($testRange, ':') > -1
+        || mb_strpos($ipToTest, ':') > -1
     ) {
         // assume IPv6
         $result = PMA_ipv6MaskTest($testRange, $ipToTest);
@@ -81,7 +85,7 @@ function PMA_ipMaskTest($testRange, $ipToTest)
 /**
  * Based on IP Pattern Matcher
  * Originally by J.Adams <jna@retina.net>
- * Found on <http://www.php.net/manual/en/function.ip2long.php>
+ * Found on <https://www.php.net/manual/en/function.ip2long.php>
  * Modified for phpMyAdmin
  *
  * Matches:
@@ -118,7 +122,7 @@ function PMA_ipv4MaskTest($testRange, $ipToTest)
 
         for ($i = 0; $i < 31; $i++) {
             if ($i < $regs[5] - 1) {
-                $maskl = $maskl + PMA_Util::pow(2, (30 - $i));
+                $maskl = $maskl + PMA\libraries\Util::pow(2, (30 - $i));
             } // end if
         } // end for
 
@@ -152,7 +156,7 @@ function PMA_ipv4MaskTest($testRange, $ipToTest)
 
 /**
  * IPv6 matcher
- * CIDR section taken from http://stackoverflow.com/a/10086404
+ * CIDR section taken from https://stackoverflow.com/a/10086404
  * Modified for phpMyAdmin
  *
  * Matches:
@@ -179,18 +183,18 @@ function PMA_ipv6MaskTest($test_range, $ip_to_test)
     $result = true;
 
     // convert to lowercase for easier comparison
-    $test_range = /*overload*/mb_strtolower($test_range);
-    $ip_to_test = /*overload*/mb_strtolower($ip_to_test);
+    $test_range = mb_strtolower($test_range);
+    $ip_to_test = mb_strtolower($ip_to_test);
 
-    $is_cidr = /*overload*/mb_strpos($test_range, '/') > -1;
-    $is_range = /*overload*/mb_strpos($test_range, '[') > -1;
+    $is_cidr = mb_strpos($test_range, '/') > -1;
+    $is_range = mb_strpos($test_range, '[') > -1;
     $is_single = ! $is_cidr && ! $is_range;
 
     $ip_hex = bin2hex(inet_pton($ip_to_test));
 
     if ($is_single) {
         $range_hex = bin2hex(inet_pton($test_range));
-        $result = $ip_hex === $range_hex;
+        $result = hash_equals($ip_hex, $range_hex);
         return $result;
     }
 
@@ -232,7 +236,7 @@ function PMA_ipv6MaskTest($test_range, $ip_to_test)
         $pos = 31;
         while ($flexbits > 0) {
             // Get the character at this position
-            $orig = /*overload*/mb_substr($last_hex, $pos, 1);
+            $orig = mb_substr($last_hex, $pos, 1);
 
             // Convert it to an integer
             $origval = hexdec($orig);
@@ -248,7 +252,7 @@ function PMA_ipv6MaskTest($test_range, $ip_to_test)
 
             // We processed one nibble, move to previous position
             $flexbits -= 4;
-            $pos -= 1;
+            --$pos;
         }
 
         // check if the IP to test is within the range
@@ -317,7 +321,7 @@ function PMA_allowDeny($type)
 
         // check for username
         if (($rule_data[1] != '%') //wildcarded first
-            && ($rule_data[1] != $username)
+            && (! hash_equals($rule_data[1], $username))
         ) {
             continue;
         }

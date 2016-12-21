@@ -191,14 +191,17 @@ var PMA_console = {
                 PMA_consoleMessages.showInstructions(PMA_console.config.enterExecutes);
             });
 
-            $(document).ajaxComplete(function (event, xhr) {
+            $(document).ajaxComplete(function (event, xhr, ajaxOptions) {
+                if (ajaxOptions.dataType && ajaxOptions.dataType.indexOf('json') != -1) {
+                    return;
+                }
                 try {
                     var data = $.parseJSON(xhr.responseText);
                     PMA_console.ajaxCallback(data);
                 } catch (e) {
                     console.log("Invalid JSON!" + e.message);
                     if (AJAX.xhr && AJAX.xhr.status === 0 && AJAX.xhr.statusText !== 'abort') {
-                        PMA_ajaxShowMessage($('<div />',{'class':'error','html':PMA_messages.strRequestFailed+' ( '+AJAX.xhr.statusText+' )'}));
+                        PMA_ajaxShowMessage($('<div />',{'class':'error','html':PMA_messages.strRequestFailed+' ( '+escapeHtml(AJAX.xhr.statusText)+' )'}));
                         AJAX.active = false;
                         AJAX.xhr = null;
                     }
@@ -1232,7 +1235,7 @@ PMA_consoleDebug = {
             functionName += dbgStep.type;
         }
         functionName += dbgStep.function;
-        if (dbgStep.args.length) {
+        if (dbgStep.args && dbgStep.args.length) {
             functionName += '(...)';
         } else {
             functionName += '()';
@@ -1300,7 +1303,7 @@ PMA_consoleDebug = {
                             .append(
                             $('<span class="file">').text(this._formatFileName(step))
                         );
-                    if (step.args.length) {
+                    if (step.args && step.args.length) {
                         $stepElem
                             .append(
                             $('<span class="args">').html(this._formatFunctionArgs(step))

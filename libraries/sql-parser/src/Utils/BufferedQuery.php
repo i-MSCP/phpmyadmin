@@ -22,8 +22,7 @@ use SqlParser\Context;
  * @category   Lexer
  * @package    SqlParser
  * @subpackage Utils
- * @author     Dan Ungureanu <udan1107@gmail.com>
- * @license    http://opensource.org/licenses/GPL-2.0 GNU Public License
+ * @license    https://www.gnu.org/licenses/gpl-2.0.txt GPL-2.0+
  */
 class BufferedQuery
 {
@@ -199,7 +198,7 @@ class BufferedQuery
              * treated differently, because of the preceding backslash, it will
              * be ignored.
              */
-            if (($this->status & static::STATUS_COMMENT == 0) && ($this->query[$i] === '\\')) {
+            if ((($this->status & static::STATUS_COMMENT) == 0) && ($this->query[$i] === '\\')) {
                 $this->current .= $this->query[$i] . $this->query[++$i];
                 continue;
             }

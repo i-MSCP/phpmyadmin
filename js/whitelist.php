@@ -18,16 +18,16 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
 // Avoid loading the full common.inc.php because this would add many
 // non-js-compatible stuff like DOCTYPE
 define('PMA_MINIMUM_COMMON', true);
+define('PMA_PATH_TO_BASEDIR', '../');
 require_once './libraries/common.inc.php';
 // Close session early as we won't write anything there
 session_write_close();
 
-require_once './libraries/OutputBuffering.class.php';
-$buffer = PMA_OutputBuffering::getInstance();
+$buffer = PMA\libraries\OutputBuffering::getInstance();
 $buffer->start();
 register_shutdown_function(
     function () {
-        echo PMA_OutputBuffering::getInstance()->getContents();
+        echo PMA\libraries\OutputBuffering::getInstance()->getContents();
     }
 );
 
@@ -35,5 +35,5 @@ echo "var PMA_gotoWhitelist = new Array();\n";
 $i = -1;
 foreach ($GLOBALS['goto_whitelist'] as $one_whitelist) {
     $i++;
-    echo 'PMA_gotoWhitelist[' . $i . ']="' . $one_whitelist . '";' . "\n";
+    echo 'PMA_gotoWhitelist[' , $i , ']="' , $one_whitelist , '";' , "\n";
 }

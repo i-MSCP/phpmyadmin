@@ -12,7 +12,6 @@
 require_once 'libraries/common.inc.php';
 require_once 'libraries/transformations.lib.php';
 require_once 'libraries/normalization.lib.php';
-require_once 'libraries/Index.class.php';
 
 if (isset($_REQUEST['getColumns'])) {
     $html = '<option selected disabled>' . __('Select one…') . '</option>'
@@ -27,7 +26,7 @@ if (isset($_REQUEST['getColumns'])) {
     exit;
 }
 if (isset($_REQUEST['splitColumn'])) {
-    $num_fields = $_REQUEST['numFields'];
+    $num_fields = min(4096, intval($_REQUEST['numFields']));
     $html = PMA_getHtmlForCreateNewColumn($num_fields, $db, $table);
     $html .= PMA_URL_getHiddenInputs($db, $table);
     echo $html;
@@ -60,13 +59,13 @@ if (isset($_REQUEST['getNewTables3NF'])) {
     $dependencies = json_decode($_REQUEST['pd']);
     $tables = json_decode($_REQUEST['tables']);
     $newTables = PMA_getHtmlForNewTables3NF($dependencies, $tables, $db);
-    PMA_Response::getInstance()->disable();
+    PMA\libraries\Response::getInstance()->disable();
     PMA_headerJSON();
     echo json_encode($newTables);
     exit;
 }
 
-$response = PMA_Response::getInstance();
+$response = PMA\libraries\Response::getInstance();
 $header = $response->getHeader();
 $scripts = $header->getScripts();
 $scripts->addFile('normalization.js');
@@ -108,13 +107,13 @@ if (isset($_REQUEST['step1'])) {
 } else if (isset($_REQUEST['step3'])) {
     $res = PMA_getHtmlContentsFor1NFStep3($db, $table);
     $response->addJSON($res);
-} else if (isset ($_REQUEST['step4'])) {
+} else if (isset($_REQUEST['step4'])) {
     $res = PMA_getHtmlContentsFor1NFStep4($db, $table);
     $response->addJSON($res);
-} else if (isset($_REQUEST['step']) && $_REQUEST['step'] == 2.1) {
+} else if (isset($_REQUEST['step']) && $_REQUEST['step'] == '2.1') {
     $res = PMA_getHtmlFor2NFstep1($db, $table);
     $response->addJSON($res);
-} else if (isset($_REQUEST['step']) && $_REQUEST['step'] == 3.1) {
+} else if (isset($_REQUEST['step']) && $_REQUEST['step'] == '3.1') {
     $tables = $_REQUEST['tables'];
     $res = PMA_getHtmlFor3NFstep1($db, $tables);
     $response->addJSON($res);

@@ -15,14 +15,14 @@ header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 3600) . ' GMT');
 // Avoid loading the full common.inc.php because this would add many
 // non-js-compatible stuff like DOCTYPE
 define('PMA_MINIMUM_COMMON', true);
+define('PMA_PATH_TO_BASEDIR', '../');
 require_once './libraries/common.inc.php';
 
-require_once './libraries/OutputBuffering.class.php';
-$buffer = PMA_OutputBuffering::getInstance();
+$buffer = PMA\libraries\OutputBuffering::getInstance();
 $buffer->start();
 register_shutdown_function(
     function () {
-        echo PMA_OutputBuffering::getInstance()->getContents();
+        echo PMA\libraries\OutputBuffering::getInstance()->getContents();
     }
 );
 
@@ -69,7 +69,7 @@ function PMA_getImage(image, alternate, attributes) {
         return false;
     };
     var sprites = [
-        <?php echo implode($keys, ",\n        ") . "\n"; ?>
+        <?php echo implode($keys, ",\n        ") , "\n"; ?>
     ];
     // custom image object, it will eventually be returned by this functions
     var retval = {
@@ -110,15 +110,15 @@ function PMA_getImage(image, alternate, attributes) {
     }
     // set alt
     if (attributes.alt != undefined) {
-        retval.attr('alt', attributes.alt);
+        retval.attr('alt', escapeHtml(attributes.alt));
     } else {
-        retval.attr('alt', alternate);
+        retval.attr('alt', escapeHtml(alternate));
     }
     // set title
     if (attributes.title != undefined) {
-        retval.attr('title', attributes.title);
+        retval.attr('title', escapeHtml(attributes.title));
     } else {
-        retval.attr('title', alternate);
+        retval.attr('title', escapeHtml(alternate));
     }
     // set src
     var klass = image.replace('.gif', '').replace('.png', '');

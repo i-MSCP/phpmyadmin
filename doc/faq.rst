@@ -45,7 +45,7 @@ groups.
 
 You just forgot to read the *install.txt* file from the PHP
 distribution. Have a look at the last message in this `PHP bug report #12061
-<http://bugs.php.net/bug.php?id=12061>`_ from the official PHP bug
+<https://bugs.php.net/bug.php?id=12061>`_ from the official PHP bug
 database.
 
 .. _faq1_5:
@@ -129,7 +129,7 @@ and after execution of your :term:`SQL` commands, removed.
 -------------------------------------------------------
 
 The MySQL manual explains how to `reset the permissions
-<http://dev.mysql.com/doc/mysql/en/resetting-permissions.html>`_.
+<https://dev.mysql.com/doc/mysql/en/resetting-permissions.html>`_.
 
 .. _faq1_13:
 
@@ -173,7 +173,7 @@ hosting provider is unwilling to change the settings:
   then able to import the files from the temporary directory. More
   information is available in the :ref:`config`  of this document.
 * Using a utility (such as `BigDump
-  <http://www.ozerov.de/bigdump.php>`_) to split the files before
+  <http://www.ozerov.de/bigdump/>`_) to split the files before
   uploading. We cannot support this or any third party applications, but
   are aware of users having success with it.
 * If you have shell (command line) access, use MySQL to import the files
@@ -189,13 +189,11 @@ hosting provider is unwilling to change the settings:
 1.17 Which Database versions does phpMyAdmin support?
 -----------------------------------------------------
 
-For `MySQL <http://www.mysql.com/>`_, versions 5.5 and newer are supported. 
+For `MySQL <https://www.mysql.com/>`_, versions 5.5 and newer are supported. 
 For older MySQL versions, our `Downloads <https://www.phpmyadmin.net/downloads/>`_ page offers older phpMyAdmin versions 
 (which may have become unsupported).
 
-For `MariaDB <http://mariadb.org/>`_, versions 5.5 and newer are supported.
-
-For `Drizzle <http://www.drizzle.org>`_, versions 7.1 and newer are supported.
+For `MariaDB <https://mariadb.org/>`_, versions 5.5 and newer are supported.
 
 .. _faq1_17a:
 
@@ -209,10 +207,10 @@ your server - as mentioned in :ref:`faq1_17`. This problem is
 generally caused by using MySQL version 4.1 or newer. MySQL changed
 the authentication hash and your PHP is trying to use the old method.
 The proper solution is to use the `mysqli extension
-<http://www.php.net/mysqli>`_ with the proper client library to match
+<https://www.php.net/mysqli>`_ with the proper client library to match
 your MySQL installation. More
 information (and several workarounds) are located in the `MySQL
-Documentation <http://dev.mysql.com/doc/mysql/en/old-client.html>`_.
+Documentation <https://dev.mysql.com/doc/mysql/en/old-client.html>`_.
 
 .. _faq1_18:
 
@@ -226,7 +224,7 @@ Documentation <http://dev.mysql.com/doc/mysql/en/old-client.html>`_.
 
 The :term:`TCPDF` library we're using for this feature requires some special
 files to use font faces. Please refers to the `TCPDF manual
-<http://www.tcpdf.org/>`_ to build these files.
+<https://tcpdf.org/>`_ to build these files.
 
 .. _faqmysql:
 
@@ -318,7 +316,7 @@ should work.
 1.27 I get empty page when I want to view huge page (eg. db\_structure.php with plenty of tables).
 --------------------------------------------------------------------------------------------------
 
-This was caused by a `PHP bug <http://bugs.php.net/21079>`_ that occur when
+This was caused by a `PHP bug <https://bugs.php.net/21079>`_ that occur when
 GZIP output buffering is enabled. If you turn off it (by
 :config:option:`$cfg['OBGzip']` in :file:`config.inc.php`), it should work.
 This bug will has been fixed in PHP 5.0.0.
@@ -417,14 +415,14 @@ Yes. This procedure was tested with phpMyAdmin 2.6.1, PHP 4.3.9 in
 ------------------------------------------------------
 
 Yes. Out of the box, you can use :term:`URL` like
-http://server/phpMyAdmin/index.php?server=X&db=database&table=table&target=script.
+https://example.com/phpMyAdmin/index.php?server=X&db=database&table=table&target=script.
 For ``server`` you use the server number
 which refers to the order of the server paragraph in
 :file:`config.inc.php`. Table and script parts are optional. If you want
-http://server/phpMyAdmin/database[/table][/script] :term:`URL`, you need to do some configuration. Following
-lines apply only for `Apache <http://httpd.apache.org>`_ web server.
+https://example.com/phpMyAdmin/database[/table][/script] :term:`URL`, you need to do some configuration. Following
+lines apply only for `Apache <https://httpd.apache.org/>`_ web server.
 First make sure, that you have enabled some features within global
-configuration. You need ``Options FollowSymLinks`` and ``AllowOverride
+configuration. You need ``Options SymLinksIfOwnerMatch`` and ``AllowOverride
 FileInfo`` enabled for directory where phpMyAdmin is installed and you
 need mod\_rewrite to be enabled. Then you just need to create
 following :term:`.htaccess` file in root folder of phpMyAdmin installation (don't
@@ -552,7 +550,7 @@ the set-cookie headers. Example from the Apache 2.2 documentation:
     ProxyPassReverseCookieDomain backend.example.com public.example.com
     ProxyPassReverseCookiePath / /mirror/foo/
 
-Note: if the backend url looks like http://host/~user/phpmyadmin, the
+Note: if the backend url looks like https://example.com/~user/phpmyadmin, the
 tilde (~) must be url encoded as %7E in the ProxyPassReverse\* lines.
 This is not specific to phpmyadmin, it's just the behavior of Apache.
 
@@ -563,7 +561,7 @@ This is not specific to phpmyadmin, it's just the behavior of Apache.
     ProxyPassReverse /mirror/foo/ http://backend.example.com/%7Euser/phpmyadmin
     ProxyPassReverseCookiePath /%7Euser/phpmyadmin /mirror/foo
 
-.. seealso:: <http://httpd.apache.org/docs/2.2/mod/mod_proxy.html>
+.. seealso:: <https://httpd.apache.org/docs/2.2/mod/mod_proxy.html>, :config:option:`$cfg['PmaAbsoluteUri']`
 
 .. _faq1_41:
 
@@ -610,6 +608,25 @@ some robots accessing your installation.
 ----------------------------------------------------------------------------------
 
 Because your PHP's ``memory_limit`` is too low; adjust it in :file:`php.ini`.
+
+.. _faq1:44:
+
+1.44 How can I reduce the installed size of phpMyAdmin on disk?
+---------------------------------------------------------------
+
+Some users have requested to be able to reduce the size of the phpMyAdmin installation.
+This is not recommended and could lead to confusion over missing features, but can be done.
+A list of files and corresponding functionality which degrade gracefully when removed include:
+
+* :file:`./libraries/tcpdf` folder (exporting to PDF)
+* :file:`./locale/` folder, or unused subfolders (interface translations)
+* Any unused themes in :file:`./themes/`
+* :file:`./js/jquery/src/` (included for licensing reasons)
+* :file:`./js/line_counts.php`
+* :file:`./doc/` (documentation)
+* :file:`./setup/` (setup script)
+* :file:`./examples/`
+* :file:`./sql/` (SQL scripts to configure advanced functionality)
 
 .. _faqconfig:
 
@@ -676,7 +693,7 @@ Here is a fix suggested by Brad Ummer:
   '0755').
 
 Have also a look at the `corresponding section of the MySQL
-documentation <http://dev.mysql.com/doc/en/can-not-connect-to-
+documentation <https://dev.mysql.com/doc/en/can-not-connect-to-
 server.html>`_.
 
 .. _faq2_4:
@@ -695,8 +712,11 @@ revision.
 2.5 Each time I want to insert or change a row or drop a database or a table, an error 404 (page not found) is displayed or, with HTTP or cookie authentication, I'm asked to log in again. What's wrong?
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Check the value you set for the :config:option:`$cfg['PmaAbsoluteUri']` directive in the phpMyAdmin
-configuration file.
+Check your webserver setup if it correctly fills in either PHP_SELF or REQUEST_URI variables.
+
+If you are running phpMyAdmin behind reverse proxy, please set the
+:config:option:`$cfg['PmaAbsoluteUri']` directive in the phpMyAdmin
+configuration file to match your setup.
 
 .. _faq2_6:
 
@@ -762,7 +782,7 @@ Here are a few points to check:
 * In :file:`config.inc.php`, try to leave the :config:option:`$cfg['PmaAbsoluteUri']` directive empty. See also
   :ref:`faq4_7`.
 * Maybe you have a broken PHP installation or you need to upgrade your
-  Zend Optimizer. See <http://bugs.php.net/bug.php?id=31134>.
+  Zend Optimizer. See <https://bugs.php.net/bug.php?id=31134>.
 * If you are using Hardened PHP with the ini directive
   ``varfilter.max_request_variables`` set to the default (200) or
   another low value, you could get this error if your table has a high
@@ -782,8 +802,8 @@ Here are a few points to check:
 ---------------------------------
 
 To be able to see a progress bar during your uploads, your server must
-have the `APC <http://pecl.php.net/package/APC>`_ extension, the
-`uploadprogress <http://pecl.php.net/package/uploadprogress>`_ one, or
+have the `APC <https://php.net/manual/en/book.apc.php>`_ extension, the
+`uploadprogress <https://pecl.php.net/package/uploadprogress>`_ one, or
 you must be running PHP 5.4.0 or higher. Moreover, the JSON extension
 has to be enabled in your PHP.
 
@@ -827,7 +847,7 @@ dump, you have to use another way.
 3.3 With InnoDB tables, I lose foreign key relationships when I rename a table or a column.
 -------------------------------------------------------------------------------------------
 
-This is an InnoDB bug, see <http://bugs.mysql.com/bug.php?id=21704>.
+This is an InnoDB bug, see <https://bugs.mysql.com/bug.php?id=21704>.
 
 .. _faq3_4:
 
@@ -903,7 +923,7 @@ official phpMyAdmin-homepage.
 
 When MySQL is running in ANSI-compatibility mode, there are some major
 differences in how :term:`SQL` is structured (see
-<http://dev.mysql.com/doc/mysql/en/ansi-mode.html>). Most important of all, the
+<https://dev.mysql.com/doc/refman/5.7/en/sql-mode.html#sqlmode_ansi>). Most important of all, the
 quote-character (") is interpreted as an identifier quote character and not as
 a string quote character, which makes many internal phpMyAdmin operations into
 invalid :term:`SQL` statements. There is no
@@ -1203,7 +1223,7 @@ Mozilla versions.
 -------------------------------------------------------------------------------------------------------------------------------
 
 This is a Mozilla bug (see bug #26882 at `BugZilla
-<http://bugzilla.mozilla.org/>`_).
+<https://bugzilla.mozilla.org/>`_).
 
 .. _faq5_10:
 
@@ -1367,6 +1387,9 @@ re–written, if possible it is suggested that you upgrade to take
 advantage of the new features.  For additional help on this subject,
 look for the word "upload" in this document.
 
+Note: For errors while importing of dumps exported from older MySQL versions to newer MySQL versions,
+please check :ref:`faq6_41`.
+
 .. _faq6_6:
 
 6.6 How can I use the relation table in Query-by-example?
@@ -1484,7 +1507,7 @@ schema layout. Which tables will go on which pages?
 ---------------------------------------------------------
 
 No, it's MySQL that is doing `silent column type changing
-<http://dev.mysql.com/doc/en/silent-column-changes.html>`_.
+<https://dev.mysql.com/doc/en/silent-column-changes.html>`_.
 
 .. _underscore:
 
@@ -1512,7 +1535,7 @@ It means "average".
 **Structure:**
 
 * "Add DROP TABLE" will add a line telling MySQL to `drop the table
-  <http://dev.mysql.com/doc/mysql/en/drop-table.html>`_, if it already
+  <https://dev.mysql.com/doc/mysql/en/drop-table.html>`_, if it already
   exists during the import. It does NOT drop the table after your
   export, it only affects the import file.
 * "If Not Exists" will only create the table if it doesn't exist.
@@ -1533,10 +1556,10 @@ It means "average".
 * "Extended inserts" provides a shorter dump file by using only once the
   INSERT verb and the table name.
 * "Delayed inserts" are best explained in the `MySQL manual - INSERT DELAYED Syntax
-  <http://dev.mysql.com/doc/mysql/en/insert-delayed.html>`_.
+  <https://dev.mysql.com/doc/mysql/en/insert-delayed.html>`_.
 * "Ignore inserts" treats errors as a warning instead. Again, more info
   is provided in the `MySQL manual - INSERT Syntax
-  <http://dev.mysql.com/doc/mysql/en/insert.html>`_, but basically with
+  <https://dev.mysql.com/doc/mysql/en/insert.html>`_, but basically with
   this selected, invalid values are adjusted and inserted rather than
   causing the entire statement to fail.
 
@@ -1675,7 +1698,7 @@ DATABASES, LOCK TABLES. Those privileges also enable users to see all the
 database names. So if your users do not need those privileges, you can remove
 them and their databases list will shorten.
 
-.. seealso:: <http://bugs.mysql.com/179>
+.. seealso:: <https://bugs.mysql.com/179>
 
 .. _faq6_21:
 
@@ -1742,7 +1765,7 @@ in Browse mode or on the Structure page.
 -----------------------------------
 
 In all places where phpMyAdmin accepts format strings, you can use
-``@VARIABLE@`` expansion and `strftime <http://php.net/strftime>`_
+``@VARIABLE@`` expansion and `strftime <https://php.net/strftime>`_
 format strings. The expanded variables depend on a context (for
 example, if you haven't chosen a table, you can not get the table
 name), but the following variables can be used:
@@ -1798,7 +1821,7 @@ other.
 Not every table can be put to the chart. Only tables with one, two or
 three columns can be visualised as a chart. Moreover the table must be
 in a special format for chart script to understand it. Currently
-supported formats can be found in the `wiki <http://wiki.phpmyadmin.ne
+supported formats can be found in the `wiki <https://wiki.phpmyadmin.ne
 t/pma/Charts#Data_formats_for_query_results_chart>`_.
 
 .. _faq6_30:
@@ -2074,6 +2097,31 @@ Parameters should be prefixed with a colon(:) and when the "Bind parameters" che
 these parameters will be identified and input fields for these parameters will be presented.
 Values entered in these field will be substituted in the query before being executed.
 
+.. _faq6_41:
+
+6.41 I get import errors while importing the dumps exported from older MySQL versions (pre-5.7.6) into newer MySQL versions (5.7.7+), but they work fine when imported back on same older versions ?
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+If you get errors like *#1031 - Table storage engine for 'table_name' doesn't have this option*
+while importing the dumps exported from pre-5.7.7 MySQL servers into new MySQL server versions 5.7.7+,
+it might be because ROW_FORMAT=FIXED is not supported with InnoDB tables. Moreover, the value of
+`innodb_strict_mode <http://dev.mysql.com/doc/refman/5.7/en/innodb-parameters.html#sysvar_innodb_strict_mode>`_ would define if this would be reported as a warning or as an error.
+
+Since MySQL version 5.7.9, the default value for `innodb_strict_mode` is `ON` and thus would generate
+an error when such a CREATE TABLE or ALTER TABLE statement is encountered.
+
+There are two ways of preventing such errors while importing:
+
+* Change the value of `innodb_strict_mode` to `OFF` before starting the import and turn it `ON` after
+  the import is successfully completed.
+* This can be achieved in two ways:
+
+  * Go to 'Variables' page and edit the value of `innodb_strict_mode`
+  * Run the query : `SET GLOBAL `innodb_strict_mode` = '[value]'`
+
+After the import is done, it is suggested that the value of `innodb_strict_mode` should be reset to the
+original value.
+
 .. _faqproject:
 
 phpMyAdmin project
@@ -2147,6 +2195,13 @@ logs. Currently there are two variables available:
 
 You can then use any log analyzing tools to detect possible break-in
 attempts.
+
+.. _faq8_3:
+
+8.3 Why are there path disclosures when directly loading certain files?
+-----------------------------------------------------------------------
+
+This is a server configuration problem. Never enable ``display_errors`` on a production site.
 
 .. _faqsynchronization:
 

@@ -10,7 +10,7 @@
  * get some globals
  */
 require './libraries/common.inc.php';
-$response = PMA_Response::getInstance();
+$response = PMA\libraries\Response::getInstance();
 $response->getFooter()->setMinimal();
 $header = $response->getHeader();
 $header->setBodyId('bodythemes');
@@ -21,7 +21,7 @@ $hash    = '#pma_' . preg_replace('/([0-9]*)\.([0-9]*)\..*/', '\1_\2', PMA_VERSI
 $url     = PMA_linkURL('https://www.phpmyadmin.net/themes/') . $hash;
 $output  = '<h1>phpMyAdmin - ' . __('Theme') . '</h1>';
 $output .= '<p>';
-$output .= '<a href="' . $url . '" class="_blank">';
+$output .= '<a href="' . $url . '" rel="noopener noreferrer" target="_blank">';
 $output .= __('Get more themes!');
 $output .= '</a>';
 $output .= '</p>';

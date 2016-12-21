@@ -23,7 +23,7 @@
  * Your phpMyAdmin URL.
  *
  * Complete the variable below with the full URL ie
- *    http://www.your_web.net/path_to_your_phpMyAdmin_directory/
+ *    https://example.com/path_to_your_phpMyAdmin_directory/
  *
  * It must contain characters that are valid for a URL, and the path is
  * case sensitive on some Web servers, for example Unix-based servers.
@@ -181,6 +181,17 @@ $cfg['Servers'][$i]['ssl_ca_path'] = null;
 $cfg['Servers'][$i]['ssl_ciphers'] = null;
 
 /**
+ * MySQL 5.6 or later triggers the mysqlnd driver in PHP to validate the
+ * peer_name of the SSL certifcate
+ * For most self-signed certificates this is a problem. Setting this to false
+ * will disable the check and allow the connection (PHP 5.6.16 or later)
+ *
+ * @link https://bugs.php.net/68344
+ * @global string $cfg['Servers'][$i]['ssl_verify']
+ */
+$cfg['Servers'][$i]['ssl_verify'] = true;
+
+/**
  * How to connect to MySQL server ('tcp' or 'socket')
  *
  * @global string $cfg['Servers'][$i]['connect_type']
@@ -243,14 +254,6 @@ $cfg['Servers'][$i]['auth_type'] = 'cookie';
  * @global string $cfg['Servers'][$i]['auth_http_realm']
  */
 $cfg['Servers'][$i]['auth_http_realm'] = '';
-
-/**
- * File containing Swekey ids and login names (see /contrib);
- * leave empty to deactivate Swekey hardware authentication
- *
- * @global string $cfg['Servers'][$i]['auth_swekey_config']
- */
-$cfg['Servers'][$i]['auth_swekey_config'] = '';
 
 /**
  * MySQL user
@@ -514,7 +517,7 @@ $cfg['Servers'][$i]['MaxTableUiprefs'] = 100;
 
 /**
  * Sets the time zone used by phpMyAdmin. Possible values are explained at
- * http://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html
+ * https://dev.mysql.com/doc/refman/5.7/en/time-zone-support.html
  *
  * @global string $cfg['Servers'][$i]['SessionTimeZone'] = ''
  */
@@ -549,10 +552,10 @@ $cfg['Servers'][$i]['AllowDeny']['order'] = '';
 $cfg['Servers'][$i]['AllowDeny']['rules'] = array();
 
 /**
- * Disable use of INFORMATION_SCHEMA. Is always 'false' for Drizzle.
+ * Disable use of INFORMATION_SCHEMA.
  *
  * @see https://sourceforge.net/p/phpmyadmin/bugs/2606/
- * @see http://bugs.mysql.com/19588
+ * @see https://bugs.mysql.com/19588
  * @global boolean $cfg['Servers'][$i]['DisableIS']
  */
 $cfg['Servers'][$i]['DisableIS'] = false;
@@ -699,13 +702,6 @@ $cfg['OBGzip'] = 'auto';
 $cfg['PersistentConnections'] = false;
 
 /**
- * whether to force using HTTPS
- *
- * @global boolean $cfg['ForceSSL']
- */
-$cfg['ForceSSL'] = false;
-
-/**
  * maximum execution time in seconds (0 for no limit)
  *
  * @global integer $cfg['ExecTimeLimit']
@@ -730,7 +726,6 @@ $cfg['MemoryLimit'] = '-1';
 
 /**
  * mark used tables, make possible to show locked tables (since MySQL 3.23.30)
- * Is ignored for Drizzle.
  *
  * @global boolean $cfg['SkipLockedTables']
  */
@@ -1063,13 +1058,6 @@ $cfg['NavigationTreeShowEvents'] = true;
 $cfg['ShowStats'] = true;
 
 /**
- * show PHP info link
- *
- * @global boolean $cfg['ShowPhpInfo']
- */
-$cfg['ShowPhpInfo'] = false;
-
-/**
  * show MySQL server and web server information
  *
  * @global boolean $cfg['ShowServerInfo']
@@ -1129,6 +1117,13 @@ $cfg['ShowDbStructureLastCheck'] = false;
  * @global boolean $cfg['HideStructureActions']
  */
 $cfg['HideStructureActions'] = true;
+
+/**
+ * Show column comments in table structure view (true|false)?
+ *
+ * @global boolean $cfg['ShowColumnComments']
+ */
+$cfg['ShowColumnComments'] = true;
 
 
 /*******************************************************************************
@@ -2599,7 +2594,7 @@ $cfg['RecodingEngine'] = 'auto';
 /**
  * Specify some parameters for iconv used in character set conversion. See iconv
  * documentation for details:
- * http://www.gnu.org/software/libiconv/documentation/libiconv/iconv_open.3.html
+ * https://www.gnu.org/software/libiconv/documentation/libiconv/iconv_open.3.html
  *
  * @global string $cfg['IconvExtraParams']
  */
@@ -2762,14 +2757,14 @@ $cfg['TablePrimaryKeyOrder'] = 'NONE';
 $cfg['RememberSorting'] = true;
 
 /**
- * shows stored relation-comments in 'browse' mode.
+ * shows column comments in 'browse' mode.
  *
  * @global boolean $cfg['ShowBrowseComments']
  */
 $cfg['ShowBrowseComments'] = true;
 
 /**
- * shows stored relation-comments in 'table property' mode.
+ * shows column comments in 'table property' mode.
  *
  * @global boolean $cfg['ShowPropertyComments']
  */
@@ -3039,7 +3034,7 @@ $cfg['CheckConfigurationPermissions'] = true;
  * is replaced by form with button.
  * This is required as some web servers (IIS) have problems with long URLs.
  * The recommended limit is 2000
- * (see http://www.boutell.com/newfaq/misc/urllength.html) but we put
+ * (see https://www.boutell.com/newfaq/misc/urllength.html) but we put
  * 1000 to accommodate Suhosin, see bug #3358750.
  */
 $cfg['LinkLengthLimit'] = 1000;
@@ -3122,7 +3117,7 @@ $cfg['DefaultFunctions'] = array(
 );
 
 /**
- * Max rows retreived for zoom search
+ * Max rows retrieved for zoom search
  */
 $cfg['maxRowPlotLimit'] = 500;
 

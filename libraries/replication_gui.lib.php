@@ -5,9 +5,7 @@
  *
  * @package PhpMyAdmin
  */
-if (! defined('PHPMYADMIN')) {
-    exit;
-}
+use PMA\libraries\Message;
 
 /**
  * returns HTML for error message
@@ -22,11 +20,11 @@ function PMA_getHtmlForErrorMessage()
     ) {
         if ($_SESSION['replication']['sr_action_status'] == 'error') {
             $error_message = $_SESSION['replication']['sr_action_info'];
-            $html .= PMA_Message::error($error_message)->getDisplay();
+            $html .= Message::error($error_message)->getDisplay();
             $_SESSION['replication']['sr_action_status'] = 'unknown';
         } elseif ($_SESSION['replication']['sr_action_status'] == 'success') {
             $success_message = $_SESSION['replication']['sr_action_info'];
-            $html .= PMA_Message::success($success_message)->getDisplay();
+            $html .= Message::success($success_message)->getDisplay();
             $_SESSION['replication']['sr_action_status'] = 'unknown';
         }
     }
@@ -130,7 +128,7 @@ function PMA_getHtmlForMasterConfiguration()
  * returns HTML for slave replication configuration
  *
  * @param bool  $server_slave_status      Whether it is Master or Slave
- * @param Array $server_slave_replication Slave replication
+ * @param array $server_slave_replication Slave replication
  *
  * @return String HTML code
  */
@@ -212,12 +210,12 @@ function PMA_getHtmlForSlaveConfiguration(
             . PMA_URL_getCommon($_url_params);
 
         if ($server_slave_replication[0]['Slave_SQL_Running'] == 'No') {
-            $html .= PMA_Message::error(
+            $html .= Message::error(
                 __('Slave SQL Thread not running!')
             )->getDisplay();
         }
         if ($server_slave_replication[0]['Slave_IO_Running'] == 'No') {
-            $html .= PMA_Message::error(
+            $html .= Message::error(
                 __('Slave IO Thread not running!')
             )->getDisplay();
         }
@@ -308,7 +306,7 @@ function PMA_getHtmlForSlaveErrorManagement($slave_skip_error_link)
         . 'id="slave_errormanagement_href">';
     $html .= __('Error management:') . '</a>';
     $html .= ' <div id="slave_errormanagement_gui" style="display: none">';
-    $html .= PMA_Message::error(
+    $html .= Message::error(
         __('Skipping errors might lead into unsynchronized master and slave!')
     )->getDisplay();
     $html .= '  <ul>';
@@ -365,7 +363,7 @@ function PMA_getHtmlForReplicationDbMultibox()
     $multi_values .= '<select name="db_select[]" '
         . 'size="6" multiple="multiple" id="db_select">';
 
-    foreach ($GLOBALS['pma']->databases as $current_db) {
+    foreach ($GLOBALS['dblist']->databases as $current_db) {
         if ($GLOBALS['dbi']->isSystemSchema($current_db)) {
             continue;
         }
@@ -470,8 +468,8 @@ function PMA_getHtmlForReplicationChangeMaster($submitname)
 /**
  * returns HTML code for Add user input div
  *
- * @param Array $label_array label tag elements
- * @param Array $input_array input tag elements
+ * @param array $label_array label tag elements
+ * @param array $input_array input tag elements
  *
  * @return String HTML code
  */
@@ -550,7 +548,7 @@ function PMA_getHtmlForReplicationStatusTable($type, $hidden = false, $title = t
     foreach (${"{$type}_variables"} as $variable) {
         $html .= '   <tr class="' . ($odd_row ? 'odd' : 'even') . '">';
         $html .= '     <td class="name">';
-        $html .=        $variable;
+        $html .= htmlspecialchars($variable);
         $html .= '     </td>';
         $html .= '     <td class="value">';
 
@@ -573,13 +571,13 @@ function PMA_getHtmlForReplicationStatusTable($type, $hidden = false, $title = t
             'Replicate_Do_Table', 'Replicate_Ignore_Table',
             'Replicate_Wild_Do_Table', 'Replicate_Wild_Ignore_Table');
         if (in_array($variable, $variables_wrap)) {
-            $html .= str_replace(
+            $html .= htmlspecialchars(str_replace(
                 ',',
                 ', ',
                 ${"server_{$type}_replication"}[0][$variable]
-            );
+            ));
         } else {
-            $html .= ${"server_{$type}_replication"}[0][$variable];
+            $html .= htmlspecialchars(${"server_{$type}_replication"}[0][$variable]);
         }
         $html .= '</span>';
 
@@ -636,7 +634,7 @@ function PMA_getHtmlForReplicationSlavesTable($hidden = false)
     $html .= '    </tbody>';
     $html .= '    </table>';
     $html .= '    <br />';
-    $html .= PMA_Message::notice(
+    $html .= Message::notice(
         __(
             'Only slaves started with the '
             . '--report-host=host_name option are visible in this list.'
@@ -688,7 +686,7 @@ function PMA_getHtmlForReplicationMasterAddSlaveuser()
         = PMA_replicationGetUsernameHostnameLength();
 
     if (isset($_REQUEST['username'])
-        && /*overload*/mb_strlen($_REQUEST['username']) === 0
+        && mb_strlen($_REQUEST['username']) === 0
     ) {
         $GLOBALS['pred_username'] = 'any';
     }
@@ -713,31 +711,23 @@ function PMA_getHtmlForReplicationMasterAddSlaveuser()
         $thishost = str_replace(
             "'",
             '',
-            /*overload*/mb_substr(
+            mb_substr(
                 $_current_user,
-                (/*overload*/mb_strrpos($_current_user, '@') + 1)
+                (mb_strrpos($_current_user, '@') + 1)
             )
         );
-        if ($thishost == 'localhost' || $thishost == '127.0.0.1') {
+        if ($thishost != 'localhost' && $thishost != '127.0.0.1') {
+            $html .= ' data-thishost="' . htmlspecialchars($thishost) . '" ';
+        } else {
             unset($thishost);
         }
     }
-    $html .= '    onchange="if (this.value == \'any\') { hostname.value = \'%\'; } '
-        .                  'else if (this.value == \'localhost\') '
-        .                  '{ hostname.value = \'localhost\'; } '
-        . (empty($thishost)
-          ? ''
-          : 'else if (this.value == \'thishost\') { hostname.value = \''
-        . addslashes(htmlspecialchars($thishost)) . '\'; } ')
-        .   'else if (this.value == \'hosttable\') { hostname.value = \'\'; } '
-        .   'else if (this.value == \'userdefined\') '
-        .   '{ hostname.focus(); hostname.select(); }">'
-        . "\n";
+    $html .= '>' . "\n";
     unset($_current_user);
 
     // when we start editing a user, $GLOBALS['pred_hostname'] is not defined
     if (! isset($GLOBALS['pred_hostname']) && isset($_REQUEST['hostname'])) {
-        switch (/*overload*/mb_strtolower($_REQUEST['hostname'])) {
+        switch (mb_strtolower($_REQUEST['hostname'])) {
         case 'localhost':
         case '127.0.0.1':
             $GLOBALS['pred_hostname'] = 'localhost';
@@ -799,10 +789,7 @@ function PMA_getHtmlForAddUserLoginForm($username_length)
         . '</label>'
         . '<span class="options">'
         . '    <select name="pred_username" id="select_pred_username" '
-        .         'title="' . __('User name') . '"'
-        . '        onchange="if (this.value == \'any\') { username.value = \'\'; } '
-        .                   'else if (this.value == \'userdefined\') { '
-        .                       ' username.focus(); username.select(); }">'
+        .         'title="' . __('User name') . '">'
         . '        <option value="any"'
         . ((isset($GLOBALS['pred_username'])
             && $GLOBALS['pred_username'] == 'any') ? ' selected="selected"' : '')
@@ -814,13 +801,13 @@ function PMA_getHtmlForAddUserLoginForm($username_length)
         . '>' . __('Use text field:') . '</option>'
         . '    </select>'
         . '</span>'
-        . '<input type="text" name="username" maxlength="'
+        . '<input type="text" name="username" id="pma_username" maxlength="'
         . $username_length . '" title="' . __('User name') . '"'
         . (empty($_REQUEST['username']) ? '' : ' value="'
         . (isset($GLOBALS['new_username'])
             ? $GLOBALS['new_username']
-            : $_REQUEST['username']) . '"')
-        . ' onchange="pred_username.value = \'userdefined\';" />'
+            : htmlspecialchars($_REQUEST['username'])) . '"')
+        . ' />'
         . '</div>';
 
     return $html;
@@ -847,12 +834,12 @@ function PMA_getHtmlForTableInfoForm($hostname_length)
         . '>' . __('Use text field:') . '</option>'
         . '    </select>'
         . '</span>'
-        . '<input type="text" name="hostname" maxlength="'
+        . '<input type="text" name="hostname" id="pma_hostname" maxlength="'
         . $hostname_length . '" value="'
-        . (isset($_REQUEST['hostname']) ? $_REQUEST['hostname'] : '')
+        . (isset($_REQUEST['hostname']) ? htmlspecialchars($_REQUEST['hostname']) : '')
         . '" title="' . __('Host')
-        . '" onchange="pred_hostname.value = \'userdefined\';" />'
-        . PMA_Util::showHint(
+        . '" />'
+        . PMA\libraries\Util::showHint(
             __(
                 'When Host table is used, this field is ignored '
                 . 'and values stored in Host table are used instead.'
@@ -865,11 +852,7 @@ function PMA_getHtmlForTableInfoForm($hostname_length)
         . '</label>'
         . '<span class="options">'
         . '    <select name="pred_password" id="select_pred_password" title="'
-        . __('Password') . '"'
-        . '            onchange="if (this.value == \'none\') '
-        .                       '{ pma_pw.value = \'\'; pma_pw2.value = \'\'; } '
-        .                       'else if (this.value == \'userdefined\') '
-        .                       '{ pma_pw.focus(); pma_pw.select(); }">'
+        . __('Password') . '">'
         . '        <option value="none"';
     if (isset($_REQUEST['username'])) {
         $html .= '  selected="selected"';
@@ -881,7 +864,7 @@ function PMA_getHtmlForTableInfoForm($hostname_length)
         . '    </select>'
         . '</span>'
         . '<input type="password" id="text_pma_pw" name="pma_pw" title="'
-        . __('Password') . '" onchange="pred_password.value = \'userdefined\';" />'
+        . __('Password') . '" />'
         . '</div>'
         . '<div class="item">'
         . '<label for="text_pma_pw2">'
@@ -889,7 +872,7 @@ function PMA_getHtmlForTableInfoForm($hostname_length)
         . '</label>'
         . '<span class="options">&nbsp;</span>'
         . '<input type="password" name="pma_pw2" id="text_pma_pw2" title="'
-        . __('Re-type') . '" onchange="pred_password.value = \'userdefined\';" />'
+        . __('Re-type') . '" />'
         . '</div>'
         . '<div class="item">'
         . '<label for="button_generate_password">'
@@ -919,7 +902,7 @@ function PMA_handleControlRequest()
 {
     if (isset($_REQUEST['sr_take_action'])) {
         $refresh = false;
-        $result = null;
+        $result = false;
         $messageSuccess = null;
         $messageError = null;
 
@@ -952,18 +935,18 @@ function PMA_handleControlRequest()
         }
 
         if ($refresh) {
-            $response = PMA_Response::getInstance();
+            $response = PMA\libraries\Response::getInstance();
             if ($response->isAjax()) {
-                $response->isSuccess($result);
+                $response->setRequestStatus($result);
                 $response->addJSON(
                     'message',
                     $result
-                    ? PMA_Message::success($messageSuccess)
-                    : PMA_Message::error($messageError)
+                    ? Message::success($messageSuccess)
+                    : Message::error($messageError)
                 );
             } else {
                 PMA_sendHeaderLocation(
-                    $GLOBALS['cfg']['PmaAbsoluteUri'] . 'server_replication.php'
+                    './server_replication.php'
                     . PMA_URL_getCommon($GLOBALS['url_params'], 'text')
                 );
             }
@@ -980,13 +963,13 @@ function PMA_handleRequestForSlaveChangeMaster()
 {
     $sr = array();
     $_SESSION['replication']['m_username'] = $sr['username']
-        = PMA_Util::sqlAddSlashes($_REQUEST['username']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['username']);
     $_SESSION['replication']['m_password'] = $sr['pma_pw']
-        = PMA_Util::sqlAddSlashes($_REQUEST['pma_pw']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['pma_pw']);
     $_SESSION['replication']['m_hostname'] = $sr['hostname']
-        = PMA_Util::sqlAddSlashes($_REQUEST['hostname']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['hostname']);
     $_SESSION['replication']['m_port']     = $sr['port']
-        = PMA_Util::sqlAddSlashes($_REQUEST['text_port']);
+        = $GLOBALS['dbi']->escapeString($_REQUEST['text_port']);
     $_SESSION['replication']['m_correct']  = '';
     $_SESSION['replication']['sr_action_status'] = 'error';
     $_SESSION['replication']['sr_action_info'] = __('Unknown error');
