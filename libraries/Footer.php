@@ -70,9 +70,9 @@ class Footer
             include './revision-info.php';
             $message .= sprintf(
                 __('Currently running Git revision %1$s from the %2$s branch.'),
-                '<a target="_blank" href="' . $repobase . $fullrevision . '">'
+                '<a target="_blank" rel="noopener noreferrer" href="' . $repobase . $fullrevision . '">'
                 . $revision . '</a>',
-                '<a target="_blank" href="' . $repobranchbase . $branch . '">'
+                '<a target="_blank" rel="noopener noreferrer" href="' . $repobranchbase . $branch . '">'
                 . $branch . '</a>'
             );
         } else {
@@ -196,7 +196,7 @@ class Footer
         $retval  = '';
         $retval .= '<div id="selflink" class="print_ignore">';
         $retval .= '<a href="' . $url . '"'
-            . ' title="' . __('Open new phpMyAdmin window') . '" target="_blank">';
+            . ' title="' . __('Open new phpMyAdmin window') . '" target="_blank" rel="noopener noreferrer">';
         if (Util::showIcons('TabsMode')) {
             $retval .= Util::getImage(
                 'window-new.png',
@@ -217,11 +217,10 @@ class Footer
      */
     public function getErrorMessages()
     {
-        $retval = '<div class="clearfloat" id="pma_errors">';
+        $retval = '';
         if ($GLOBALS['error_handler']->hasDisplayErrors()) {
             $retval .= $GLOBALS['error_handler']->getDispErrors();
         }
-        $retval .= '</div>';
 
         /**
          * Report php errors
@@ -241,6 +240,10 @@ class Footer
         if (! PMA_isValid($_REQUEST['no_history'])
             && empty($GLOBALS['error_message'])
             && ! empty($GLOBALS['sql_query'])
+            && (isset($GLOBALS['dbi'])
+            && ($GLOBALS['dbi']->getLink()
+            || isset($GLOBALS['controllink'])
+            && $GLOBALS['controllink']))
         ) {
             PMA_setHistory(
                 PMA_ifSetOr($GLOBALS['db'], ''),
@@ -341,7 +344,9 @@ class Footer
                 $this->_scripts->addCode(
                     'var debugSQLInfo = ' . $this->getDebugMessage() . ';'
                 );
+                $retval .= '<div class="clearfloat" id="pma_errors">';
                 $retval .= $this->getErrorMessages();
+                $retval .= '</div>';
                 $retval .= $this->_scripts->getDisplay();
                 if ($GLOBALS['cfg']['DBG']['demo']) {
                     $retval .= '<div id="pma_demo">';

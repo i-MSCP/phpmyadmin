@@ -28,7 +28,7 @@ if (! empty($_REQUEST['master_connection'])) {
     if ($server_slave_multi_replication) {
         $GLOBALS['dbi']->query(
             "SET @@default_master_connection = '"
-            . PMA\libraries\Util::sqlAddSlashes(
+            . $GLOBALS['dbi']->escapeString(
                 $_REQUEST['master_connection']
             ) . "'"
         );
@@ -293,7 +293,7 @@ function PMA_Replication_connectToMaster(
     $user, $password, $host = null, $port = null, $socket = null
 ) {
     $server = array();
-    $server["host"] = $host;
+    $server["host"] = PMA_sanitizeMySQLHost($host);
     $server["port"] = $port;
     $server["socket"] = $socket;
 

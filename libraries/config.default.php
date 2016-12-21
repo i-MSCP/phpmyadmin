@@ -20,6 +20,25 @@
  */
 
 /**
+ * Your phpMyAdmin URL.
+ *
+ * Complete the variable below with the full URL ie
+ *    https://example.com/path_to_your_phpMyAdmin_directory/
+ *
+ * It must contain characters that are valid for a URL, and the path is
+ * case sensitive on some Web servers, for example Unix-based servers.
+ *
+ * In most cases you can leave this variable empty, as the correct value
+ * will be detected automatically. However, we recommend that you do
+ * test to see that the auto-detection code works in your system. A good
+ * test is to browse a table, then edit a row and save it.  There will be
+ * an error message if phpMyAdmin cannot auto-detect the correct value.
+ *
+ * @global string $cfg['PmaAbsoluteUri']
+ */
+$cfg['PmaAbsoluteUri'] = '';
+
+/**
  * Disable the default warning that is displayed on the DB Details Structure page if
  * any of the required Tables for the configuration storage could not be found
  *
@@ -167,7 +186,7 @@ $cfg['Servers'][$i]['ssl_ciphers'] = null;
  * For most self-signed certificates this is a problem. Setting this to false
  * will disable the check and allow the connection (PHP 5.6.16 or later)
  *
- * @link http://bugs.php.net/68344
+ * @link https://bugs.php.net/68344
  * @global string $cfg['Servers'][$i]['ssl_verify']
  */
 $cfg['Servers'][$i]['ssl_verify'] = true;
@@ -235,14 +254,6 @@ $cfg['Servers'][$i]['auth_type'] = 'cookie';
  * @global string $cfg['Servers'][$i]['auth_http_realm']
  */
 $cfg['Servers'][$i]['auth_http_realm'] = '';
-
-/**
- * File containing Swekey ids and login names (see /contrib);
- * leave empty to deactivate Swekey hardware authentication
- *
- * @global string $cfg['Servers'][$i]['auth_swekey_config']
- */
-$cfg['Servers'][$i]['auth_swekey_config'] = '';
 
 /**
  * MySQL user
@@ -1045,13 +1056,6 @@ $cfg['NavigationTreeShowEvents'] = true;
  * @global boolean $cfg['ShowStats']
  */
 $cfg['ShowStats'] = true;
-
-/**
- * show PHP info link
- *
- * @global boolean $cfg['ShowPhpInfo']
- */
-$cfg['ShowPhpInfo'] = false;
 
 /**
  * show MySQL server and web server information
@@ -2590,7 +2594,7 @@ $cfg['RecodingEngine'] = 'auto';
 /**
  * Specify some parameters for iconv used in character set conversion. See iconv
  * documentation for details:
- * http://www.gnu.org/software/libiconv/documentation/libiconv/iconv_open.3.html
+ * https://www.gnu.org/software/libiconv/documentation/libiconv/iconv_open.3.html
  *
  * @global string $cfg['IconvExtraParams']
  */
@@ -3030,7 +3034,7 @@ $cfg['CheckConfigurationPermissions'] = true;
  * is replaced by form with button.
  * This is required as some web servers (IIS) have problems with long URLs.
  * The recommended limit is 2000
- * (see http://www.boutell.com/newfaq/misc/urllength.html) but we put
+ * (see https://www.boutell.com/newfaq/misc/urllength.html) but we put
  * 1000 to accommodate Suhosin, see bug #3358750.
  */
 $cfg['LinkLengthLimit'] = 1000;

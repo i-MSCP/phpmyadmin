@@ -7,6 +7,11 @@
  */
 use PMA\libraries\plugins\ImportPlugin;
 
+/* Enable LOAD DATA LOCAL INFILE for LDI plugin */
+if (isset($_POST['format']) && $_POST['format'] == 'ldi') {
+    define('PMA_ENABLE_LDI', 1);
+}
+
 /**
  * Get the variables sent or posted to this script and a core script
  */
@@ -115,13 +120,13 @@ if (! empty($sql_query)) {
             // making sure that :param does not apply values to :param1
             $sql_query = preg_replace(
                 '/' . $quoted . '([^a-zA-Z0-9_])/',
-                PMA\libraries\Util::sqlAddSlashes($replacement) . '${1}',
+                $GLOBALS['dbi']->escapeString($replacement) . '${1}',
                 $sql_query
             );
             // for parameters the appear at the end of the string
             $sql_query = preg_replace(
                 '/' . $quoted . '$/',
-                PMA\libraries\Util::sqlAddSlashes($replacement),
+                $GLOBALS['dbi']->escapeString($replacement),
                 $sql_query
             );
         }
@@ -194,7 +199,10 @@ if ($_POST == array() && $_GET == array()) {
     $_SESSION['Import_message']['message'] = $message->getDisplay();
     $_SESSION['Import_message']['go_back_url'] = $GLOBALS['goto'];
 
-    $message->display();
+    $response = PMA\libraries\Response::getInstance();
+    $response->setRequestStatus(false);
+    $response->addJSON('message', $message);
+
     exit; // the footer is displayed automatically
 }
 
@@ -435,6 +443,15 @@ if (! empty($local_import_file) && ! empty($cfg['UploadDir'])) {
     $import_file = PMA\libraries\Util::userDir($cfg['UploadDir'])
         . $local_import_file;
 
+    /*
+     * Do not allow symlinks to avoid security issues
+     * (user can create symlink to file he can not access,
+     * but phpMyAdmin can).
+     */
+    if (@is_link($import_file)) {
+        $import_file  = 'none';
+    }
+
 } elseif (empty($import_file) || ! is_uploaded_file($import_file)) {
     $import_file  = 'none';
 }
@@ -599,8 +616,8 @@ if ($GLOBALS['PMA_recoding_engine'] != PMA_CHARSET_NONE && isset($charset_of_fil
 
 // Something to skip? (because timeout has passed)
 if (! $error && isset($_POST['skip'])) {
-    $original_skip = $skip = $_POST['skip'];
-    while ($skip > 0) {
+    $original_skip = $skip = intval($_POST['skip']);
+    while ($skip > 0 && ! $finished) {
         PMA_importGetNextChunk($skip < $read_limit ? $skip : $read_limit);
         // Disable read progressivity, otherwise we eat all memory!
         $read_multiply = 1;
@@ -742,10 +759,14 @@ if ($sqlLength <= $GLOBALS['cfg']['MaxCharactersInDisplayedSQL']) {
     list(
         $analyzed_sql_results,
         $db,
-        $table
+        $table_from_sql
     ) = PMA_parseAnalyze($sql_query, $db);
     // @todo: possibly refactor
     extract($analyzed_sql_results);
+
+    if ($table != $table_from_sql && !empty($table_from_sql)) {
+        $table = $table_from_sql;
+    }
 }
 
 // There was an error?
@@ -767,6 +788,7 @@ if ($go_sql) {
     }
 
     $html_output = '';
+
     foreach ($sql_queries as $sql_query) {
 
         // parse sql query
@@ -774,10 +796,27 @@ if ($go_sql) {
         list(
             $analyzed_sql_results,
             $db,
-            $table
+            $table_from_sql
         ) = PMA_parseAnalyze($sql_query, $db);
         // @todo: possibly refactor
         extract($analyzed_sql_results);
+
+        // Check if User is allowed to issue a 'DROP DATABASE' Statement
+        if (PMA_hasNoRightsToDropDatabase(
+            $analyzed_sql_results, $cfg['AllowUserDropDatabase'], $GLOBALS['is_superuser']
+        )) {
+            PMA\libraries\Util::mysqlDie(
+                __('"DROP DATABASE" statements are disabled.'),
+                '',
+                false,
+                $_SESSION['Import_message']['go_back_url']
+            );
+            return;
+        } // end if
+
+        if ($table != $table_from_sql && !empty($table_from_sql)) {
+            $table = $table_from_sql;
+        }
 
         $html_output .= PMA_executeQueryAndGetQueryResponse(
             $analyzed_sql_results, // analyzed_sql_results
@@ -785,7 +824,7 @@ if ($go_sql) {
             $db, // db
             $table, // table
             null, // find_real_end
-            $_REQUEST['sql_query'], // sql_query_for_bookmark
+            null, // sql_query_for_bookmark - see below
             null, // extra_data
             null, // message_to_show
             null, // message
@@ -798,6 +837,18 @@ if ($go_sql) {
             $sql_query, // sql_query
             null, // selectedTables
             null // complete_query
+        );
+    }
+
+    // sql_query_for_bookmark is not included in PMA_executeQueryAndGetQueryResponse
+    // since only one bookmark has to be added for all the queries submitted through
+    // the SQL tab
+    if (! empty($_POST['bkm_label']) && ! empty($import_text)) {
+        $cfgBookmark = PMA_Bookmark_getParams();
+        PMA_storeTheQueryAsBookmark(
+            $db, $cfgBookmark['user'],
+            $_REQUEST['sql_query'], $_POST['bkm_label'],
+            isset($_POST['bkm_replace']) ? $_POST['bkm_replace'] : null
         );
     }
 

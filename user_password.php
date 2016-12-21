@@ -112,13 +112,16 @@ function PMA_setChangePasswordMsg()
     $message = PMA\libraries\Message::success(__('The profile has been updated.'));
 
     if (($_REQUEST['nopass'] != '1')) {
-        if (empty($_REQUEST['pma_pw']) || empty($_REQUEST['pma_pw2'])) {
+        if (strlen($_REQUEST['pma_pw']) === 0 || strlen($_REQUEST['pma_pw2']) === 0) {
             $message = PMA\libraries\Message::error(__('The password is empty!'));
             $error = true;
-        } elseif ($_REQUEST['pma_pw'] != $_REQUEST['pma_pw2']) {
+        } elseif ($_REQUEST['pma_pw'] !== $_REQUEST['pma_pw2']) {
             $message = PMA\libraries\Message::error(
                 __('The passwords aren\'t the same!')
             );
+            $error = true;
+        } elseif (strlen($_REQUEST['pma_pw']) > 256) {
+            $message = PMA_Message::error(__('Password is too long!'));
             $error = true;
         }
     }
@@ -233,10 +236,11 @@ function PMA_changePassUrlParamsAndSubmitQuery(
             . ' IDENTIFIED with ' . $orig_auth_plugin . ' BY '
             . (($password == '')
             ? '\'\''
-            : '\'' . PMA\libraries\Util::sqlAddSlashes($password) . '\'');
+            : '\'' . $GLOBALS['dbi']->escapeString($password) . '\'');
     } else if ($serverType == 'MariaDB'
         && PMA_MYSQL_INT_VERSION >= 50200
         && PMA_MYSQL_INT_VERSION < 100100
+        && $orig_auth_plugin !== ''
     ) {
         if ($orig_auth_plugin == 'mysql_native_password') {
             // Set the hashing method used by PASSWORD()
@@ -256,13 +260,11 @@ function PMA_changePassUrlParamsAndSubmitQuery(
             . " `plugin` = '" . $orig_auth_plugin . "'"
             . " WHERE `User` = '" . $username . "' AND Host = '"
             . $hostname . "';";
-
-        $GLOBALS['dbi']->tryQuery("FLUSH PRIVILEGES;");
     } else {
         $local_query = 'SET password = ' . (($password == '')
             ? '\'\''
             : $hashing_function . '(\''
-                . PMA\libraries\Util::sqlAddSlashes($password) . '\')');
+                . $GLOBALS['dbi']->escapeString($password) . '\')');
     }
     if (! @$GLOBALS['dbi']->tryQuery($local_query)) {
         PMA\libraries\Util::mysqlDie(
@@ -272,6 +274,9 @@ function PMA_changePassUrlParamsAndSubmitQuery(
             $err_url
         );
     }
+
+    // Flush privileges after successful password change
+    $GLOBALS['dbi']->tryQuery("FLUSH PRIVILEGES;");
 }
 
 /**

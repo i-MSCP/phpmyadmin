@@ -47,24 +47,11 @@ class VersionInformation
             $response = $_SESSION['cache']['version_check']['response'];
         } else {
             $save = true;
+            if (! defined('TESTSUITE')) {
+                session_write_close();
+            }
             $file = 'https://www.phpmyadmin.net/home_page/version.json';
-            if (ini_get('allow_url_fopen')) {
-                $context = array(
-                    'http' => array(
-                        'request_fulluri' => true,
-                        'timeout' => $connection_timeout,
-                    )
-                );
-                $context = Util::handleContext($context);
-                if (! defined('TESTSUITE')) {
-                    session_write_close();
-                }
-                $response = file_get_contents(
-                    $file,
-                    false,
-                    stream_context_create($context)
-                );
-            } else if (function_exists('curl_init')) {
+            if (function_exists('curl_init')) {
                 $curl_handle = curl_init($file);
                 if ($curl_handle === false) {
                     return null;
@@ -85,10 +72,24 @@ class VersionInformation
                     CURLOPT_TIMEOUT,
                     $connection_timeout
                 );
-                if (! defined('TESTSUITE')) {
-                    session_write_close();
-                }
-                $response = curl_exec($curl_handle);
+                $response = @curl_exec($curl_handle);
+            } else if (ini_get('allow_url_fopen')) {
+                $context = array(
+                    'http' => array(
+                        'request_fulluri' => true,
+                        'timeout' => $connection_timeout,
+                    )
+                );
+                $context = Util::handleContext($context);
+                $response = @file_get_contents(
+                    $file,
+                    false,
+                    stream_context_create($context)
+                );
+            }
+            // Check possible failure of getting data
+            if ($response === false) {
+                $response = '{}';
             }
         }
 
@@ -106,10 +107,6 @@ class VersionInformation
 
         if ($save) {
             if (! isset($_SESSION) && ! defined('TESTSUITE')) {
-                ini_set('session.use_only_cookies', 'false');
-                ini_set('session.use_cookies', 'false');
-                ini_set('session.use_trans_sid', 'false');
-                ini_set('session.cache_limiter', 'nocache');
                 session_start();
             }
             $_SESSION['cache']['version_check'] = array(
@@ -276,6 +273,6 @@ class VersionInformation
      */
     protected function getMySQLVersion()
     {
-        return Util::cacheGet('PMA_MYSQL_STR_VERSION');
+        return PMA_MYSQL_STR_VERSION;
     }
 }

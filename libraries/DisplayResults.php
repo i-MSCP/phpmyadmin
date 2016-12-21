@@ -868,9 +868,10 @@ class DisplayResults
         $endpos = $_SESSION['tmpval']['pos']
             + $_SESSION['tmpval']['max_rows'];
 
-        if (($endpos < $this->__get('unlim_num_rows'))
-            && ($this->__get('num_rows') >= $_SESSION['tmpval']['max_rows'])
-            && ($_SESSION['tmpval']['max_rows'] != self::ALL_ROWS)
+        if ($this->__get('unlim_num_rows') === false // view with unknown number of rows
+            || ($endpos < $this->__get('unlim_num_rows')
+            && $this->__get('num_rows') >= $_SESSION['tmpval']['max_rows']
+            && $_SESSION['tmpval']['max_rows'] != self::ALL_ROWS)
         ) {
 
             $table_navigation_html
@@ -1023,7 +1024,7 @@ class DisplayResults
             . '<input type="hidden" name="is_browse_distinct" value="'
             . $this->__get('is_browse_distinct') . '" />'
             . '<input type="hidden" name="session_max_rows" value="'
-            . (! $showing_all ? 'all' : $GLOBALS['cfg']['MaxRows']) . '" />'
+            . (! $showing_all ? 'all' : intval($GLOBALS['cfg']['MaxRows'])) . '" />'
             . '<input type="hidden" name="goto" value="' . $this->__get('goto')
             . '" />'
             . '<input type="checkbox" name="navig"'
@@ -1076,12 +1077,12 @@ class DisplayResults
 
         $maxRows = $_SESSION['tmpval']['max_rows'];
         $onsubmit = 'onsubmit="return '
-            . ($_SESSION['tmpval']['pos']
+            . (($_SESSION['tmpval']['pos']
                 + $maxRows
                 < $this->__get('unlim_num_rows')
                 && $this->__get('num_rows') >= $maxRows)
             ? 'true'
-            : 'false' . '"';
+            : 'false') . '"';
 
         // display the End button
         $buttons_html .= $this->_getTableNavigationButton(
@@ -3277,7 +3278,7 @@ class DisplayResults
         $divider = strpos($link_relations['default_page'], '?') ? '&' : '?';
         if (empty($link_relations['link_dependancy_params'])) {
             return $link_relations['default_page']
-                . PMA_URL_getCommon($linking_url_params, 'html', $divider);
+                . PMA_URL_getCommon($linking_url_params, 'raw', $divider);
         }
 
         foreach ($link_relations['link_dependancy_params'] as $new_param) {
@@ -3301,7 +3302,7 @@ class DisplayResults
         }
 
         return $link_relations['default_page']
-            . PMA_URL_getCommon($linking_url_params, 'html', $divider);
+            . PMA_URL_getCommon($linking_url_params, 'raw', $divider);
     }
 
 
@@ -4040,7 +4041,7 @@ class DisplayResults
             || $bool_nowrap) ? ' nowrap' : '';
 
         $where_comparison = ' = \''
-            . Util::sqlAddSlashes($column)
+            . $GLOBALS['dbi']->escapeString($column)
             . '\'';
 
         $cell = $this->_getRowData(
@@ -4094,7 +4095,7 @@ class DisplayResults
             $query['max_rows'] = self::ALL_ROWS;
             unset($_REQUEST['session_max_rows']);
         } elseif (empty($query['max_rows'])) {
-            $query['max_rows'] = $GLOBALS['cfg']['MaxRows'];
+            $query['max_rows'] = intval($GLOBALS['cfg']['MaxRows']);
         }
 
         if (PMA_isValid($_REQUEST['pos'], 'numeric')) {
@@ -5250,7 +5251,7 @@ class DisplayResults
 
         if (isset($content)) {
 
-            $size = mb_strlen($content, '8bit');
+            $size = strlen($content);
             $display_size = Util::formatByteDown($size, 3, 1);
             $result .= ' - ' . $display_size[0] . ' ' . $display_size[1];
 

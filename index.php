@@ -152,7 +152,7 @@ if ($server > 0 || count($cfg['Servers']) > 1
                 . 'please do not change root, debian-sys-maint and pma users. '
                 . 'More information is available at %s.'
             ),
-            '<a href="url.php?url=https://demo.phpmyadmin.net/">demo.phpmyadmin.net</a>'
+            '<a href="url.php?url=https://demo.phpmyadmin.net/" target="_blank" rel="noopener noreferrer">demo.phpmyadmin.net</a>'
         );
         echo '</p>';
         echo '</div>';
@@ -317,7 +317,7 @@ if ($server > 0 && $GLOBALS['cfg']['ShowServerInfo']) {
        . ' </div>';
 }
 
-if ($GLOBALS['cfg']['ShowServerInfo'] || $GLOBALS['cfg']['ShowPhpInfo']) {
+if ($GLOBALS['cfg']['ShowServerInfo']) {
     echo '<div class="group">';
     echo '<h2>' , __('Web server') , '</h2>';
     echo '<ul>';
@@ -357,15 +357,6 @@ if ($GLOBALS['cfg']['ShowServerInfo'] || $GLOBALS['cfg']['ShowPhpInfo']) {
         }
     }
 
-    if ($cfg['ShowPhpInfo']) {
-        PMA_printListItem(
-            __('Show PHP information'),
-            'li_phpinfo',
-            'phpinfo.php' . $common_url_query,
-            null,
-            '_blank'
-        );
-    }
     echo '  </ul>';
     echo ' </div>';
 }
@@ -398,7 +389,7 @@ PMA_printListItem(
 PMA_printListItem(
     __('Official Homepage'),
     'li_pma_homepage',
-    PMA_linkURL('https://www.phpMyAdmin.net/'),
+    PMA_linkURL('https://www.phpmyadmin.net/'),
     null,
     '_blank'
 );
@@ -436,21 +427,6 @@ echo ' </div>';
 echo '</div>';
 
 echo '</div>';
-
-/**
- * As we try to handle charsets by ourself, mbstring overloads just
- * break it, see bug 1063821.
- */
-if (@extension_loaded('mbstring') && @ini_get('mbstring.func_overload') > 1) {
-    trigger_error(
-        __(
-            'You have enabled mbstring.func_overload in your PHP '
-            . 'configuration. This option is incompatible with phpMyAdmin '
-            . 'and might cause some data to be corrupted!'
-        ),
-        E_USER_WARNING
-    );
-}
 
 /**
  * mbstring is used for handling multibytes inside parser, so it is good
@@ -519,15 +495,22 @@ if ($GLOBALS['cfg']['LoginCookieStore'] != 0
 /**
  * Check if user does not have defined blowfish secret and it is being used.
  */
-if (! empty($_SESSION['encryption_key'])
-    && empty($GLOBALS['cfg']['blowfish_secret'])
-) {
-    trigger_error(
-        __(
-            'The configuration file now needs a secret passphrase (blowfish_secret).'
-        ),
-        E_USER_WARNING
-    );
+if (! empty($_SESSION['encryption_key'])) {
+    if (empty($GLOBALS['cfg']['blowfish_secret'])) {
+        trigger_error(
+            __(
+                'The configuration file now needs a secret passphrase (blowfish_secret).'
+            ),
+            E_USER_WARNING
+        );
+    } elseif (strlen($GLOBALS['cfg']['blowfish_secret']) < 32) {
+        trigger_error(
+            __(
+                'The secret passphrase in configuration (blowfish_secret) is too short.'
+            ),
+            E_USER_WARNING
+        );
+    }
 }
 
 /**
@@ -558,7 +541,7 @@ if ($server > 0) {
             . '%sFind out why%s. '
         );
         if ($cfg['ZeroConf'] == true) {
-            $msg_text .= '<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' .
+            $msg_text .= '<br>' .
                 __(
                     'Or alternately go to \'Operations\' tab of any database '
                     . 'to set it up there.'

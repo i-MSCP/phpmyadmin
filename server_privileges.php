@@ -68,8 +68,9 @@ $strPrivDescDropTbl = __('Allows dropping tables.');
 $strPrivDescEvent = __('Allows to set up events for the event scheduler.');
 $strPrivDescExecute = __('Allows executing stored routines.');
 $strPrivDescFile = __('Allows importing data from and exporting data into files.');
-$strPrivDescGrant = __(
-    'Allows adding users and privileges without reloading the privilege tables.'
+$strPrivDescGrantTbl = __(
+    'Allows user to give to other users or remove from other users the privileges '
+    . 'that user possess yourself.'
 );
 $strPrivDescIndex = __('Allows creating and dropping indexes.');
 $strPrivDescInsert = __('Allows inserting and replacing data.');
@@ -301,7 +302,7 @@ if ($GLOBALS['is_ajax_request']
     && (! isset($_REQUEST['submit_mult']) || $_REQUEST['submit_mult'] != 'export')
     && ((! isset($_REQUEST['initial']) || $_REQUEST['initial'] === null
     || $_REQUEST['initial'] === '')
-    || (isset($_REQUEST['delete']) && $_REQUEST['delete'] === 'Go'))
+    || (isset($_REQUEST['delete']) && $_REQUEST['delete'] === __('Go')))
     && ! isset($_REQUEST['showall'])
     && ! isset($_REQUEST['edit_user_group_dialog'])
     && ! isset($_REQUEST['db_specific'])
