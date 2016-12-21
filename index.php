@@ -149,7 +149,7 @@ if ($server > 0 || count($cfg['Servers']) > 1
                 . 'please do not change root, debian-sys-maint and pma users. '
                 . 'More information is available at %s.'
             ),
-            '<a href="http://demo.phpmyadmin.net/">demo.phpmyadmin.net</a>'
+            '<a href="https://demo.phpmyadmin.net/">demo.phpmyadmin.net</a>'
         );
         echo '</p>';
         echo '</div>';
@@ -311,7 +311,7 @@ if ($server > 0 && $GLOBALS['cfg']['ShowServerInfo']) {
        . ' </div>';
 }
 
-if ($GLOBALS['cfg']['ShowServerInfo'] || $GLOBALS['cfg']['ShowPhpInfo']) {
+if ($GLOBALS['cfg']['ShowServerInfo']) {
     echo '<div class="group">';
     echo '<h2>' . __('Web server') . '</h2>';
     echo '<ul>';
@@ -351,15 +351,6 @@ if ($GLOBALS['cfg']['ShowServerInfo'] || $GLOBALS['cfg']['ShowPhpInfo']) {
         }
     }
 
-    if ($cfg['ShowPhpInfo']) {
-        PMA_printListItem(
-            __('Show PHP information'),
-            'li_phpinfo',
-            'phpinfo.php' . $common_url_query,
-            null,
-            '_blank'
-        );
-    }
     echo '  </ul>';
     echo ' </div>';
 }
@@ -368,7 +359,7 @@ echo '<div class="group pmagroup">';
 echo '<h2>phpMyAdmin</h2>';
 echo '<ul>';
 $class = null;
-// We rely on CSP to allow access to http://www.phpmyadmin.net, but IE lacks
+// We rely on CSP to allow access to https://www.phpmyadmin.net, but IE lacks
 // support here and does not allow request to http once using https.
 if ($GLOBALS['cfg']['VersionCheck']
     && (! $GLOBALS['PMA_Config']->get('is_https') || PMA_USR_BROWSER_AGENT != 'IE')
@@ -394,7 +385,7 @@ PMA_printListItem(
 PMA_printListItem(
     __('Wiki'),
     'li_pma_wiki',
-    PMA_linkURL('http://wiki.phpmyadmin.net/'),
+    PMA_linkURL('https://wiki.phpmyadmin.net/'),
     null,
     '_blank'
 );
@@ -403,7 +394,7 @@ PMA_printListItem(
 PMA_printListItem(
     __('Official Homepage'),
     'li_pma_homepage',
-    PMA_linkURL('http://www.phpMyAdmin.net/'),
+    PMA_linkURL('http://www.phpmyadmin.net/'),
     null,
     '_blank'
 );
@@ -513,13 +504,22 @@ if ($GLOBALS['cfg']['LoginCookieStore'] != 0
 /**
  * Check if user does not have defined blowfish secret and it is being used.
  */
-if (! empty($_SESSION['encryption_key'])
-    && empty($GLOBALS['cfg']['blowfish_secret'])
-) {
-    trigger_error(
-        __('The configuration file now needs a secret passphrase (blowfish_secret).'),
-        E_USER_WARNING
-    );
+if (! empty($_SESSION['encryption_key'])) {
+    if (empty($GLOBALS['cfg']['blowfish_secret'])) {
+        trigger_error(
+            __(
+                'The configuration file now needs a secret passphrase (blowfish_secret).'
+            ),
+            E_USER_WARNING
+        );
+    } elseif (strlen($GLOBALS['cfg']['blowfish_secret']) < 32) {
+        trigger_error(
+            __(
+                'The secret passphrase in configuration (blowfish_secret) is too short.'
+            ),
+            E_USER_WARNING
+        );
+    }
 }
 
 /**
@@ -678,6 +678,9 @@ function PMA_printListItem($name, $listId = null, $url = null,
         echo '<a href="' . $url . '"';
         if (null !== $target) {
             echo ' target="' . $target . '"';
+            if ($target == '_blank') {
+                echo ' rel="noopener noreferrer"';
+            }
         }
         if (null != $a_id) {
             echo ' id="' . $a_id . '"';

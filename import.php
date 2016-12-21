@@ -6,6 +6,11 @@
  * @package PhpMyAdmin
  */
 
+/* Enable LOAD DATA LOCAL INFILE for LDI plugin */
+if (isset($_POST['format']) && $_POST['format'] == 'ldi') {
+    define('PMA_ENABLE_LDI', 1);
+}
+
 /**
  * Get the variables sent or posted to this script and a core script
  */
@@ -415,6 +420,15 @@ if (! empty($local_import_file) && ! empty($cfg['UploadDir'])) {
     $import_file = PMA_Util::userDir($cfg['UploadDir'])
         . $local_import_file;
 
+    /*
+     * Do not allow symlinks to avoid security issues
+     * (user can create symlink to file he can not access,
+     * but phpMyAdmin can).
+     */
+    if (is_link($import_file)) {
+        $import_file  = 'none';
+    }
+
 } elseif (empty($import_file) || ! is_uploaded_file($import_file)) {
     $import_file  = 'none';
 }
@@ -567,8 +581,9 @@ if ($GLOBALS['PMA_recoding_engine'] != PMA_CHARSET_NONE && isset($charset_of_fil
 
 // Something to skip?
 if (! $error && isset($skip)) {
+    $skip = intval($skip);
     $original_skip = $skip;
-    while ($skip > 0) {
+    while ($skip > 0 && ! $finished) {
         PMA_importGetNextChunk($skip < $read_limit ? $skip : $read_limit);
         // Disable read progressivity, otherwise we eat all memory!
         $read_multiply = 1;

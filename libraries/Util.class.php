@@ -512,7 +512,7 @@ class PMA_Util
         /* Check if we have built local documentation */
         if (defined('TESTSUITE')) {
             /* Provide consistent URL for testsuite */
-            return PMA_linkURL('http://docs.phpmyadmin.net/en/latest/' . $url);
+            return PMA_linkURL('https://docs.phpmyadmin.net/en/latest/' . $url);
         } else if (file_exists('doc/html/index.html')) {
             if (defined('PMA_SETUP')) {
                 return '../doc/html/' . $url;
@@ -521,7 +521,7 @@ class PMA_Util
             }
         } else {
             /* TODO: Should link to correct branch for released versions */
-            return PMA_linkURL('http://docs.phpmyadmin.net/en/latest/' . $url);
+            return PMA_linkURL('https://docs.phpmyadmin.net/en/latest/' . $url);
         }
     }
 
@@ -2562,7 +2562,7 @@ class PMA_Util
             $dir .= '/';
         }
 
-        return str_replace('%u', $GLOBALS['cfg']['Server']['user'], $dir);
+        return str_replace('%u', PMA_securePath($GLOBALS['cfg']['Server']['user']), $dir);
     }
 
     /**

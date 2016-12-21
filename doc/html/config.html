@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &mdash; phpMyAdmin 4.4.15.7 documentation</title>
+    <title>Configuration &mdash; phpMyAdmin 4.4.15.9 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.4.15.7',
+        VERSION:     '4.4.15.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.15.7 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.4.15.9 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.15.9 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -640,23 +640,6 @@ log in from prepared PHP session data or using supplied PHP script.</li>
 explicitly specified in your configuration, a string combined of
 &#8220;phpMyAdmin &#8221; and either <span class="target" id="index-10"></span><a class="reference internal" href="#cfg_Servers_verbose"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['verbose']</span></tt></a> or
 <span class="target" id="index-11"></span><a class="reference internal" href="#cfg_Servers_host"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['host']</span></tt></a> will be used.</p>
-</dd></dl>
-
-<span class="target" id="servers-auth-swekey-config"></span><dl class="option">
-<dt id="cfg_Servers_auth_swekey_config">
-<tt class="descname">$cfg['Servers'][$i]['auth_swekey_config']</tt><a class="headerlink" href="#cfg_Servers_auth_swekey_config" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">string</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body"><tt class="docutils literal"><span class="pre">''</span></tt></td>
-</tr>
-</tbody>
-</table>
-<p>The name of the file containing <a class="reference internal" href="setup.html#swekey"><em>Swekey authentication mode</em></a> ids and login names for hardware
-authentication. Leave empty to deactivate this feature.</p>
 </dd></dl>
 
 <span class="target" id="servers-user"></span><dl class="option">
@@ -2148,7 +2131,9 @@ statement if one of the queries fails. Default is to abort execution.</p>
 <p>The &#8220;cookie&#8221; auth_type uses AES algorithm to encrypt the password. If you
 are using the &#8220;cookie&#8221; auth_type, enter here a random passphrase of your
 choice. It will be used internally by the AES algorithm: you won’t be
-prompted for this passphrase. There is no maximum length for this secret.</p>
+prompted for this passphrase.</p>
+<p>The secret should be 32 characters long. Using shorter will lead to weaker security
+of encrypted cookies, using longer will cause no harm.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">The configuration is called blowfish_secret for historical reasons as
@@ -2728,21 +2713,6 @@ You can additionally hide more information by using
 </dd></dl>
 
 <dl class="option">
-<dt id="cfg_ShowPhpInfo">
-<tt class="descname">$cfg['ShowPhpInfo']</tt><a class="headerlink" href="#cfg_ShowPhpInfo" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">boolean</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body">false</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="option">
 <dt id="cfg_ShowChgPassword">
 <tt class="descname">$cfg['ShowChgPassword']</tt><a class="headerlink" href="#cfg_ShowChgPassword" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
@@ -2770,15 +2740,10 @@ You can additionally hide more information by using
 </tr>
 </tbody>
 </table>
-<p>Defines whether to display the <em class="guilabel">PHP information</em> and
+<p>Defines whether to display the
 <em class="guilabel">Change password</em> links and form for creating database or not at
 the starting main (right) frame. This setting does not check MySQL commands
 entered directly.</p>
-<p>Please note that to block the usage of <tt class="docutils literal"><span class="pre">phpinfo()</span></tt> in scripts, you have to
-put this in your <tt class="file docutils literal"><span class="pre">php.ini</span></tt>:</p>
-<div class="highlight-ini"><div class="highlight"><pre><span class="na">disable_functions</span> <span class="o">=</span> <span class="s">phpinfo()</span>
-</pre></div>
-</div>
 <p>Also note that enabling the <em class="guilabel">Change password</em> link has no effect
 with config authentication mode: because of the hard coded password value
 in the configuration file, end users can&#8217;t be allowed to change their
@@ -4908,7 +4873,7 @@ displayed in the bottom of main page (right frame).</p>
 </tbody>
 </table>
 <p>Enable to let server present itself as demo server.
-This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.net/">http://demo.phpmyadmin.net/</a>&gt;.</p>
+This is used for &lt;<a class="reference external" href="https://demo.phpmyadmin.net/">https://demo.phpmyadmin.net/</a>&gt;.</p>
 </dd></dl>
 
 </div>
@@ -4992,7 +4957,7 @@ This is used for &lt;<a class="reference external" href="http://demo.phpmyadmin.
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.15.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

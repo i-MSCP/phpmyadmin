@@ -1,7 +1,7 @@
 phpMyAdmin - Readme
 ===================
 
-Version 4.4.15.7
+Version 4.4.15.9
 
 A set of PHP-scripts to manage MySQL over the web.
 
@@ -12,7 +12,7 @@ Summary
 
 phpMyAdmin is intended to handle the administration of MySQL over the web.
 For a summary of features, list of requirements, and installation instructions,
-please see the documentation in the ./doc/ folder or at http://docs.phpmyadmin.net/
+please see the documentation in the ./doc/ folder or at https://docs.phpmyadmin.net/
 
 Copyright
 ---------

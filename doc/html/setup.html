@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Installation &mdash; phpMyAdmin 4.4.15.7 documentation</title>
+    <title>Installation &mdash; phpMyAdmin 4.4.15.9 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.4.15.7',
+        VERSION:     '4.4.15.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.4.15.7 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.4.15.9 documentation" href="index.html" />
     <link rel="next" title="Configuration" href="config.html" />
     <link rel="prev" title="Requirements" href="require.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="require.html" title="Requirements"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.15.9 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -158,7 +158,8 @@ okay for a particular setting, there is no need to include it in
 <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt>. You&#8217;ll probably need only a few directives to get going; a
 simple configuration may look like this:</p>
 <div class="highlight-xml+php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
-<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;blowfish_secret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ba17c1ec07d65003&#39;</span><span class="p">;</span>  <span class="c1">// use here a value of your choice</span>
+<span class="c1">// use here a value of your choice at least 32 chars long</span>
+<span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;blowfish_secret&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1{dd0`&lt;Q),5XP_:R9UK%%8\&quot;EEcyH#{o&#39;</span><span class="p">;</span>
 
 <span class="nv">$i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
 <span class="nv">$i</span><span class="o">++</span><span class="p">;</span>
@@ -423,13 +424,13 @@ the login process.</li>
 <span class="sd"> */</span>
 
 <span class="cm">/* Need to have cookie visible from parent directory */</span>
-<span class="nb">session_set_cookie_params</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+<span class="nb">session_set_cookie_params</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
 <span class="cm">/* Create signon session */</span>
 <span class="nv">$session_name</span> <span class="o">=</span> <span class="s1">&#39;SignonSession&#39;</span><span class="p">;</span>
 <span class="nb">session_name</span><span class="p">(</span><span class="nv">$session_name</span><span class="p">);</span>
 <span class="c1">// Uncomment and change the following line to match your $cfg[&#39;SessionSavePath&#39;]</span>
 <span class="c1">//session_save_path(&#39;/foobar&#39;);</span>
-<span class="nb">session_start</span><span class="p">();</span>
+<span class="o">@</span><span class="nb">session_start</span><span class="p">();</span>
 
 <span class="cm">/* Was data posted? */</span>
 <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]))</span> <span class="p">{</span>
@@ -442,7 +443,7 @@ the login process.</li>
     <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;PMA_single_signon_cfgupdate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Signon test&#39;</span><span class="p">);</span>
     <span class="nv">$id</span> <span class="o">=</span> <span class="nb">session_id</span><span class="p">();</span>
     <span class="cm">/* Close that session */</span>
-    <span class="nb">session_write_close</span><span class="p">();</span>
+    <span class="o">@</span><span class="nb">session_write_close</span><span class="p">();</span>
     <span class="cm">/* Redirect to phpMyAdmin (should use absolute URL here!) */</span>
     <span class="nb">header</span><span class="p">(</span><span class="s1">&#39;Location: ../index.php&#39;</span><span class="p">);</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -560,11 +561,11 @@ in <tt class="file docutils literal"><span class="pre">examples/openid.php</span
 
 
 <span class="cm">/* Need to have cookie visible from parent directory */</span>
-<span class="nb">session_set_cookie_params</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+<span class="nb">session_set_cookie_params</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
 <span class="cm">/* Create signon session */</span>
 <span class="nv">$session_name</span> <span class="o">=</span> <span class="s1">&#39;SignonSession&#39;</span><span class="p">;</span>
 <span class="nb">session_name</span><span class="p">(</span><span class="nv">$session_name</span><span class="p">);</span>
-<span class="nb">session_start</span><span class="p">();</span>
+<span class="o">@</span><span class="nb">session_start</span><span class="p">();</span>
 
 <span class="c1">// Determine realm and return_to</span>
 <span class="nv">$base</span> <span class="o">=</span> <span class="s1">&#39;http&#39;</span><span class="p">;</span>
@@ -725,77 +726,6 @@ of which are beyond the scope of this manual but easily searchable
 with Google).</li>
 </ul>
 </div>
-<div class="section" id="swekey-authentication-mode">
-<span id="swekey"></span><span id="index-25"></span><h3>Swekey authentication mode<a class="headerlink" href="#swekey-authentication-mode" title="Permalink to this headline">¶</a></h3>
-<p>The Swekey is a low cost authentication USB key that can be used in
-web applications. When Swekey authentication is activated, phpMyAdmin
-requires the users&#8217;s Swekey to be plugged before entering the login
-page (currently supported for cookie authentication mode only). Swekey
-Authentication is disabled by default. To enable it, add the following
-line to <tt class="file docutils literal"><span class="pre">config.inc.php</span></tt>:</p>
-<div class="highlight-php"><div class="highlight"><pre><span class="nv">$cfg</span><span class="p">[</span><span class="s1">&#39;Servers&#39;</span><span class="p">][</span><span class="nv">$i</span><span class="p">][</span><span class="s1">&#39;auth_swekey_config&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/etc/swekey.conf&#39;</span><span class="p">;</span>
-</pre></div>
-</div>
-<p>You then have to create the <tt class="docutils literal"><span class="pre">swekey.conf</span></tt> file that will associate
-each user with their Swekey Id. It is important to place this file
-outside of your web server&#8217;s document root (in the example, it is
-located in <tt class="docutils literal"><span class="pre">/etc</span></tt>). Feel free to use it with your own users&#8217;
-information. If you want to purchase a Swekey please visit
-<a class="reference external" href="https://www.phpmyadmin.net/auth_key/">https://www.phpmyadmin.net/auth_key/</a>
-since this link provides funding for phpMyAdmin.</p>
-<p>A self documented sample file is provided in the
-file <tt class="file docutils literal"><span class="pre">examples/swekey.sample.conf</span></tt>:</p>
-<div class="highlight-sh"><div class="highlight"><pre><span class="c"># This is a typical file used to enable Swekey hardware authentication.</span>
-<span class="c">#</span>
-<span class="c"># To activate the Swekey authentication add the following line to your config.inc.php file.</span>
-<span class="c">#       $cfg[&#39;Servers&#39;][$i][&#39;auth_swekey_config&#39;] = &#39;/etc/swekey-pma.conf&#39;;</span>
-<span class="c"># Then rename this file &quot;swekey-pma.conf&quot; and copy it to the /etc directory.</span>
-<span class="c"># Add all the Swekey ids you want to grant access to in the file.</span>
-<span class="c"># After each Swekey id put the corresponding user name.</span>
-<span class="c">#</span>
-<span class="c"># If you don&#39;t know the id of a Swekey just visit http://www.swekey.com?sel=support</span>
-<span class="c"># while your Swekey is connected.</span>
-<span class="c">#</span>
-<span class="c"># If you need to purchase a Swekey please visit https://www.phpmyadmin.net/auth_key/</span>
-<span class="c"># since this link provides funding to PhpMyAdmin.</span>
-<span class="c">#</span>
-
-0000000000000000000000000000763A:root
-000000000000000000000000000089E4:steve
-0000000000000000000000000000231E:scott
-
-<span class="c">#</span>
-<span class="c"># It is recommended to include the following lines to contact the</span>
-<span class="c"># authentication servers in SSL mode.</span>
-<span class="c">#</span>
-
-<span class="nv">SERVER_CHECK</span><span class="o">=</span>https://auth-check-ssl.musbe.net
-<span class="nv">SERVER_RNDTOKEN</span><span class="o">=</span>https://auth-rnd-gen-ssl.musbe.net
-<span class="nv">SERVER_STATUS</span><span class="o">=</span>https://auth-status-ssl.musbe.net
-
-<span class="c">#</span>
-<span class="c"># The path of the root certificate file used to ensure a secure</span>
-<span class="c"># communication with the authentication servers in SSL mode.</span>
-<span class="c"># If not specified, will use musbe-ca.crt found in your</span>
-<span class="c"># phpMyAdmin/libraries/auth/swekey.</span>
-<span class="c">#</span>
-
-<span class="c">#CA_FILE=/var/http-root/phpmyadmin/libraries/auth/swekey/musbe-ca.crt</span>
-
-<span class="c">#</span>
-<span class="c"># If your server receives many login requests, you can enable the random</span>
-<span class="c"># token caching to accelerate the authentication process.</span>
-<span class="c"># Token caching is enabled by default.</span>
-<span class="c">#</span>
-
-<span class="c">#ENABLE_TOKEN_CACHE=0</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><span class="target" id="index-26"></span><a class="reference internal" href="config.html#cfg_Servers_auth_swekey_config"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['auth_swekey_config']</span></tt></a></p>
-</div>
-</div>
 </div>
 <div class="section" id="securing-your-phpmyadmin-installation">
 <h2>Securing your phpMyAdmin installation<a class="headerlink" href="#securing-your-phpmyadmin-installation" title="Permalink to this headline">¶</a></h2>
@@ -807,13 +737,13 @@ use it after the initial setup.</li>
 <li>Properly choose an authentication method - <a class="reference internal" href="#cookie"><em>Cookie authentication mode</em></a>
 is probably the best choice for shared hosting.</li>
 <li>In case you don&#8217;t want all MySQL users to be able to access
-phpMyAdmin, you can use <span class="target" id="index-27"></span><a class="reference internal" href="config.html#cfg_Servers_AllowDeny_rules"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['AllowDeny']['rules']</span></tt></a> to limit them.</li>
+phpMyAdmin, you can use <span class="target" id="index-25"></span><a class="reference internal" href="config.html#cfg_Servers_AllowDeny_rules"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['Servers'][$i]['AllowDeny']['rules']</span></tt></a> to limit them.</li>
 <li>Consider hiding phpMyAdmin behind an authentication proxy, so that
 users need to authenticate prior to providing MySQL credentials
 to phpMyAdmin.</li>
 <li>If you are afraid of automated attacks, enabling Captcha by
-<span class="target" id="index-28"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPublicKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPublicKey']</span></tt></a> and
-<span class="target" id="index-29"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPrivateKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPrivateKey']</span></tt></a> might be an option.</li>
+<span class="target" id="index-26"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPublicKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPublicKey']</span></tt></a> and
+<span class="target" id="index-27"></span><a class="reference internal" href="config.html#cfg_CaptchaLoginPrivateKey"><tt class="xref config config-option docutils literal"><span class="pre">$cfg['CaptchaLoginPrivateKey']</span></tt></a> might be an option.</li>
 </ul>
 </div>
 </div>
@@ -854,7 +784,6 @@ to phpMyAdmin.</li>
 <li><a class="reference internal" href="#cookie-authentication-mode">Cookie authentication mode</a></li>
 <li><a class="reference internal" href="#signon-authentication-mode">Signon authentication mode</a></li>
 <li><a class="reference internal" href="#config-authentication-mode">Config authentication mode</a></li>
-<li><a class="reference internal" href="#swekey-authentication-mode">Swekey authentication mode</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#securing-your-phpmyadmin-installation">Securing your phpMyAdmin installation</a></li>
@@ -902,7 +831,7 @@ to phpMyAdmin.</li>
         <li class="right" >
           <a href="require.html" title="Requirements"
              >previous</a> |</li>
-        <li><a href="index.html">phpMyAdmin 4.4.15.7 documentation</a> &raquo;</li> 
+        <li><a href="index.html">phpMyAdmin 4.4.15.9 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

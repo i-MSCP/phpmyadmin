@@ -33,14 +33,22 @@ function PMA_getIp()
         return $direct_ip;
     }
 
-    $trusted_header_value
-        = PMA_getenv($GLOBALS['cfg']['TrustedProxies'][$direct_ip]);
-    $matches = array();
+    /**
+     * Parse header in form:
+     * X-Forwarded-For: client, proxy1, proxy2
+     */
+    // Get header content
+    $value = PMA_getenv($GLOBALS['cfg']['TrustedProxies'][$direct_ip]);
+    // Grab first element what is client adddress
+    $values = explode(',', $value);
+    $value = $values[0];
+    // Extract IP address
     // the $ checks that the header contains only one IP address,
     // ?: makes sure the () don't capture
+    $matches = array();
     $is_ip = preg_match(
         '|^(?:[0-9]{1,3}\.){3,3}[0-9]{1,3}$|',
-        $trusted_header_value, $matches
+        $value, $matches
     );
 
     if ($is_ip && (count($matches) == 1)) {
@@ -48,8 +56,8 @@ function PMA_getIp()
         return $matches[0];
     }
 
-    /* Return true IP */
-    return $direct_ip;
+    // We could not parse header
+    return false;
 } // end of the 'PMA_getIp()' function
 
 
@@ -190,7 +198,7 @@ function PMA_ipv6MaskTest($test_range, $ip_to_test)
 
     if ($is_single) {
         $range_hex = bin2hex(inet_pton($test_range));
-        $result = $ip_hex === $range_hex;
+        $result = hash_equals($ip_hex, $range_hex);
         return $result;
     }
 
@@ -310,7 +318,7 @@ function PMA_allowDeny($type)
 
         // check for username
         if (($rule_data[1] != '%') //wildcarded first
-            && ($rule_data[1] != $username)
+            && (! hash_equals($rule_data[1], $username))
         ) {
             continue;
         }

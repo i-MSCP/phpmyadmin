@@ -375,9 +375,7 @@ function PMA_getHtmlForTableVersionDetails(
 function PMA_getTableLastVersionNumber($sql_result)
 {
     $maxversion = $GLOBALS['dbi']->fetchArray($sql_result);
-    $last_version = $maxversion['version'];
-
-    return $last_version;
+    return intval($maxversion['version']);
 }
 
 /**
@@ -848,7 +846,10 @@ function PMA_getHtmlForSchemaSnapshot($url_query)
     );
 
     // Unserialize snapshot
-    $temp = unserialize($data['schema_snapshot']);
+    $temp = PMA_safeUnserialize($data['schema_snapshot']);
+    if ($temp === null) {
+        $temp = array('COLUMNS' => array(), 'INDEXES' => array());
+    }
     $columns = $temp['COLUMNS'];
     $indexes = $temp['INDEXES'];
     $html .= PMA_getHtmlForColumns($columns);
@@ -1161,14 +1162,16 @@ function PMA_exportAsFileDownload($entries)
 {
     @ini_set('url_rewriter.tags', '');
 
+    // Replace all multiple whitespaces by a single space
+    $table = htmlspecialchars(preg_replace('/\s+/', ' ', $_REQUEST['table']));
     $dump = "# " . sprintf(
-        __('Tracking report for table `%s`'), htmlspecialchars($_REQUEST['table'])
+        __('Tracking report for table `%s`'), $table
     )
     . "\n" . "# " . date('Y-m-d H:i:s') . "\n";
     foreach ($entries as $entry) {
         $dump .= $entry['statement'];
     }
-    $filename = 'log_' . htmlspecialchars($_REQUEST['table']) . '.sql';
+    $filename = 'log_' . $table . '.sql';
     PMA_Response::getInstance()->disable();
     PMA_downloadHeader(
         $filename,
