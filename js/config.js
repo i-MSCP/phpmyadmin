@@ -10,7 +10,7 @@
  *
  * @returns bool
  */
-function isStorageSupported(type)
+function isStorageSupported(type, warn)
 {
     try {
         window[type].setItem('PMATest', 'test');
@@ -22,7 +22,9 @@ function isStorageSupported(type)
         }
     } catch(error) {
         // Not supported
-        PMA_ajaxShowMessage(PMA_messages.strNoLocalStorage, false);
+        if (warn) {
+            PMA_ajaxShowMessage(PMA_messages.strNoLocalStorage, false);
+        }
     }
     return false;
 }
@@ -583,10 +585,10 @@ function setTab(tab_id)
 {
     $('ul.tabs').each(function() {
         var $this = $(this);
-        if (!$this.find('li a[href=#' + tab_id + ']').length) {
+        if (!$this.find('li a[href="#' + tab_id + '"]').length) {
             return;
         }
-        $this.find('li').removeClass('active').find('a[href=#' + tab_id + ']').parent().addClass('active');
+        $this.find('li').removeClass('active').find('a[href="#' + tab_id + '"]').parent().addClass('active');
         $this.parent().find('div.tabs_contents fieldset').hide().filter('#' + tab_id).show();
         var hashValue = 'tab_' + tab_id;
         location.hash = hashValue;
@@ -740,7 +742,7 @@ AJAX.registerOnload('config.js', function () {
         });
 
     // detect localStorage state
-    var ls_supported = isStorageSupported('localStorage');
+    var ls_supported = isStorageSupported('localStorage', true);
     var ls_exists = ls_supported ? (window.localStorage.config || false) : false;
     $('div.localStorage-' + (ls_supported ? 'un' : '') + 'supported').hide();
     $('div.localStorage-' + (ls_exists ? 'empty' : 'exists')).hide();
@@ -796,8 +798,8 @@ function savePrefsToLocalStorage(form)
         type: 'POST',
         data: {
             ajax_request: true,
-            server: $form.find('input[name=server]').val(),
-            token: $form.find('input[name=token]').val(),
+            server: PMA_commonParams.get('server'),
+            token: PMA_commonParams.get('token'),
             submit_get_json: true
         },
         success: function (data) {
@@ -836,7 +838,7 @@ function updatePrefsDate()
 }
 
 /**
- * Prepares message which informs that localStorage preferences are available and can be imported
+ * Prepares message which informs that localStorage preferences are available and can be imported or deleted
  */
 function offerPrefsAutoimport()
 {
@@ -851,7 +853,17 @@ function offerPrefsAutoimport()
         if ($a.attr('href') == '#no') {
             $cnt.remove();
             $.post('index.php', {
-                token: $cnt.find('input[name=token]').val(),
+                token: PMA_commonParams.get('token'),
+                server: PMA_commonParams.get('server'),
+                prefs_autoload: 'hide'
+            }, null, 'html');
+            return;
+        } else if ($a.attr('href') == '#delete') {
+            $cnt.remove();
+            localStorage.clear();
+            $.post('index.php', {
+                token: PMA_commonParams.get('token'),
+                server: PMA_commonParams.get('server'),
                 prefs_autoload: 'hide'
             }, null, 'html');
             return;

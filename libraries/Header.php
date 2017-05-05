@@ -8,9 +8,10 @@
 namespace PMA\libraries;
 
 use PMA\libraries\navigation\Navigation;
+use PMA\libraries\URL;
+use PMA\libraries\Sanitize;
+use PMA\libraries\Config;
 
-require_once 'libraries/js_escape.lib.php';
-require_once 'libraries/url_generating.lib.php';
 
 /**
  * Class used to output the HTTP and HTML headers
@@ -84,8 +85,6 @@ class Header
     private $_isPrintView;
     /**
      * Whether we are servicing an ajax request.
-     * We can't simply use $GLOBALS['is_ajax_request']
-     * here since it may have not been initialised yet.
      *
      * @access private
      * @var bool
@@ -153,14 +152,15 @@ class Header
         if (isset($GLOBALS['db'])) {
             $params['db'] = $GLOBALS['db'];
         }
-        $this->_scripts->addFile('jquery/jquery-2.1.4.min.js');
+        $this->_scripts->addFile('jquery/jquery.min.js');
+        $this->_scripts->addFile('jquery/jquery-migrate-3.0.0.js');
         $this->_scripts->addFile(
-            'whitelist.php' . PMA_URL_getCommon($params), false, true
+            'whitelist.php' . URL::getCommon($params), false, true
         );
         $this->_scripts->addFile('sprintf.js');
         $this->_scripts->addFile('ajax.js');
         $this->_scripts->addFile('keyhandler.js');
-        $this->_scripts->addFile('jquery/jquery-ui-1.11.4.min.js');
+        $this->_scripts->addFile('jquery/jquery-ui.min.js');
         $this->_scripts->addFile('jquery/jquery.cookie.js');
         $this->_scripts->addFile('jquery/jquery.mousewheel.js');
         $this->_scripts->addFile('jquery/jquery.event.drag-2.2.js');
@@ -183,7 +183,7 @@ class Header
         // Here would not be a good place to add CodeMirror because
         // the user preferences have not been merged at this point
 
-        $this->_scripts->addFile('messages.php' . PMA_URL_getCommon($params));
+        $this->_scripts->addFile('messages.php' . URL::getCommon($params));
         // Append the theme id to this url to invalidate
         // the cache on a theme change. Though this might be
         // unavailable for fatal errors.
@@ -202,6 +202,9 @@ class Header
         $this->_scripts->addFile('indexes.js');
         $this->_scripts->addFile('common.js');
         $this->_scripts->addFile('page_settings.js');
+        if(!$GLOBALS['cfg']['DisableShortcutKeys']) {
+            $this->_scripts->addFile('shortcuts_handler.js');
+        }
         $this->_scripts->addCode($this->getJsParamsCode());
     }
 
@@ -224,11 +227,10 @@ class Header
         }
 
         $params = array(
-            'common_query' => PMA_URL_getCommon(array(), 'text'),
+            'common_query' => URL::getCommonRaw(),
             'opendb_url' => Util::getScriptNameForOption(
                 $GLOBALS['cfg']['DefaultTabDatabase'], 'database'
             ),
-            'safari_browser' => PMA_USR_BROWSER_AGENT == 'SAFARI' ? 1 : 0,
             'collation_connection' => $GLOBALS['collation_connection'],
             'lang' => $GLOBALS['lang'],
             'server' => $GLOBALS['server'],
@@ -250,6 +252,7 @@ class Header
             'pftext' => $pftext,
             'confirm' => $GLOBALS['cfg']['Confirm'],
             'LoginCookieValidity' => $GLOBALS['cfg']['LoginCookieValidity'],
+            'session_gc_maxlifetime' => (int)@ini_get('session.gc_maxlifetime'),
             'logged_in' => isset($GLOBALS['userlink']) ? true : false,
             'PMA_VERSION' => PMA_VERSION
         );
@@ -257,6 +260,9 @@ class Header
             && isset($GLOBALS['cfg']['Server']['auth_type'])
         ) {
             $params['auth_type'] = $GLOBALS['cfg']['Server']['auth_type'];
+            if (isset($GLOBALS['cfg']['Server']['user'])) {
+                $params['user'] = $GLOBALS['cfg']['Server']['user'];
+            }
         }
 
         return $params;
@@ -272,7 +278,7 @@ class Header
     {
         $params = $this->getJsParams();
         foreach ($params as $key => $value) {
-            $params[$key] = $key . ':"' . PMA_escapeJsString($value) . '"';
+            $params[$key] = $key . ':"' . Sanitize::escapeJsString($value) . '"';
         }
         return 'PMA_commonParams.setAll({' . implode(',', $params) . '});';
     }
@@ -427,14 +433,7 @@ class Header
                     $retval .= $nav->getDisplay();
                 }
                 // Include possible custom headers
-                if (file_exists(CUSTOM_HEADER_FILE)) {
-                    $retval .= '<div id="pma_header">';
-                    ob_start();
-                    include CUSTOM_HEADER_FILE;
-                    $retval .= ob_get_contents();
-                    ob_end_clean();
-                    $retval .= '</div>';
-                }
+                $retval .= Config::renderHeader();
                 // offer to load user preferences from localStorage
                 if ($this->_userprefsOfferImport) {
                     include_once './libraries/user_preferences.lib.php';
@@ -514,7 +513,7 @@ class Header
      */
     public function sendHttpHeaders()
     {
-        if (defined('TESTSUITE') && ! defined('PMA_TEST_HEADERS')) {
+        if (defined('TESTSUITE')) {
             return;
         }
         $map_tile_urls = ' *.tile.openstreetmap.org';
@@ -538,6 +537,7 @@ class Header
                 'X-Frame-Options: DENY'
             );
         }
+        header('Referrer-Policy: no-referrer');
         header(
             "Content-Security-Policy: default-src 'self' "
             . $captcha_url
@@ -550,7 +550,6 @@ class Header
             . $captcha_url
             . $GLOBALS['cfg']['CSPAllow']
             . ";"
-            . "referrer no-referrer;"
             . "img-src 'self' data: "
             . $GLOBALS['cfg']['CSPAllow']
             . $map_tile_urls
@@ -599,7 +598,7 @@ class Header
             'X-Content-Type-Options: nosniff'
         );
         // Adobe cross-domain-policies
-        // see http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html
+        // see https://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html
         header(
             'X-Permitted-Cross-Domain-Policies: none'
         );
@@ -627,10 +626,7 @@ class Header
         $dir  = $GLOBALS['text_dir'];
 
         $retval  = "<!DOCTYPE HTML>";
-        $retval .= "<html lang='$lang' dir='$dir' class='";
-        $retval .= mb_strtolower(PMA_USR_BROWSER_AGENT) . " ";
-        $retval .= mb_strtolower(PMA_USR_BROWSER_AGENT)
-            . intval(PMA_USR_BROWSER_VER) . "'>";
+        $retval .= "<html lang='$lang' dir='$dir'>";
         $retval .= '<head>';
 
         return $retval;
@@ -646,7 +642,7 @@ class Header
         $retval  = '<meta charset="utf-8" />';
         $retval .= '<meta name="referrer" content="no-referrer" />';
         $retval .= '<meta name="robots" content="noindex,nofollow" />';
-        $retval .= '<meta http-equiv="X-UA-Compatible" content="IE=Edge">';
+        $retval .= '<meta http-equiv="X-UA-Compatible" content="IE=Edge" />';
         if (! $GLOBALS['cfg']['AllowThirdPartyFraming']) {
             $retval .= '<style id="cfs-style">html{display: none;}</style>';
         }
@@ -677,7 +673,7 @@ class Header
             // load jQuery's CSS prior to our theme's CSS, to let the theme
             // override jQuery's CSS
             $retval .= '<link rel="stylesheet" type="text/css" href="'
-                . $theme_path . '/jquery/jquery-ui-1.11.4.css" />';
+                . $theme_path . '/jquery/jquery-ui.css" />';
             $retval .= '<link rel="stylesheet" type="text/css" href="'
                 . $basedir . 'js/codemirror/lib/codemirror.css?' . $v . '" />';
             $retval .= '<link rel="stylesheet" type="text/css" href="'
@@ -784,7 +780,7 @@ class Header
     {
         $retval = '';
         if ($this->_menuEnabled
-            && mb_strlen($table)
+            && strlen($table) > 0
             && $GLOBALS['cfg']['NumRecentTables'] > 0
         ) {
             $tmp_result = RecentFavoriteTable::getInstance('recent')
