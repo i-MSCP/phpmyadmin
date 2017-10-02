@@ -51,9 +51,16 @@ class CaseExpression extends Component
     /**
      * The result in ELSE section of expr.
      *
-     * @var array
+     * @var Expression
      */
     public $else_result;
+
+    /**
+     * The sub-expression.
+     *
+     * @var string
+     */
+    public $expr = '';
 
     /**
      * Constructor.
@@ -192,6 +199,8 @@ class CaseExpression extends Component
                 'Unexpected end of CASE expression',
                 $list->tokens[$list->idx - 1]
             );
+        } else {
+            $ret->expr = self::build($ret);
         }
 
         --$list->idx;

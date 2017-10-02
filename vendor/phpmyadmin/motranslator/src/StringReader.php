@@ -70,8 +70,15 @@ class StringReader
     public function readint($unpack, $pos)
     {
         $data = unpack($unpack, $this->read($pos, 4));
+        $result = $data[1];
 
-        return $data[1];
+        /* We're reading unsigned int, but PHP will happily
+         * give us negative number on 32-bit platforms.
+         *
+         * See also documentation:
+         * https://secure.php.net/manual/en/function.unpack.php#refsect1-function.unpack-notes
+         */
+        return $result < 0 ? PHP_INT_MAX : $result;
     }
 
     /**

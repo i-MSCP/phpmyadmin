@@ -259,7 +259,7 @@ button.mult_submit {
 
 /* odd items 1,3,5,7,... */
 table tr:nth-child(odd) {
-        background: <?php echo $GLOBALS['cfg']['BgOne']; ?>; 
+        background: <?php echo $GLOBALS['cfg']['BgOne']; ?>;
 }
 
 /* even items 2,4,6,8,... */
@@ -1694,7 +1694,7 @@ input#input_import_file {
 /**
  * Indexes
  */
-#index_frm .index_info input,
+#index_frm .index_info input[type="text"],
 #index_frm .index_info select {
     width: 100%;
     box-sizing:         border-box;
@@ -2679,19 +2679,8 @@ table.show_create td {
     border-right: 1px solid #bbb;
 }
 
-#alias_modal table th {
-    vertical-align: middle;
-    padding-left: 1em;
-}
-
-#alias_modal label.col-2 {
-    min-width: 20%;
-    display: inline-block;
-}
-
-#alias_modal select {
-    width: 25%;
-    margin-right: 2em;
+#alias_modal table {
+    width: 100%;
 }
 
 #alias_modal label {

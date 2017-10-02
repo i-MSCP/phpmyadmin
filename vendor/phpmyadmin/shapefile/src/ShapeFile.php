@@ -56,7 +56,9 @@ class ShapeFile
     }
 
     /**
-     * @param int $shapeType
+     * @param int        $shapeType   File shape type, should be same as all records
+     * @param array      $boundingBox File bounding box
+     * @param null|mixed $FileName    File name
      */
     public function __construct($shapeType, $boundingBox = array('xmin' => 0.0, 'ymin' => 0.0, 'xmax' => 0.0, 'ymax' => 0.0), $FileName = null)
     {
@@ -98,9 +100,9 @@ class ShapeFile
             $this->_closeDBFFile();
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -633,7 +635,7 @@ class ShapeFile
     /**
      * Check whether file contains measure data.
      *
-     * For some reason this is distinguished by zero bouding box in the
+     * For some reason this is distinguished by zero bounding box in the
      * specification.
      *
      * @return bool

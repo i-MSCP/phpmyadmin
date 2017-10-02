@@ -1017,15 +1017,14 @@ class Util
 
             if (! empty($GLOBALS['show_as_php'])) {
                 $new_line = '\\n"<br />' . "\n" . '&nbsp;&nbsp;&nbsp;&nbsp;. "';
-                $query_base = '$sql  = \'' . $query_base;
-                $query_base = '<code class="php"><pre>' . "\n"
-                    . htmlspecialchars(addslashes($query_base));
+                $query_base = htmlspecialchars(addslashes($query_base));
                 $query_base = preg_replace(
                     '/((\015\012)|(\015)|(\012))/',
                     $new_line,
                     $query_base
                 );
-                $query_base = '$sql  = \'' . $query_base . '"';
+                $query_base = '<code class="php"><pre>' . "\n"
+                    . '$sql = "' . $query_base;
             } elseif ($query_too_big) {
                 $query_base = htmlspecialchars($query_base);
             } else {
@@ -1062,18 +1061,18 @@ class Util
                 $explain_params = $url_params;
                 if ($is_select) {
                     $explain_params['sql_query'] = 'EXPLAIN ' . $sql_query;
-                    $explain_link = ' ['
+                    $explain_link = ' [&nbsp;'
                         . self::linkOrButton(
                             'import.php' . URL::getCommon($explain_params),
                             __('Explain SQL')
-                        ) . ']';
+                        ) . '&nbsp;]';
                 } elseif (preg_match(
                     '@^EXPLAIN[[:space:]]+SELECT[[:space:]]+@i',
                     $sql_query
                 )) {
                     $explain_params['sql_query']
                         = mb_substr($sql_query, 8);
-                    $explain_link = ' ['
+                    $explain_link = ' [&nbsp;'
                         . self::linkOrButton(
                             'import.php' . URL::getCommon($explain_params),
                             __('Skip Explain SQL')
@@ -1089,7 +1088,7 @@ class Util
                             true,
                             false,
                             '_blank'
-                        ) . ']';
+                        ) . '&nbsp;]';
                 }
             } //show explain
 
@@ -1102,9 +1101,9 @@ class Util
                 && empty($GLOBALS['show_as_php'])
             ) {
                 $edit_link .= URL::getCommon($url_params) . '#querybox';
-                $edit_link = ' ['
+                $edit_link = ' [&nbsp;'
                     . self::linkOrButton($edit_link, __('Edit'))
-                    . ']';
+                    . '&nbsp;]';
             } else {
                 $edit_link = '';
             }
@@ -1114,7 +1113,7 @@ class Util
             if (! empty($cfg['SQLQuery']['ShowAsPHP']) && ! $query_too_big) {
 
                 if (! empty($GLOBALS['show_as_php'])) {
-                    $php_link = ' ['
+                    $php_link = ' [&nbsp;'
                         . self::linkOrButton(
                             'import.php' . URL::getCommon($url_params),
                             __('Without PHP code'),
@@ -1124,9 +1123,9 @@ class Util
                             '',
                             true
                         )
-                        . ']';
+                        . '&nbsp;]';
 
-                    $php_link .= ' ['
+                    $php_link .= ' [&nbsp;'
                         . self::linkOrButton(
                             'import.php' . URL::getCommon($url_params),
                             __('Submit query'),
@@ -1136,17 +1135,17 @@ class Util
                             '',
                             true
                         )
-                        . ']';
+                        . '&nbsp;]';
                 } else {
                     $php_params = $url_params;
                     $php_params['show_as_php'] = 1;
                     $_message = __('Create PHP code');
-                    $php_link = ' ['
+                    $php_link = ' [&nbsp;'
                         . self::linkOrButton(
                             'import.php' . URL::getCommon($php_params),
                             $_message
                         )
-                        . ']';
+                        . '&nbsp;]';
                 }
             } else {
                 $php_link = '';
@@ -1158,8 +1157,8 @@ class Util
                 && preg_match('@^(SELECT|SHOW)[[:space:]]+@i', $sql_query)
             ) {
                 $refresh_link = 'import.php' . URL::getCommon($url_params);
-                $refresh_link = ' ['
-                    . self::linkOrButton($refresh_link, __('Refresh')) . ']';
+                $refresh_link = ' [&nbsp;'
+                    . self::linkOrButton($refresh_link, __('Refresh')) . '&nbsp;]';
             } else {
                 $refresh_link = '';
             } //refresh
@@ -1169,7 +1168,7 @@ class Util
 
             //Clean up the end of the PHP
             if (! empty($GLOBALS['show_as_php'])) {
-                $retval .= '\';' . "\n"
+                $retval .= '";' . "\n"
                     . '</pre></code>';
             }
             $retval .= '</div>';
@@ -1769,11 +1768,6 @@ class Util
         $new_form = true, $strip_img = false, $target = '', $force_button = false
     ) {
         $url_length = mb_strlen($url);
-        // with this we should be able to catch case of image upload
-        // into a (MEDIUM) BLOB; not worth generating even a form for these
-        if ($url_length > $GLOBALS['cfg']['LinkLengthLimit'] * 100) {
-            return '';
-        }
 
         if (! is_array($tag_params)) {
             $tmp = $tag_params;
@@ -1839,9 +1833,9 @@ class Util
             }
 
             // no whitespace within an <a> else Safari will make it part of the link
-            $ret = "\n" . '<a href="' . $url . '" '
+            $ret = '<a href="' . $url . '" '
                 . implode(' ', $tag_params_strings) . '>'
-                . $message . $displayed_message . '</a>' . "\n";
+                . $message . $displayed_message . '</a>';
         } else {
             // no spaces (line breaks) at all
             // or after the hidden fields
@@ -1858,6 +1852,7 @@ class Util
                 }
                 $ret = '<form action="' . $url_parts['path'] . '" class="link"'
                      . ' method="post"' . $target . ' style="display: inline;">';
+                $ret .= URL::getHiddenInputs();
                 $subname_open   = '';
                 $subname_close  = '';
                 $submit_link    = '#';
@@ -2412,6 +2407,13 @@ class Util
         $count, $pos, $_url_params, $script, $frame, $max_count, $name = 'pos',
         $classes = array()
     ) {
+
+        // This is often coming from $cfg['MaxTableList'] and
+        // people sometimes set it to empty string
+        $max_count = intval($max_count);
+        if ($max_count <= 0) {
+            $max_count = 250;
+        }
 
         $class = $frame == 'frame_navigation' ? ' class="ajax"' : '';
 
@@ -4743,7 +4745,7 @@ class Util
      *
      * @return mixed
      */
-    public static function httprequestcurl($url, $method, $return_only_status = false, $content = null, $header = "", $ssl = 0)
+    public static function httpRequestCurl($url, $method, $return_only_status = false, $content = null, $header = "", $ssl = 0)
     {
         $curl_handle = curl_init($url);
         if ($curl_handle === false) {
@@ -4787,7 +4789,7 @@ class Util
         if ($ssl == CURLOPT_CAPATH) {
             $curl_status &= curl_setopt($curl_handle, CURLOPT_CAPATH, $certs_dir);
         } elseif ($ssl == CURLOPT_CAINFO) {
-            $curl_status &= curl_setopt($curl_handle, CURLOPT_CAINFO, $certs_dir . 'isrgrootx1.pem');
+            $curl_status &= curl_setopt($curl_handle, CURLOPT_CAINFO, $certs_dir . 'cacert.pem');
         }
 
         $curl_status &= curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER,true);
@@ -4888,5 +4890,18 @@ class Util
             return Util::httpRequestFopen($url, $method, $return_only_status, $content, $header);
         }
         return null;
+    }
+
+    /**
+     * Wrapper around php's set_time_limit
+     *
+     * @return void
+     */
+    public static function setTimeLimit()
+    {
+        // The function can be disabled in php.ini
+        if (function_exists('set_time_limit')) {
+            @set_time_limit($GLOBALS['cfg']['ExecTimeLimit']);
+        }
     }
 }

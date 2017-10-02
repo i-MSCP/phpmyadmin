@@ -375,7 +375,7 @@ $token_provided = false;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (PMA_isValid($_POST['token'])) {
         $token_provided = true;
-        $token_mismatch = ! hash_equals($_SESSION[' PMA_token '], $_POST['token']);
+        $token_mismatch = ! @hash_equals($_SESSION[' PMA_token '], $_POST['token']);
     }
 
     if ($token_mismatch) {
@@ -460,13 +460,29 @@ $GLOBALS['PMA_Config']->checkErrors();
 /**
  * As we try to handle charsets by ourself, mbstring overloads just
  * break it, see bug 1063821.
+ *
+ * We specifically use empty here as we are looking for anything else than
+ * empty value or 0.
  */
-if (@extension_loaded('mbstring') && @ini_get('mbstring.func_overload') != '0') {
+if (@extension_loaded('mbstring') && !empty(@ini_get('mbstring.func_overload'))) {
     PMA_fatalError(
         __(
             'You have enabled mbstring.func_overload in your PHP '
             . 'configuration. This option is incompatible with phpMyAdmin '
             . 'and might cause some data to be corrupted!'
+        )
+    );
+}
+
+/**
+ * The ini_set and ini_get functions can be disabled using
+ * disable_functions but we're relying quite a lot of them.
+ */
+if (! function_exists('ini_get') || ! function_exists('ini_set')) {
+    PMA_fatalError(
+        __(
+            'You have disabled ini_get and/or ini_set in php.ini. '
+            . 'This option is incompatible with phpMyAdmin!'
         )
     );
 }
@@ -524,11 +540,6 @@ if (! isset($cfg['Servers']) || count($cfg['Servers']) == 0) {
 unset($default_server);
 
 
-/******************************************************************************/
-/* setup themes                                          LABEL_theme_setup    */
-
-ThemeManager::initializeTheme();
-
 if (! defined('PMA_MINIMUM_COMMON')) {
     /**
      * Lookup server by name
@@ -555,34 +566,41 @@ if (! defined('PMA_MINIMUM_COMMON')) {
         }
         unset($i);
     }
+}
 
-    /**
-     * If no server is selected, make sure that $cfg['Server'] is empty (so
-     * that nothing will work), and skip server authentication.
-     * We do NOT exit here, but continue on without logging into any server.
-     * This way, the welcome page will still come up (with no server info) and
-     * present a choice of servers in the case that there are multiple servers
-     * and '$cfg['ServerDefault'] = 0' is set.
-     */
+/**
+ * If no server is selected, make sure that $cfg['Server'] is empty (so
+ * that nothing will work), and skip server authentication.
+ * We do NOT exit here, but continue on without logging into any server.
+ * This way, the welcome page will still come up (with no server info) and
+ * present a choice of servers in the case that there are multiple servers
+ * and '$cfg['ServerDefault'] = 0' is set.
+ */
 
-    if (isset($_REQUEST['server'])
-        && (is_string($_REQUEST['server']) || is_numeric($_REQUEST['server']))
-        && ! empty($_REQUEST['server'])
-        && ! empty($cfg['Servers'][$_REQUEST['server']])
-    ) {
-        $GLOBALS['server'] = $_REQUEST['server'];
+if (isset($_REQUEST['server'])
+    && (is_string($_REQUEST['server']) || is_numeric($_REQUEST['server']))
+    && ! empty($_REQUEST['server'])
+    && ! empty($cfg['Servers'][$_REQUEST['server']])
+) {
+    $GLOBALS['server'] = $_REQUEST['server'];
+    $cfg['Server'] = $cfg['Servers'][$GLOBALS['server']];
+} else {
+    if (!empty($cfg['Servers'][$cfg['ServerDefault']])) {
+        $GLOBALS['server'] = $cfg['ServerDefault'];
         $cfg['Server'] = $cfg['Servers'][$GLOBALS['server']];
     } else {
-        if (!empty($cfg['Servers'][$cfg['ServerDefault']])) {
-            $GLOBALS['server'] = $cfg['ServerDefault'];
-            $cfg['Server'] = $cfg['Servers'][$GLOBALS['server']];
-        } else {
-            $GLOBALS['server'] = 0;
-            $cfg['Server'] = array();
-        }
+        $GLOBALS['server'] = 0;
+        $cfg['Server'] = array();
     }
-    $GLOBALS['url_params']['server'] = $GLOBALS['server'];
+}
+$GLOBALS['url_params']['server'] = $GLOBALS['server'];
 
+/******************************************************************************/
+/* setup themes                                          LABEL_theme_setup    */
+
+ThemeManager::initializeTheme();
+
+if (! defined('PMA_MINIMUM_COMMON')) {
     /**
      * save some settings in cookies
      * @todo should be done in PMA\libraries\Config
@@ -630,7 +648,7 @@ if (! defined('PMA_MINIMUM_COMMON')) {
          * the required auth type plugin
          */
         $auth_class = "Authentication" . ucfirst($cfg['Server']['auth_type']);
-        if (! file_exists(
+        if (! @file_exists(
             './libraries/plugins/auth/'
             . $auth_class . '.php'
         )) {

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Configuration &#8212; phpMyAdmin 4.7.0 documentation</title>
+    <title>Configuration &#8212; phpMyAdmin 4.7.4 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '4.7.0',
+        VERSION:     '4.7.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="copyright" title="Copyright" href="copyright.html" />
-    <link rel="top" title="phpMyAdmin 4.7.0 documentation" href="index.html" />
+    <link rel="top" title="phpMyAdmin 4.7.4 documentation" href="index.html" />
     <link rel="next" title="User Guide" href="user.html" />
     <link rel="prev" title="Installation" href="setup.html" /> 
   </head>
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="setup.html" title="Installation"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">phpMyAdmin 4.7.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">phpMyAdmin 4.7.4 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -614,7 +614,7 @@ none of the remaining <code class="docutils literal"><span class="pre">'ssl...'<
 MySQL server is 5.6 or later, and your SSL certificate is self-signed,
 there is a chance your SSL connection will fail due to validation.
 Setting this to <code class="docutils literal"><span class="pre">false</span></code> will disable the validation check.</p>
-<p>Since PHP 5.6.0 it also verifies whether server name matches CN of it&#8217;s
+<p>Since PHP 5.6.0 it also verifies whether server name matches CN of its
 certificate. There is currently no way to disable just this check without
 disabling complete SSL verification.</p>
 <div class="admonition warning">
@@ -1928,6 +1928,9 @@ MySQL servers.</p>
 </tr>
 </tbody>
 </table>
+<div class="versionadded">
+<p><span class="versionmodified">New in version 3.5.0.</span></p>
+</div>
 <p>Name of PHP script to be sourced and executed to obtain login
 credentials. This is alternative approach to session based single
 signon. The script has to provide a function called
@@ -3122,7 +3125,7 @@ localized equivalent of:</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">boolean</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body">false</td>
+<tr class="field-even field"><th class="field-name">Default value:</th><td class="field-body">true</td>
 </tr>
 </tbody>
 </table>
@@ -5377,6 +5380,13 @@ Requires <span class="target" id="index-148"></span><a class="reference internal
 </table>
 <p>Enable to let server present itself as demo server.
 This is used for <a class="reference external" href="https://www.phpmyadmin.net/try/">phpMyAdmin demo server</a>.</p>
+<p>It currently changes following behavior:</p>
+<ul class="simple">
+<li>There is welcome message on the main page.</li>
+<li>There is footer information about demo server and used git revision.</li>
+<li>The setup script is enabled even with existing configuration.</li>
+<li>The setup does not try to connect to the MySQL server.</li>
+</ul>
 </dd></dl>
 
 </div>
@@ -5745,7 +5755,7 @@ server certificates and tell phpMyAdmin to use them:</p>
         <li class="right" >
           <a href="setup.html" title="Installation"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">phpMyAdmin 4.7.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">phpMyAdmin 4.7.4 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

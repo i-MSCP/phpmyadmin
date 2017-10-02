@@ -1,5 +1,44 @@
 # Change Log
 
+## [4.1.10] - 2017-08-21
+
+* Use custom LoaderException for context loading errors.
+
+## [4.1.9] - 2017-07-12
+
+* Various code cleanups.
+* Improved error handling of several invalid statements.
+
+## [4.1.8] - 2017-07-09
+
+* Fixed parsing SQL comment at the end of query.
+* Improved handing of non utf-8 strings.
+* Added query flag for SET queries.
+
+## [4.1.7] - 2017-06-06
+
+* Fixed setting combination SQL Modes.
+
+## [4.1.6] - 2017-06-01
+
+* Fixed building query with GROUP BY clause.
+
+## [4.1.5] - 2017-05-15
+
+* Fixed invalid lexing of queries with : in strings.
+* Properly handle maximal length of delimiter.
+
+## [4.1.4] - 2017-05-05
+
+* Fixed wrong extract of string tokens with escaped characters.
+* Properly handle lowercase begin statement.
+
+## [4.1.3] - 2017-04-06
+
+* Added suppport for DELETE ... JOIN clauses.
+* Changed BufferedQuery to include comments in output.
+* Fixed parsing of inline comments.
+
 ## [4.1.2] - 2017-02-20
 
 * Coding style improvements.

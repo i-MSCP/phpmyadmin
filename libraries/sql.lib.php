@@ -612,7 +612,7 @@ function PMA_isRememberSortingOrder($analyzed_sql_results)
             || $analyzed_sql_results['is_analyse'])
         && $analyzed_sql_results['select_from']
         && ((empty($analyzed_sql_results['select_expr']))
-            || (count($analyzed_sql_results['select_expr'] == 1)
+            || ((count($analyzed_sql_results['select_expr']) == 1)
                 && ($analyzed_sql_results['select_expr'][0] == '*')))
         && count($analyzed_sql_results['select_tables']) == 1;
 }
@@ -712,7 +712,7 @@ function PMA_hasNoRightsToDropDatabase($analyzed_sql_results,
  */
 function PMA_setColumnProperty($pmatable, $request_index)
 {
-    $property_value = explode(',', $_REQUEST[$request_index]);
+    $property_value = array_map('intval', explode(',', $_REQUEST[$request_index]));
     switch($request_index) {
     case 'col_order':
         $property_to_set = Table::PROP_COLUMN_ORDER;

@@ -303,8 +303,10 @@ class Lexer extends Core
 
                 // Parsing the delimiter.
                 $this->delimiter = null;
-                while (++$this->last < $this->len && !Context::isWhitespace($this->str[$this->last])) {
+                $delimiterLen = 0;
+                while (++$this->last < $this->len && !Context::isWhitespace($this->str[$this->last]) && $delimiterLen < 15) {
                     $this->delimiter .= $this->str[$this->last];
+                    ++$delimiterLen;
                 }
 
                 if (empty($this->delimiter)) {
@@ -437,30 +439,20 @@ class Lexer extends Core
          * @var int
          */
         $iEnd = $this->last;
-
-        /**
-         * Whether last parsed character is a whitespace.
-         *
-         * @var bool
-         */
-        $lastSpace = false;
-
         for ($j = 1; $j < Context::LABEL_MAX_LENGTH && $this->last < $this->len; ++$j, ++$this->last) {
-            // Composed keywords shouldn't have more than one whitespace between
-            // keywords.
-            if (Context::isWhitespace($this->str[$this->last])) {
-                if ($lastSpace) {
-                    --$j; // The size of the keyword didn't increase.
-                    continue;
-                }
-                $lastSpace = true;
-            } elseif ($this->str[$this->last] === ':') {
+            if ($this->str[$this->last] === ':' && $j > 1) {
+                // End of label
                 $token .= $this->str[$this->last];
                 $ret = new Token($token, Token::TYPE_LABEL);
                 $iEnd = $this->last;
                 break;
-            } else {
-                $lastSpace = false;
+            } elseif (Context::isWhitespace($this->str[$this->last]) && $j > 1) {
+                // Whitespace between label and :
+                // The size of the keyword didn't increase.
+                --$j;
+            } elseif (Context::isSeparator($this->str[$this->last])) {
+                // Any other separator
+                break;
             }
             $token .= $this->str[$this->last];
         }
@@ -546,6 +538,10 @@ class Lexer extends Core
             ) {
                 $token .= $this->str[$this->last];
             }
+            // Include trailing \n as whitespace token
+            if ($this->last < $this->len) {
+                --$this->last;
+            }
 
             return new Token($token, Token::TYPE_COMMENT, Token::FLAG_COMMENT_BASH);
         }
@@ -606,19 +602,27 @@ class Lexer extends Core
         // SQL style comments. (-- comment\n)
         if (++$this->last < $this->len) {
             $token .= $this->str[$this->last];
-            if (Context::isComment($token)) {
-                // Checking if this comment did not end already (```--\n```).
-                if ($this->str[$this->last] !== "\n") {
-                    while (
-                        ++$this->last < $this->len
-                        && $this->str[$this->last] !== "\n"
-                    ) {
-                        $token .= $this->str[$this->last];
-                    }
+            $end = false;
+        } else {
+            --$this->last;
+            $end = true;
+        }
+        if (Context::isComment($token, $end)) {
+            // Checking if this comment did not end already (```--\n```).
+            if ($this->str[$this->last] !== "\n") {
+                while (
+                    ++$this->last < $this->len
+                    && $this->str[$this->last] !== "\n"
+                ) {
+                    $token .= $this->str[$this->last];
                 }
-
-                return new Token($token, Token::TYPE_COMMENT, Token::FLAG_COMMENT_SQL);
             }
+            // Include trailing \n as whitespace token
+            if ($this->last < $this->len) {
+                --$this->last;
+            }
+
+            return new Token($token, Token::TYPE_COMMENT, Token::FLAG_COMMENT_SQL);
         }
 
         $this->last = $iBak;
