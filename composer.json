@@ -1,22 +1,45 @@
 {
-    "name": "imscp/phpmyadmin",
-    "description": "iMSCP tools - PhpMyadmin - MySQL administration tool",
-    "version": "4.7.4.0",
-    "authors": [
-        {
-            "name": "The phpMyAdmin Team",
-            "email": "phpmyadmin-devel@lists.sourceforge.net",
-            "homepage": "http://www.phpmyadmin.net/home_page/team.php"
-        }
-    ],
-    "license": "GPL-2.0+",
-    "keywords": [
-        "imscp",
-        "phpmyadmin",
-        "mysql",
-        "tools"
-    ],
-    "require": {
-        "PHP": ">=5.5.0"
+  "name": "imscp/phpmyadmin",
+  "type": "imscp-tool",
+  "license": "LGPL-2.1-only",
+  "description": "Provides the PhpMyAdmin SQL administration tool for i-MSCP",
+  "keywords": [
+    "",
+    "iMSCP",
+    "tools",
+    "phpmyadmin",
+  ],
+  "homepage": "https://www.i-mscp.net/",
+  "authors": [
+    {
+      "name": "Laurent Declercq",
+      "email": "l.declercq@nuxwin.com",
+      "homepage": "https://www.i-mscp.net"
     }
+  ],
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "class": "iMSCP\\Composer\\Plugin",
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  },
+  "require": {
+    "php": "^7.3",
+    "imscp/composer-installers": "^1.0",
+    "phpmyadmin/phpmyadmin": "^4.8"
+  },
+  "require-dev": {
+    "imscp/imscp-coding-standard": "^1.0",
+    "roave/security-advisories": "dev-master"
+  },
+  "scripts": {
+    "check": [
+      "@cs-check"
+    ],
+    "cs-check": "phpcs",
+    "cs-fix": "phpcbf"
+  }
 }
