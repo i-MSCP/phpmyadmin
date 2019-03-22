@@ -4,10 +4,10 @@
   "license": "LGPL-2.1-only",
   "description": "Provides the PhpMyAdmin SQL administration tool for i-MSCP",
   "keywords": [
-    "",
     "iMSCP",
     "tools",
-    "phpmyadmin",
+    "sql",
+    "phpmyadmin"
   ],
   "homepage": "https://www.i-mscp.net/",
   "authors": [
@@ -21,9 +21,8 @@
     "sort-packages": true
   },
   "extra": {
-    "class": "iMSCP\\Composer\\Plugin",
     "branch-alias": {
-      "dev-master": "1.0-dev"
+      "dev-master": "4.8.x-dev"
     }
   },
   "require": {
