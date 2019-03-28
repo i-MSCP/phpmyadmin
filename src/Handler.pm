@@ -333,7 +333,8 @@ sub _buildConfigFiles
 
     $cfgTpl = process( $data, $cfgTpl );
 
-    my $ug = $::imscpConfig{'SYSTEM_USER_PREFIX'} . $::imscpConfig{'SYSTEM_USER_MIN_UID'};
+    my $ug = $::imscpConfig{'SYSTEM_USER_PREFIX'} .
+        $::imscpConfig{'SYSTEM_USER_MIN_UID'};
     my $file = iMSCP::File->new(
         filename => './vendor/phpmyadmin/phpmyadmin/config.inc.php'
     );
@@ -349,9 +350,12 @@ sub _buildConfigFiles
     );
     return 1 unless defined( my $fileC = $file->getAsRef());
 
-    ${ $fileC } =~ s%^define\('AUTOLOAD_FILE',\s+'./vendor/autoload.php'\);%define('AUTOLOAD_FILE', '$CWD/vendor/autoload.php');%m;
-    ${ $fileC } =~ s%^define\('TEMP_DIR',\s+'./tmp/'\);%define('TEMP_DIR', '$CWD/data/tmp/');%m;
-    ${ $fileC } =~ s%^define\('VERSION_CHECK_DEFAULT',\s+true\);%define\('VERSION_CHECK_DEFAULT', false);%m;
+    ${ $fileC } =~ s%^define\('AUTOLOAD_FILE',\s+'./vendor/autoload.php'\);
+        %define('AUTOLOAD_FILE', '$CWD/vendor/autoload.php');%mx;
+    ${ $fileC } =~ s%^define\('TEMP_DIR',\s+'./tmp/'\);
+        %define('TEMP_DIR', '$CWD/data/tmp/');%mx;
+    ${ $fileC } =~ s%^define\('VERSION_CHECK_DEFAULT',\s+true\);
+        %define\('VERSION_CHECK_DEFAULT', false);%mx;
 
     $file->save();
 }
