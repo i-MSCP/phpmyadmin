@@ -11,7 +11,7 @@
  * use iMSCP::EventManager;
  * use iMSCP::File;
  * 
- * iMSCP::EventManager->getInstance()->registerOne('onLoadTemplate', sub {
+ * iMSCP::EventManager->getInstance()->register('onLoadTemplate', sub {
  *   my ($target, $cfgTplName, $cfgTplContent) = @_;
  *
  *   # We do not want act if the target isn't PhpMyAdmin, or if the
