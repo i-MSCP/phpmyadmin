@@ -145,9 +145,11 @@ sub uninstall
             $dbh->quote_identifier( $::imscpConfig{'DATABASE_NAME'} . '_pma' )
         ));
 
-        if ( defined( my $controlUser = @{ $dbh->selectcol_arrayref(
-            "SELECT `value` FROM `config` WHERE `name` = 'PMA_CONTROL_USER'" ) }
-        ) ) {
+        my ( $controlUser ) = @{ $dbh->selectcol_arrayref(
+            "SELECT `value` FROM `config` WHERE `name` = 'PMA_CONTROL_USER'"
+        ) };
+
+        if ( defined $controlUser ) {
             $controlUser = decryptRijndaelCBC(
                 $::imscpDBKey, $::imscpDBiv, $controlUser
             );
