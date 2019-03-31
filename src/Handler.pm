@@ -476,11 +476,6 @@ sub _setupSqlUser
             $dbUserHost
         );
         $dbh->do(
-            'GRANT SELECT ON mysql.db TO ?@?',
-            undef, $self->{'_pma_control_user'},
-            $dbUserHost
-        );
-        $dbh->do(
             '
                 GRANT SELECT (
                     Host, User, Select_priv, Insert_priv, Update_priv,
@@ -493,18 +488,30 @@ sub _setupSqlUser
             ',
             undef, $self->{'_pma_control_user'}, $dbUserHost
         );
+        
+        $dbh->do(
+            'GRANT SELECT ON mysql.db TO ?@?',
+            undef, $self->{'_pma_control_user'},
+            $dbUserHost
+        );
 
         # Check for mysql.host table existence (as for MySQL >= 5.6.7, the
         # mysql.host table is no longer provided)
         if ( $dbh->selectrow_hashref( "SHOW tables FROM mysql LIKE 'host'" ) ) {
             $dbh->do(
-                'GRANT SELECT ON mysql.user TO ?@?',
+                'GRANT SELECT ON mysql.host TO ?@?',
                 undef,
                 $self->{'_pma_control_user'},
                 $dbUserHost
             );
         }
 
+        $dbh->do(
+            'GRANT SELECT ON mysql.user TO ?@?',
+            undef,
+            $self->{'_pma_control_user'},
+            $dbUserHost
+        );
         $dbh->do(
             '
                 GRANT SELECT (Host, Db, User, Table_name, Table_priv, Column_priv)
