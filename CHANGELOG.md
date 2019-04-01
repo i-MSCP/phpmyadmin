@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.0.2 - TBD
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- DBI instance must be Lazy loaded
+- Nginx configuration file not removed on uninstallation
+- Uncaught exception in `Package::SqlAdminTools::PhpMyAdmin::Handler::_setupDatabase()`
+
 ## 1.0.1 - 20190331
 
 ### Added

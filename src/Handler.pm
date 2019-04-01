@@ -37,6 +37,7 @@ use iMSCP::Execute 'execute';
 use iMSCP::File;
 use iMSCP::Rights 'setRights';
 use iMSCP::TemplateParser qw/ getBloc replaceBloc process /;
+use Scalar::Defer 'lazy';
 use Servers::sqld;
 use parent 'Common::Object';
 
@@ -77,6 +78,8 @@ sub install
 {
     my ( $self ) = @_;
 
+    local $CWD = $::imscpConfig{'GUI_ROOT_DIR'};
+
     my $rs ||= $self->_buildConfigFiles();
     $rs ||= $self->_buildHttpdConfigFile();
     $rs ||= $self->_setupDatabase();
@@ -95,15 +98,16 @@ sub postinstall
 {
     local $CWD = $::imscpConfig{'GUI_ROOT_DIR'};
 
-    if ( -l './public/tools/phpmyadmin' ) {
+    if ( -l "$CWD/public/tools/phpmyadmin" ) {
         my $rs = iMSCP::File->new(
-            filename => './public/tools/phpmyadmin'
+            filename => "$CWD/public/tools/phpmyadmin"
         )->delFile();
         return $rs if $rs;
     }
 
     unless ( symlink( File::Spec->abs2rel(
-        "$CWD/vendor/phpmyadmin/phpmyadmin", "$CWD/public/tools" ),
+        "$CWD/vendor/phpmyadmin/phpmyadmin", "$CWD/public/tools"
+    ),
         "$CWD/public/tools/phpmyadmin"
     ) ) {
         error( sprintf(
@@ -125,27 +129,32 @@ sub postinstall
 
 sub uninstall
 {
+    my ( $self ) = @_;
+
     local $CWD = $::imscpConfig{'GUI_ROOT_DIR'};
 
-    if ( -l './public/tools/phpmyadmin' ) {
+    if ( -l "$CWD/public/tools/phpmyadmin" ) {
         my $rs = iMSCP::File->new(
-            filename => './public/tools/phpmyadmin'
+            filename => "$CWD/public/tools/phpmyadmin"
+        )->delFile();
+        return $rs if $rs;
+    }
+
+    if ( -f '/etc/nginx/imscp_pma.conf' ) {
+        my $rs = iMSCP::File->new(
+            filename => '/etc/nginx/imscp_pma.conf'
         )->delFile();
         return $rs if $rs;
     }
 
     eval {
-        my $db = iMSCP::Database->factory();
-        my $dbh = $db->getRawDb();
+        local $self->{'dbh'}->{'RaiseError'} = TRUE;
 
-        local $dbh->{'RaiseError'} = TRUE;
+        $self->{'dbh'}->do(
+            "DROP DATABASE IF EXISTS @{ [ $self->{'dbh'}->quote_identifier( $::imscpConfig{'DATABASE_NAME'} . '_pma' ) ] }"
+        );
 
-        $dbh->do( sprintf(
-            'DROP DATABASE IF EXISTS %s',
-            $dbh->quote_identifier( $::imscpConfig{'DATABASE_NAME'} . '_pma' )
-        ));
-
-        my ( $controlUser ) = @{ $dbh->selectcol_arrayref(
+        my ( $controlUser ) = @{ $self->{'dbh'}->selectcol_arrayref(
             "SELECT `value` FROM `config` WHERE `name` = 'PMA_CONTROL_USER'"
         ) };
 
@@ -163,7 +172,7 @@ sub uninstall
             }
         }
 
-        $dbh->do( "DELETE FROM `config` WHERE `name` LIKE 'PMA_%'" );
+        $self->{'dbh'}->do( "DELETE FROM `config` WHERE `name` LIKE 'PMA_%'" );
     };
     if ( $@ ) {
         error( $@ );
@@ -232,6 +241,7 @@ sub _init
     my ( $self ) = @_;
 
     $self->{'events'} = iMSCP::EventManager->getInstance();
+    $self->{'dbh'} = lazy { iMSCP::Database->factory()->getRawDb(); };
     $self;
 }
 
@@ -247,42 +257,35 @@ sub _buildConfigFiles
 {
     my ( $self ) = @_;
 
-    # Main configuration file
+    my $rs = eval {
+        # Main configuration file
+        local $self->{'dbh'}->{'RaiseError'} = TRUE;
 
-    my $db = iMSCP::Database->factory();
-    my $dbh = $db->getRawDb();
-
-    my %config = eval {
-        local $dbh->{'RaiseError'} = TRUE;
-        @{ $dbh->selectcol_arrayref(
+        my %config = @{ $self->{'dbh'}->selectcol_arrayref(
             "SELECT `name`, `value` FROM `config` WHERE `name` LIKE 'PMA_%'",
             { Columns => [ 1, 2 ] }
         ) };
-    };
-    if ( $@ ) {
-        error( $@ );
-        return 1;
-    }
 
-    ( $config{'PMA_BLOWFISH_SECRET'} = decryptRijndaelCBC(
-        $::imscpDBKey, $::imscpDBiv, $config{'PMA_BLOWFISH_SECRET'} // ''
-    ) || randomStr( 32, iMSCP::Crypt::ALPHA64 ) );
+        ( $config{'PMA_BLOWFISH_SECRET'} = decryptRijndaelCBC(
+            $::imscpDBKey, $::imscpDBiv, $config{'PMA_BLOWFISH_SECRET'} // ''
+        ) || randomStr( 32, iMSCP::Crypt::ALPHA64 ) );
 
-    ( $config{'PMA_CONTROL_USER'} = decryptRijndaelCBC(
-        $::imscpDBKey, $::imscpDBiv, $config{'PMA_CONTROL_USER'} // ''
-    ) || 'pma_' . randomStr( 12, iMSCP::Crypt::ALPHA64 ) );
+        ( $config{'PMA_CONTROL_USER'} = decryptRijndaelCBC(
+            $::imscpDBKey, $::imscpDBiv, $config{'PMA_CONTROL_USER'} // ''
+        ) || 'pma_' . randomStr( 12, iMSCP::Crypt::ALPHA64 ) );
 
-    ( $config{'PMA_CONTROL_USER_PASSWD'} = decryptRijndaelCBC(
-        $::imscpDBKey, $::imscpDBiv, $config{'PMA_CONTROL_USER_PASSWD'} // ''
-    ) || randomStr( 16, iMSCP::Crypt::ALPHA64 ) );
+        ( $config{'PMA_CONTROL_USER_PASSWD'} = decryptRijndaelCBC(
+            $::imscpDBKey, $::imscpDBiv, $config{'PMA_CONTROL_USER_PASSWD'} // ''
+        ) || randomStr( 16, iMSCP::Crypt::ALPHA64 ) );
 
-    ( $self->{'_pma_control_user'}, $self->{'_pma_control_user_passwd'} ) = (
-        $config{'PMA_CONTROL_USER'}, $config{'PMA_CONTROL_USER_PASSWD'}
-    );
+        (
+            $self->{'_pma_control_user'},
+            $self->{'_pma_control_user_passwd'}
+        ) = (
+            $config{'PMA_CONTROL_USER'}, $config{'PMA_CONTROL_USER_PASSWD'}
+        );
 
-    eval {
-        local $dbh->{'RaiseError'} = TRUE;
-        $dbh->do(
+        $self->{'dbh'}->do(
             '
                 INSERT INTO `config` (`name`,`value`)
                 VALUES (?,?),(?,?),(?,?)
@@ -302,64 +305,69 @@ sub _buildConfigFiles
                 $::imscpDBKey, $::imscpDBiv, $config{'PMA_CONTROL_USER_PASSWD'}
             )
         );
+
+        my $data = {
+            BLOWFISH_SECRET   => $config{'PMA_BLOWFISH_SECRET'},
+            DATABASE_HOSTNAME => ::setupGetQuestion( 'DATABASE_HOST' ),
+            DATABASE_PORT     => ::setupGetQuestion( 'DATABASE_PORT' ),
+            DATABASE_NAME     => ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma',
+            DATABASE_USER     => $config{'PMA_CONTROL_USER'},
+            DATABASE_PASSWORD => $config{'PMA_CONTROL_USER_PASSWD'},
+            SESSION_SAVE_PATH => "$CWD/data/sessions/",
+            TMP_DIR           => "$CWD/data/tmp/"
+        };
+
+        my $rs = $self->{'events'}->trigger(
+            'onLoadTemplate',
+            'phpmyadmin',
+            'config.inc.php',
+            \my $cfgTpl,
+            $data
+        );
+        return $rs if $rs;
+
+        unless ( defined $cfgTpl ) {
+            $cfgTpl = iMSCP::File->new(
+                filename => "$CWD/vendor/imscp/phpmyadmin/src/config.inc.php"
+            )->get();
+            return 1 unless defined $cfgTpl;
+        }
+
+        $cfgTpl = process( $data, $cfgTpl );
+
+        my $file = iMSCP::File->new(
+            filename => "$CWD/vendor/phpmyadmin/phpmyadmin/config.inc.php"
+        );
+        $file->set( $cfgTpl );
+        $rs = $file->save();
+        $rs ||= $file->owner(
+            $::imscpConfig{'SYSTEM_USER_PREFIX'} . $::imscpConfig{'SYSTEM_USER_MIN_UID'},
+            $::imscpConfig{'SYSTEM_USER_PREFIX'} . $::imscpConfig{'SYSTEM_USER_MIN_UID'}
+        );
+        return $rs if $rs;
+
+        # Vendor configuration file
+
+        $file = iMSCP::File->new(
+            filename => "$CWD/vendor/phpmyadmin/phpmyadmin/libraries/vendor_config.php"
+        );
+        return 1 unless defined( my $fileC = $file->getAsRef());
+
+        ${ $fileC } =~ s%^define\('AUTOLOAD_FILE',\s+'./vendor/autoload.php'\);
+            %define('AUTOLOAD_FILE', '$CWD/vendor/autoload.php');%mx;
+        ${ $fileC } =~ s%^define\('TEMP_DIR',\s+'./tmp/'\);
+            %define('TEMP_DIR', '$CWD/data/tmp/');%mx;
+        ${ $fileC } =~ s%^define\('VERSION_CHECK_DEFAULT',\s+true\);
+            %define\('VERSION_CHECK_DEFAULT', false);%mx;
+
+        $file->save();
     };
     if ( $@ ) {
         error( $@ );
         return 1;
     }
 
-    local $CWD = $::imscpConfig{'GUI_ROOT_DIR'};
-
-    my $data = {
-        BLOWFISH_SECRET          => $config{'PMA_BLOWFISH_SECRET'},
-        DATABASE_SERVER_HOSTNAME => ::setupGetQuestion( 'DATABASE_HOST' ),
-        DATABASE_SERVER_PORT     => ::setupGetQuestion( 'DATABASE_PORT' ),
-        CONTROL_USER             => $config{'PMA_CONTROL_USER'},
-        CONTROL_USER_PASSWD      => $config{'PMA_CONTROL_USER_PASSWD'},
-        DATABASE                 => ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma',
-        SESSION_SAVE_PATH        => $CWD . '/data/sessions/',
-        TMP_DIR                  => $CWD . '/data/tmp/'
-    };
-
-    my $rs = $self->{'events'}->trigger(
-        'onLoadTemplate', 'phpmyadmin', 'config.inc.php', \my $cfgTpl, $data
-    );
-    return $rs if $rs;
-
-    unless ( defined $cfgTpl ) {
-        $cfgTpl = iMSCP::File->new(
-            filename => './vendor/imscp/phpmyadmin/src/config.inc.php'
-        )->get();
-        return 1 unless defined $cfgTpl;
-    }
-
-    $cfgTpl = process( $data, $cfgTpl );
-
-    my $ug = $::imscpConfig{'SYSTEM_USER_PREFIX'} .
-        $::imscpConfig{'SYSTEM_USER_MIN_UID'};
-    my $file = iMSCP::File->new(
-        filename => './vendor/phpmyadmin/phpmyadmin/config.inc.php'
-    );
-    $file->set( $cfgTpl );
-    $rs = $file->save();
-    $rs ||= $file->owner( $ug, $ug );
-    return $rs if $rs;
-
-    # Vendor configuration file
-
-    $file = iMSCP::File->new(
-        filename => './vendor/phpmyadmin/phpmyadmin/libraries/vendor_config.php'
-    );
-    return 1 unless defined( my $fileC = $file->getAsRef());
-
-    ${ $fileC } =~ s%^define\('AUTOLOAD_FILE',\s+'./vendor/autoload.php'\);
-        %define('AUTOLOAD_FILE', '$CWD/vendor/autoload.php');%mx;
-    ${ $fileC } =~ s%^define\('TEMP_DIR',\s+'./tmp/'\);
-        %define('TEMP_DIR', '$CWD/data/tmp/');%mx;
-    ${ $fileC } =~ s%^define\('VERSION_CHECK_DEFAULT',\s+true\);
-        %define\('VERSION_CHECK_DEFAULT', false);%mx;
-
-    $file->save();
+    $rs;
 }
 
 =item _buildHttpdConfigFile( )
@@ -373,17 +381,14 @@ sub _buildConfigFiles
 sub _buildHttpdConfigFile
 {
     my $rs = iMSCP::File->new(
-        filename => "$::imscpConfig{'GUI_ROOT_DIR'}/vendor/imscp/phpmyadmin/src/nginx.conf"
+        filename => "$CWD/vendor/imscp/phpmyadmin/src/nginx.conf"
     )->copyFile( '/etc/nginx/imscp_pma.conf' );
     return $rs if $rs;
 
     my $file = iMSCP::File->new( filename => '/etc/nginx/imscp_pma.conf' );
     return 1 unless defined( my $fileC = $file->getAsRef());
 
-    ${ $fileC } = process(
-        { GUI_ROOT_DIR => $::imscpConfig{'GUI_ROOT_DIR'} },
-        ${ $fileC }
-    );
+    ${ $fileC } = process( { GUI_ROOT_DIR => $CWD }, ${ $fileC } );
 
     $file->save();
 }
@@ -398,16 +403,15 @@ sub _buildHttpdConfigFile
 
 sub _setupDatabase
 {
-    local $CWD = $::imscpConfig{'GUI_ROOT_DIR'};
+    my ( $self ) = @_;
 
     my $database = ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma';
-    my $db = iMSCP::Database->factory();
-    my $dbh = $db->getRawDb();
 
     eval {
-        local $dbh->{'RaiseError'} = TRUE;
-        $dbh->do( sprintf(
-            'DROP DATABASE IF EXISTS %s', $dbh->quote_identifier( $database )
+        local $self->{'dbh'}->{'RaiseError'} = TRUE;
+        $self->{'dbh'}->do( sprintf(
+            'DROP DATABASE IF EXISTS %s',
+            $self->{'dbh'}->quote_identifier( $database )
         ));
     };
     if ( $@ ) {
@@ -418,7 +422,7 @@ sub _setupDatabase
     my $schemaFile = File::Temp->new();
 
     my $file = iMSCP::File->new(
-        filename => './vendor/phpmyadmin/phpmyadmin/sql/create_tables.sql'
+        filename => "$CWD/vendor/phpmyadmin/phpmyadmin/sql/create_tables.sql"
     );
     return 1 unless defined( my $fileC = $file->getAsRef());
 
@@ -449,33 +453,34 @@ sub _setupSqlUser
 {
     my ( $self ) = @_;
 
-    my $database = ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma';
-    my $dbUserHost = ::setupGetQuestion( 'DATABASE_USER_HOST' );
-    my $sqlServer = Servers::sqld->factory();
-
-    for my $host ( $::imscpOldConfig{'DATABASE_USER_HOST'}, $dbUserHost ) {
-        next unless length $host;
-        $sqlServer->dropUser( $self->{'_pma_control_user'}, $host );
-    }
-
-    $sqlServer->createUser(
-        $self->{'_pma_control_user'},
-        $dbUserHost,
-        $self->{'_pma_control_user_passwd'}
-    );
-
     eval {
-        my $db = iMSCP::Database->factory();
-        my $dbh = $db->getRawDb();
+        my $database = ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma';
+        my $dbUserHost = ::setupGetQuestion( 'DATABASE_USER_HOST' );
+        my $sqlServer = Servers::sqld->factory();
 
-        local $dbh->{'RaiseError'} = TRUE;
+        for my $host (
+            $::imscpOldConfig{'DATABASE_USER_HOST'},
+            $dbUserHost
+        ) {
+            next unless length $host;
+            $sqlServer->dropUser( $self->{'_pma_control_user'}, $host );
+        }
 
-        $dbh->do(
+        $sqlServer->createUser(
+            $self->{'_pma_control_user'},
+            $dbUserHost,
+            $self->{'_pma_control_user_passwd'}
+        );
+
+        local $self->{'dbh'}->{'RaiseError'} = TRUE;
+
+        $self->{'dbh'}->do(
             'GRANT USAGE ON mysql.* TO ?@?',
-            undef, $self->{'_pma_control_user'},
+            undef,
+            $self->{'_pma_control_user'},
             $dbUserHost
         );
-        $dbh->do(
+        $self->{'dbh'}->do(
             '
                 GRANT SELECT (
                     Host, User, Select_priv, Insert_priv, Update_priv,
@@ -488,17 +493,20 @@ sub _setupSqlUser
             ',
             undef, $self->{'_pma_control_user'}, $dbUserHost
         );
-        
-        $dbh->do(
+
+        $self->{'dbh'}->do(
             'GRANT SELECT ON mysql.db TO ?@?',
-            undef, $self->{'_pma_control_user'},
+            undef,
+            $self->{'_pma_control_user'},
             $dbUserHost
         );
 
         # Check for mysql.host table existence (as for MySQL >= 5.6.7, the
         # mysql.host table is no longer provided)
-        if ( $dbh->selectrow_hashref( "SHOW tables FROM mysql LIKE 'host'" ) ) {
-            $dbh->do(
+        if ( $self->{'dbh'}->selectrow_hashref(
+            "SHOW tables FROM mysql LIKE 'host'"
+        ) ) {
+            $self->{'dbh'}->do(
                 'GRANT SELECT ON mysql.host TO ?@?',
                 undef,
                 $self->{'_pma_control_user'},
@@ -506,24 +514,34 @@ sub _setupSqlUser
             );
         }
 
-        $dbh->do(
+        $self->{'dbh'}->do(
             'GRANT SELECT ON mysql.user TO ?@?',
             undef,
             $self->{'_pma_control_user'},
             $dbUserHost
         );
-        $dbh->do(
+        $self->{'dbh'}->do(
             '
-                GRANT SELECT (Host, Db, User, Table_name, Table_priv, Column_priv)
-                ON mysql.tables_priv
+                GRANT SELECT (
+                    Host, Db, User, Table_name, Table_priv, Column_priv
+                ) ON mysql.tables_priv
                 TO?@?
             ',
-            undef, $self->{'_pma_control_user'}, $dbUserHost
+            undef,
+            $self->{'_pma_control_user'},
+            $dbUserHost
         );
 
-        ( my $quotedDbName = $dbh->quote_identifier( $database ) ) =~ s/([%_])/\\$1/g;
-        $dbh->do(
-            "GRANT SELECT, INSERT, UPDATE, DELETE ON $quotedDbName.* TO ?\@?",
+        $self->{'dbh'}->do(
+            "
+                GRANT SELECT, INSERT, UPDATE, DELETE
+                ON @{ [
+                $self->{'dbh'}->quote_identifier(
+                    $database
+                ) =~ s/([%_])/\\$1/gr
+            ] }.*
+                TO ?\@?
+            ",
             undef,
             $self->{'_pma_control_user'},
             $dbUserHost
