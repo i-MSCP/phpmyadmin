@@ -35,7 +35,6 @@ use iMSCP::Debug qw/ debug error /;
 use iMSCP::EventManager;
 use iMSCP::Execute 'execute';
 use iMSCP::File;
-use iMSCP::Rights 'setRights';
 use iMSCP::TemplateParser qw/ getBloc replaceBloc process /;
 use Scalar::Defer 'lazy';
 use Servers::sqld;
@@ -111,7 +110,7 @@ sub postinstall
         "$CWD/public/tools/phpmyadmin"
     ) ) {
         error( sprintf(
-            "Couldn't create symlink for PhpMyAdmin SQL administration tool"
+            "Couldn't create symlink for the PhpMyAdmin SQL administration tool"
         ));
         return 1;
     }
@@ -285,6 +284,7 @@ sub _buildConfigFiles
             $config{'PMA_CONTROL_USER'}, $config{'PMA_CONTROL_USER_PASSWD'}
         );
 
+        # Save generated values in database (encrypted)
         $self->{'dbh'}->do(
             '
                 INSERT INTO `config` (`name`,`value`)
@@ -340,10 +340,6 @@ sub _buildConfigFiles
         );
         $file->set( $cfgTpl );
         $rs = $file->save();
-        $rs ||= $file->owner(
-            $::imscpConfig{'SYSTEM_USER_PREFIX'} . $::imscpConfig{'SYSTEM_USER_MIN_UID'},
-            $::imscpConfig{'SYSTEM_USER_PREFIX'} . $::imscpConfig{'SYSTEM_USER_MIN_UID'}
-        );
         return $rs if $rs;
 
         # Vendor configuration file
@@ -364,7 +360,7 @@ sub _buildConfigFiles
     };
     if ( $@ ) {
         error( $@ );
-        return 1;
+        $rs = 1;
     }
 
     $rs;
