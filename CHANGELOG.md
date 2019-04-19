@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.0.4 - TBD
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Hide server info.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Unwanted configuration parameter.
+
 ## 1.0.3 - 20190410
 
 ### Added

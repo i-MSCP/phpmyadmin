@@ -14,7 +14,7 @@
  * use warnings;
  * use iMSCP::EventManager;
  * use iMSCP::File;
- * 
+ *
  * iMSCP::EventManager->getInstance()->register('onLoadTemplate', sub {
  *   my ($target, $cfgTplName, $cfgTplContent) = @_;
  *
@@ -30,7 +30,7 @@
  *
  *   0;
  * });
- * 
+ *
  * 1;
  * __END__
  *
@@ -80,7 +80,6 @@ $cfg['PmaNoRelation_DisableWarning'] = true;
 $cfg['RecodingEngine'] = 'iconv';
 $cfg['SendErrorReports'] = 'never';
 $cfg['SessionSavePath'] = '{SESSION_SAVE_PATH}';
-$cfg[''] = false;
 $cfg['ShowServerInfo'] = true;
 $cfg['ShowStats'] = true;
 $cfg['SuhosinDisableWarning'] = true;
