@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.0.5 - TBD
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Hide server info.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- CS fixes (package handler)
+- Localize $@ variable (package handler)
+
 ## 1.0.4 - 20190419
 
 ### Added

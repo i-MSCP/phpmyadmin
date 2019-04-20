@@ -33,7 +33,7 @@ use iMSCP::Cwd '$CWD';
 use iMSCP::Database;
 use iMSCP::Debug qw/ debug error /;
 use iMSCP::EventManager;
-use iMSCP::Execute 'execute';
+use iMSCP::Execute qw/ execute escapeShell /;
 use iMSCP::File;
 use iMSCP::TemplateParser qw/ getBloc replaceBloc process /;
 use Scalar::Defer 'lazy';
@@ -146,11 +146,12 @@ sub uninstall
         return $rs if $rs;
     }
 
+    local $@;
     eval {
         local $self->{'dbh'}->{'RaiseError'} = TRUE;
 
         $self->{'dbh'}->do(
-            "DROP DATABASE IF EXISTS @{ [ $self->{'dbh'}->quote_identifier( $::imscpConfig{'DATABASE_NAME'} . '_pma' ) ] }"
+            "DROP DATABASE IF EXISTS `@{ [ $::imscpConfig{'DATABASE_NAME'} . '_pma' ] }`"
         );
 
         my ( $controlUser ) = @{ $self->{'dbh'}->selectcol_arrayref(
@@ -209,10 +210,10 @@ sub afterFrontEndBuildConfFile
         "# SECTION custom END.\n",
         "    # SECTION custom BEGIN.\n"
             . getBloc(
-                "# SECTION custom BEGIN.\n",
-                "# SECTION custom END.\n",
-                ${ $tplContent }
-            )
+            "# SECTION custom BEGIN.\n",
+            "# SECTION custom END.\n",
+            ${ $tplContent }
+        )
             . "    include imscp_pma.conf;\n"
             . "    # SECTION custom END.\n",
         ${ $tplContent }
@@ -256,6 +257,7 @@ sub _buildConfigFiles
 {
     my ( $self ) = @_;
 
+    local $@;
     my $rs = eval {
         # Main configuration file
         local $self->{'dbh'}->{'RaiseError'} = TRUE;
@@ -274,7 +276,9 @@ sub _buildConfigFiles
         ) || 'pma_' . randomStr( 12, iMSCP::Crypt::ALPHA64 ) );
 
         ( $config{'PMA_CONTROL_USER_PASSWD'} = decryptRijndaelCBC(
-            $::imscpDBKey, $::imscpDBiv, $config{'PMA_CONTROL_USER_PASSWD'} // ''
+            $::imscpDBKey,
+            $::imscpDBiv,
+            $config{'PMA_CONTROL_USER_PASSWD'} // ''
         ) || randomStr( 16, iMSCP::Crypt::ALPHA64 ) );
 
         (
@@ -403,12 +407,10 @@ sub _setupDatabase
 
     my $database = ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma';
 
+    local $@;
     eval {
         local $self->{'dbh'}->{'RaiseError'} = TRUE;
-        $self->{'dbh'}->do( sprintf(
-            'DROP DATABASE IF EXISTS %s',
-            $self->{'dbh'}->quote_identifier( $database )
-        ));
+        $self->{'dbh'}->do( "DROP DATABASE IF EXISTS `$database`" );
     };
     if ( $@ ) {
         error( $@ );
@@ -428,7 +430,7 @@ sub _setupDatabase
     $schemaFile->close();
 
     my $rs = execute(
-        "/usr/bin/mysql < $schemaFile",
+        '/usr/bin/mysql  < ' . escapeShell( $schemaFile ),
         \my $stdout,
         \my $stderr
     );
@@ -449,14 +451,15 @@ sub _setupSqlUser
 {
     my ( $self ) = @_;
 
+    local $@;
     eval {
         my $database = ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma';
-        my $dbUserHost = ::setupGetQuestion( 'DATABASE_USER_HOST' );
+        my $databaseUserHost = ::setupGetQuestion( 'DATABASE_USER_HOST' );
         my $sqlServer = Servers::sqld->factory();
 
         for my $host (
             $::imscpOldConfig{'DATABASE_USER_HOST'},
-            $dbUserHost
+            $databaseUserHost
         ) {
             next unless length $host;
             $sqlServer->dropUser( $self->{'_pma_control_user'}, $host );
@@ -464,83 +467,82 @@ sub _setupSqlUser
 
         $sqlServer->createUser(
             $self->{'_pma_control_user'},
-            $dbUserHost,
+            $databaseUserHost,
             $self->{'_pma_control_user_passwd'}
         );
 
         local $self->{'dbh'}->{'RaiseError'} = TRUE;
 
         $self->{'dbh'}->do(
-            'GRANT USAGE ON mysql.* TO ?@?',
+            'GRANT USAGE ON `mysql`.* TO ?@?',
             undef,
             $self->{'_pma_control_user'},
-            $dbUserHost
+            $databaseUserHost
         );
         $self->{'dbh'}->do(
             '
                 GRANT SELECT (
-                    Host, User, Select_priv, Insert_priv, Update_priv,
-                    Delete_priv, Create_priv, Drop_priv, Reload_priv,
-                    Shutdown_priv, Process_priv, File_priv, Grant_priv,
-                    References_priv, Index_priv, Alter_priv, Show_db_priv,
-                    Super_priv, Create_tmp_table_priv, Lock_tables_priv,
-                    Execute_priv, Repl_slave_priv, Repl_client_priv
-                ) ON mysql.user TO ?@?
+                    `Host`,`User`,`Select_priv`,`Insert_priv`,
+                    `Update_priv`,`Delete_priv`,`Create_priv`,`Drop_priv`,
+                    `Reload_priv`,`Shutdown_priv`,`Process_priv`,
+                    `File_priv`,`Grant_priv`,`References_priv`,`Index_priv`,
+                    `Alter_priv`,`Show_db_priv`,`Super_priv`,
+                    `Create_tmp_table_priv`,`Lock_tables_priv`,`Execute_priv`,
+                    `Repl_slave_priv`,`Repl_client_priv`
+                ) ON `mysql`.`user` TO ?@?
             ',
-            undef, $self->{'_pma_control_user'}, $dbUserHost
+            undef,
+            $self->{'_pma_control_user'},
+            $databaseUserHost
         );
 
         $self->{'dbh'}->do(
-            'GRANT SELECT ON mysql.db TO ?@?',
+            'GRANT SELECT ON `mysql`.`db` TO ?@?',
             undef,
             $self->{'_pma_control_user'},
-            $dbUserHost
+            $databaseUserHost
         );
 
         # Check for mysql.host table existence (as for MySQL >= 5.6.7, the
         # mysql.host table is no longer provided)
         if ( $self->{'dbh'}->selectrow_hashref(
-            "SHOW tables FROM mysql LIKE 'host'"
+            "SHOW tables FROM `mysql` LIKE 'host'"
         ) ) {
             $self->{'dbh'}->do(
-                'GRANT SELECT ON mysql.host TO ?@?',
+                'GRANT SELECT ON `mysql`.`host` TO ?@?',
                 undef,
                 $self->{'_pma_control_user'},
-                $dbUserHost
+                $databaseUserHost
             );
         }
 
         $self->{'dbh'}->do(
-            'GRANT SELECT ON mysql.user TO ?@?',
+            'GRANT SELECT ON `mysql`.`user` TO ?@?',
             undef,
             $self->{'_pma_control_user'},
-            $dbUserHost
+            $databaseUserHost
         );
         $self->{'dbh'}->do(
             '
                 GRANT SELECT (
-                    Host, Db, User, Table_name, Table_priv, Column_priv
-                ) ON mysql.tables_priv
+                    `Host`,`Db`,`User`,`Table_name`,`Table_priv`,`Column_priv`
+                ) ON `mysql`.`tables_priv`
                 TO?@?
             ',
             undef,
             $self->{'_pma_control_user'},
-            $dbUserHost
+            $databaseUserHost
         );
 
         $self->{'dbh'}->do(
             "
-                GRANT SELECT, INSERT, UPDATE, DELETE
-                ON @{ [
-                $self->{'dbh'}->quote_identifier(
-                    $database
-                ) =~ s/([%_])/\\$1/gr
-            ] }.*
+                GRANT SELECT,INSERT,UPDATE,DELETE
+                ON `@{ [ $database =~ s/([%_])/\\$1/gr ] }`.*
                 TO ?\@?
             ",
             undef,
             $self->{'_pma_control_user'},
-            $dbUserHost
+            $databaseUserHost
         );
     };
     if ( $@ ) {
