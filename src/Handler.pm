@@ -27,7 +27,6 @@ use strict;
 use warnings;
 use File::Spec;
 use File::Temp;
-use iMSCP::Boolean;
 use iMSCP::Crypt qw/ decryptRijndaelCBC encryptRijndaelCBC randomStr /;
 use iMSCP::Cwd '$CWD';
 use iMSCP::Database;
@@ -148,8 +147,6 @@ sub uninstall
 
     local $@;
     eval {
-        local $self->{'dbh'}->{'RaiseError'} = TRUE;
-
         $self->{'dbh'}->do(
             "DROP DATABASE IF EXISTS `@{ [ $::imscpConfig{'DATABASE_NAME'} . '_pma' ] }`"
         );
@@ -201,19 +198,19 @@ sub afterFrontEndBuildConfFile
 {
     my ( $tplContent, $tplName ) = @_;
 
-    return 0 unless grep (
-        $_ eq $tplName, '00_master.nginx', '00_master_ssl.nginx'
-    );
+    return 0 unless grep ( $_ eq $tplName, qw/
+        00_master.nginx 00_master_ssl.nginx
+    / );
 
     ${ $tplContent } = replaceBloc(
         "# SECTION custom BEGIN.\n",
         "# SECTION custom END.\n",
         "    # SECTION custom BEGIN.\n"
             . getBloc(
-            "# SECTION custom BEGIN.\n",
-            "# SECTION custom END.\n",
-            ${ $tplContent }
-        )
+                "# SECTION custom BEGIN.\n",
+                "# SECTION custom END.\n",
+                ${ $tplContent }
+            )
             . "    include imscp_pma.conf;\n"
             . "    # SECTION custom END.\n",
         ${ $tplContent }
@@ -260,8 +257,6 @@ sub _buildConfigFiles
     local $@;
     my $rs = eval {
         # Main configuration file
-        local $self->{'dbh'}->{'RaiseError'} = TRUE;
-
         my %config = @{ $self->{'dbh'}->selectcol_arrayref(
             "SELECT `name`, `value` FROM `config` WHERE `name` LIKE 'PMA_%'",
             { Columns => [ 1, 2 ] }
@@ -408,10 +403,7 @@ sub _setupDatabase
     my $database = ::setupGetQuestion( 'DATABASE_NAME' ) . '_pma';
 
     local $@;
-    eval {
-        local $self->{'dbh'}->{'RaiseError'} = TRUE;
-        $self->{'dbh'}->do( "DROP DATABASE IF EXISTS `$database`" );
-    };
+    eval { $self->{'dbh'}->do( "DROP DATABASE IF EXISTS `$database`" ); };
     if ( $@ ) {
         error( $@ );
         return 1;
@@ -470,8 +462,6 @@ sub _setupSqlUser
             $databaseUserHost,
             $self->{'_pma_control_user_passwd'}
         );
-
-        local $self->{'dbh'}->{'RaiseError'} = TRUE;
 
         $self->{'dbh'}->do(
             'GRANT USAGE ON `mysql`.* TO ?@?',
